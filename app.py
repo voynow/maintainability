@@ -35,6 +35,12 @@ PROMPT_TEMPLATE = (
 
 
 def read_text(path: Path) -> str:
+    """
+    Read the content of a file
+
+    :param path: The path to the file.
+    :return: The content of the file.
+    """
     try:
         with open(path, "r") as file:
             return file.read()
@@ -47,6 +53,12 @@ def read_text(path: Path) -> str:
 
 
 def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
+    """
+    Get a list of patterns to ignore from a .gitignore file
+
+    :param gitignore_path: The path to the .gitignore file
+    :return: A compiled list of patterns to ignore
+    """
     try:
         gitignore_content = read_text(gitignore_path)
         return PathSpec.from_lines(GitWildMatchPattern, gitignore_content.splitlines())
@@ -56,6 +68,13 @@ def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
 
 
 def collect_text_from_files(dir_path: Path, pathspec: PathSpec) -> dict[Path, str]:
+    """
+    Recursively collect text from files in a directory.
+
+    :param dir_path: The root directory path.
+    :param pathspec: The compiled list of patterns to ignore.
+    :return: A dictionary mapping file paths to their content.
+    """
     result = {}
     for path in dir_path.iterdir():
         if pathspec.match_file(str(path)):
@@ -71,6 +90,13 @@ def collect_text_from_files(dir_path: Path, pathspec: PathSpec) -> dict[Path, st
 def analyze_maintainability(
     block: blocks.TemplateBlock, repo: dict[Path, str]
 ) -> dict[Path, str]:
+    """
+    Analyze the maintainability of the code in a repository.
+
+    :param block: The template block for llm_blocks.
+    :param repo: A dictionary mapping file paths to their content.
+    :return: A dictionary mapping file paths to maintainability metrics.
+    """
     result = {}
     for path, text in repo.items():
         logging.info(f"Evaluating {path}")
@@ -79,11 +105,25 @@ def analyze_maintainability(
 
 
 def generate_output(maintainability_metrics: dict) -> None:
+    """
+    Generate an output file containing maintainability metrics.
+
+    :param maintainability_metrics: The calculated metrics.
+    :return: None
+    """
     with open("output.txt", "w") as file:
         file.write(str(maintainability_metrics))
 
 
 def main() -> None:
+    """
+    High-level function to run the maintainability analysis
+
+    1. Get a list of patterns to ignore from .gitignore
+    2. Collect text from files in the repository
+    3. Analyze the maintainability of the code
+    4. Generate an output file containing maintainability metrics
+    """
     logging.info("Starting maintainability analysis")
     pathspec = get_ignored_patterns(Path(".gitignore"))
     repo = collect_text_from_files(Path("."), pathspec)

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "maintainer"
+name = "maintainability"
 version = "0.1.0"
 description = "Codebase Maintainability Analyzer"
 authors = ["voynow <voynow99@gmail.com>"]

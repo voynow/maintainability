@@ -1,0 +1,25 @@
+{
+    "prompt": "You are a highly respected tech lead participating in a code review:\n{code}\n\nBe strict and critical. Evaluate this code across key maintainability metrics:\nReadability: Ease to understand. Includes comments. 1=Hard, 10=Easy\nDesign Quality: Adherence to single-responsibility and complexity of functions. 1=Poor, 10=Excellent\nTestability: Ease to write unit tests. 1=Hard, 10=Easy\nConsistency: Naming and coding conventions. 1=Inconsistent, 10=Consistent\nDebug & Error Handling: Availability of logs and error-handling. 1=Poor, 10=Excellent\n\nRespond with JSON only.",
+    "extensions": [
+        ".py",
+        ".js",
+        ".java",
+        ".c",
+        ".cpp",
+        ".h",
+        ".cs",
+        ".go",
+        ".rb",
+        ".php",
+        ".swift",
+        ".ts",
+        ".kt",
+        ".rs",
+        ".scala",
+        ".m",
+        ".sh",
+        ".sql",
+        ".html",
+        ".css"
+    ]
+}

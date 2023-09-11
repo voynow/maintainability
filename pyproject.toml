@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "maintainability"
+version = "0.1.0"
+description = "Codebase Maintainability Analyzer"
+authors = ["voynow <voynow99@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "*"
+llm_blocks = "0.3.7"
+pathspec = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

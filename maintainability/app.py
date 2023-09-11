@@ -106,7 +106,7 @@ def main() -> None:
     """
     logging.info("Starting maintainability analysis")
 
-    config = json.load(open("maintainer/config.json", "r"))
+    config = json.load(open("maintainability/config.json", "r"))
     llm_block = block_factory.get(
         "template", template=config["prompt"], temperature=0.0
     )

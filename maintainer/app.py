@@ -106,9 +106,9 @@ def main() -> None:
     """
     logging.info("Starting maintainability analysis")
 
-    config = json.load(open("config.json", "r"))
+    config = json.load(open("maintainer/config.json", "r"))
     llm_block = block_factory.get(
-        "template", template=config["prompt"], model_name="gpt-4", temperature=0.0
+        "template", template=config["prompt"], temperature=0.0
     )
 
     pathspec = get_ignored_patterns(Path(".gitignore"))

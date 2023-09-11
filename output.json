@@ -5,5 +5,12 @@
         "Testability": 6,
         "Consistency": 9,
         "Debug & Error Handling": 8
+    },
+    "test_package_install.sh": {
+        "Readability": 8,
+        "Design Quality": 7,
+        "Testability": 3,
+        "Consistency": 9,
+        "Debug & Error Handling": 5
     }
 }

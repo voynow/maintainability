@@ -77,9 +77,10 @@ def analyze_maintainability(
     """
     result = {}
     for path, text in repo.items():
-        logging.info(f"Evaluating {path}")
-        response = llm_block(filename=path, code=text)
-        result[path] = json.loads(response)
+        if text:
+            logging.info(f"Evaluating {path}")
+            response = llm_block(filename=path, code=text)
+            result[path] = json.loads(response)
     return result
 
 
@@ -90,8 +91,6 @@ def generate_output(maintainability_metrics: dict) -> None:
     :param maintainability_metrics: The calculated metrics.
     :return: None
     """
-    print(maintainability_metrics)
-    print(json.dumps(maintainability_metrics, indent=4))
     with open("output.json", "w") as file:
         json.dump(maintainability_metrics, file, indent=4)
 

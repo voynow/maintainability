@@ -62,12 +62,12 @@ def collect_text_from_files(
             if path.suffix in extensions:
                 result[path.name] = read_text(path)
         elif path.is_dir():
-            result.update(collect_text_from_files(path, pathspec))
+            result.update(collect_text_from_files(path, pathspec, extensions))
     return result
 
 
 def analyze_maintainability(
-    block: blocks.TemplateBlock, repo: dict[Path, str]
+    llm_block: blocks.TemplateBlock, repo: dict[Path, str]
 ) -> dict[Path, str]:
     """
     Analyze the maintainability of the code in a repository.
@@ -79,7 +79,7 @@ def analyze_maintainability(
     result = {}
     for path, text in repo.items():
         logging.info(f"Evaluating {path}")
-        result[path] = block(filename=path, code=text)
+        result[path] = llm_block(filename=path, code=text)
     return result
 
 
@@ -106,17 +106,17 @@ def main() -> None:
     logging.info("Starting maintainability analysis")
 
     config = json.load(open("config.json", "r"))
+    llm_block = block_factory.get(
+        "template", template=config["prompt"], model_name="gpt-4", temperature=0.0
+    )
 
     pathspec = get_ignored_patterns(Path(".gitignore"))
     repo = collect_text_from_files(Path("."), pathspec, config["extensions"])
-    print(config["prompt"])
-    block = block_factory.get(
-        "template", template=config["prompt"], model_name="gpt-4", temperature=0.0
-    )
-    maintainability_metrics = analyze_maintainability(block, repo)
-    pprint(maintainability_metrics)
 
+    maintainability_metrics = analyze_maintainability(llm_block, repo)
     generate_output(maintainability_metrics)
+
+    pprint(maintainability_metrics)
     logging.info("Completed maintainability analysis")
 
 

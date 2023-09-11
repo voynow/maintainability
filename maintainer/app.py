@@ -1,7 +1,6 @@
 import json
 import logging
 from pathlib import Path
-from pprint import pprint
 from typing import List
 
 from llm_blocks import block_factory, blocks
@@ -79,19 +78,22 @@ def analyze_maintainability(
     result = {}
     for path, text in repo.items():
         logging.info(f"Evaluating {path}")
-        result[path] = llm_block(filename=path, code=text)
+        response = llm_block(filename=path, code=text)
+        result[path] = json.loads(response)
     return result
 
 
 def generate_output(maintainability_metrics: dict) -> None:
     """
-    Generate an output file containing maintainability metrics.
+    Json dump the maintainability metrics to a file.
 
     :param maintainability_metrics: The calculated metrics.
     :return: None
     """
-    with open("output.txt", "w") as file:
-        file.write(str(maintainability_metrics))
+    print(maintainability_metrics)
+    print(json.dumps(maintainability_metrics, indent=4))
+    with open("output.json", "w") as file:
+        json.dump(maintainability_metrics, file, indent=4)
 
 
 def main() -> None:
@@ -116,7 +118,6 @@ def main() -> None:
     maintainability_metrics = analyze_maintainability(llm_block, repo)
     generate_output(maintainability_metrics)
 
-    pprint(maintainability_metrics)
     logging.info("Completed maintainability analysis")
 
 

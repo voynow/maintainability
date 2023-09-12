@@ -27,7 +27,8 @@ echo "Building package..."
 poetry build
 
 echo "Installing package..."
-pip install ./dist/maintainability-0.1.0-py3-none-any.whl
+latest_package=$(ls -t dist/*.whl | head -n 1)
+pip install $latest_package
 
 echo "Running app..."
 python maintainability/app.py

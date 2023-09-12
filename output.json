@@ -6,11 +6,18 @@
         "Consistency": 8,
         "Debug & Error Handling": 7
     },
+    "cli.py": {
+        "Readability": 8,
+        "Design Quality": 7,
+        "Testability": 6,
+        "Consistency": 9,
+        "Debug & Error Handling": 7
+    },
     "test_package_install.sh": {
         "readability": 7,
-        "design_quality": 6,
+        "designQuality": 6,
         "testability": 5,
         "consistency": 8,
-        "debug_error_handling": 6
+        "debugErrorHandling": 6
     }
 }

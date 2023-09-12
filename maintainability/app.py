@@ -6,8 +6,14 @@ from typing import List
 from llm_blocks import block_factory, blocks
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
+from pkg_resources import resource_stream
 
 logging.basicConfig(level=logging.INFO)
+
+
+def get_config() -> dict:
+    with resource_stream(__name__, "config.json") as f:
+        return json.load(f)
 
 
 def read_text(path: Path) -> str:
@@ -106,7 +112,7 @@ def main() -> None:
     """
     logging.info("Starting maintainability analysis")
 
-    config = json.load(open("maintainability/config.json", "r"))
+    config = get_config()
     llm_block = block_factory.get(
         "template", template=config["prompt"], temperature=0.0
     )

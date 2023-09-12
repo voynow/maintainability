@@ -1,115 +1,58 @@
 import json
 import logging
 from pathlib import Path
-from typing import List
+from typing import Dict
 
-from llm_blocks import block_factory, blocks
-from pathspec import PathSpec
-from pathspec.patterns import GitWildMatchPattern
-from pkg_resources import resource_stream
+from llm_blocks import block_factory
+
+from .models import MaintainabilityMetrics
+from .utils import collect_text_from_files, get_config, get_ignored_patterns
 
 logging.basicConfig(level=logging.INFO)
 
 
-def get_config() -> dict:
-    with resource_stream(__name__, "config.json") as f:
-        return json.load(f)
-
-
-def read_text(path: Path) -> str:
-    """
-    Read the content of a file
-
-    :param path: The path to the file.
-    :return: The content of the file.
-    """
+def validate_metrics(data: Dict) -> MaintainabilityMetrics:
     try:
-        with open(path, "r") as file:
-            return file.read()
-    except UnicodeDecodeError:
-        with open(path, "r", encoding="utf-8", errors="replace") as file:
-            return file.read()
-    except Exception as e:
-        logging.error(f"Error reading file {path}: {e}")
-        raise e
+        return MaintainabilityMetrics(**data)
+    except TypeError:
+        logging.error("Invalid metrics schema.")
+        raise ValueError("Invalid schema")
 
 
-def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
-    """
-    Get a list of patterns to ignore from a .gitignore file
+def analyze_code(
+    path: Path, text: str, llm_block, retries: int, max_retries: int
+) -> Dict:
+    logging.info(f"Evaluating {path}")
+    response = llm_block(filename=path, code=text)
+    parsed_response = json.loads(response)
 
-    :param gitignore_path: The path to the .gitignore file
-    :return: A compiled list of patterns to ignore
-    """
     try:
-        gitignore_content = read_text(gitignore_path)
-        return PathSpec.from_lines(GitWildMatchPattern, gitignore_content.splitlines())
-    except FileNotFoundError:
-        logging.warning(".gitignore not found. No files will be ignored based on it.")
-        return PathSpec.from_lines(GitWildMatchPattern, [])
-
-
-def collect_text_from_files(
-    dir_path: Path, pathspec: PathSpec, extensions: List[str]
-) -> dict[str, str]:
-    """
-    Recursively collect text from files in a directory.
-
-    :param dir_path: The root directory path.
-    :param pathspec: The compiled list of patterns to ignore.
-    :return: A dictionary mapping file paths to their content.
-    """
-    result = {}
-    for path in dir_path.iterdir():
-        if pathspec.match_file(str(path)):
-            continue
-        if path.is_file():
-            if path.suffix in extensions:
-                result[path.name] = read_text(path)
-        elif path.is_dir():
-            result.update(collect_text_from_files(path, pathspec, extensions))
-    return result
+        return validate_metrics(parsed_response)
+    except ValueError:
+        logging.warning(f"Retry {retries + 1} for {path}.")
+        if retries >= max_retries:
+            logging.error(f"Max retries reached for {path}. Aborting.")
+            return None
+        return analyze_code(path, text, llm_block, retries + 1, max_retries)
 
 
 def analyze_maintainability(
-    llm_block: blocks.TemplateBlock, repo: dict[Path, str]
-) -> dict[Path, str]:
-    """
-    Analyze the maintainability of the code in a repository.
-
-    :param block: The template block for llm_blocks.
-    :param repo: A dictionary mapping file paths to their content.
-    :return: A dictionary mapping file paths to maintainability metrics.
-    """
+    llm_block, repo: Dict[Path, str], max_retries: int = 3
+) -> Dict[Path, Dict]:
     result = {}
     for path, text in repo.items():
-        if text:
-            logging.info(f"Evaluating {path}")
-            response = llm_block(filename=path, code=text)
-            result[path] = json.loads(response)
+        metrics = analyze_code(path, text, llm_block, 0, max_retries)
+        if metrics is not None:
+            result[path] = metrics
     return result
 
 
-def generate_output(maintainability_metrics: dict) -> None:
-    """
-    Json dump the maintainability metrics to a file.
-
-    :param maintainability_metrics: The calculated metrics.
-    :return: None
-    """
+def generate_output(maintainability_metrics: Dict[Path, Dict]) -> None:
     with open("output.json", "w") as file:
         json.dump(maintainability_metrics, file, indent=4)
 
 
 def main() -> None:
-    """
-    High-level function to run the maintainability analysis
-
-    1. Get a list of patterns to ignore from .gitignore
-    2. Collect text from files in the repository
-    3. Analyze the maintainability of the code
-    4. Generate an output file containing maintainability metrics
-    """
     logging.info("Starting maintainability analysis")
 
     config = get_config()
@@ -121,8 +64,8 @@ def main() -> None:
     repo = collect_text_from_files(Path("."), pathspec, config["extensions"])
 
     maintainability_metrics = analyze_maintainability(llm_block, repo)
-    generate_output(maintainability_metrics)
 
+    generate_output(maintainability_metrics)
     logging.info("Completed maintainability analysis")
 
 

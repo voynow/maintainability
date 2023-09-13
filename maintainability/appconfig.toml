@@ -39,4 +39,4 @@ extensions = [
     ".css",
 ]
 
-max_retries = 3
+min_num_lines = 20

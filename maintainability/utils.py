@@ -34,16 +34,18 @@ def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
         return PathSpec.from_lines(GitWildMatchPattern, [])
 
 
-def collect_text_from_files(dir_path: Path, pathspec: PathSpec) -> Dict[Path, str]:
+def collect_text_from_files(
+    pathspec: PathSpec, basepath: Path = Path(".")
+) -> Dict[Path, str]:
     result = {}
-    for path in dir_path.iterdir():
+    for path in basepath.iterdir():
         if pathspec.match_file(str(path)):
             continue
         if path.is_file():
             if path.suffix in config["extensions"]:
-                result[path.name] = read_text(path)
+                result[path] = read_text(path)
         elif path.is_dir():
-            result.update(collect_text_from_files(path, pathspec))
+            result.update(collect_text_from_files(pathspec, path))
     return result
 
 

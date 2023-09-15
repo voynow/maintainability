@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from llm_blocks import block_factory
 
@@ -14,6 +14,16 @@ logging.basicConfig(level=logging.INFO)
 def analyze_code(response: str) -> Optional[Dict]:
     jsonified_data = json.loads(response)
     return MaintainabilityMetrics(**jsonified_data)
+
+
+def filter_repo_by_paths(repo: Dict[Path, str], paths: List[Path]) -> Dict[Path, str]:
+    """Filter the repo dictionary to only include files under the directories in paths."""
+    filtered_repo = {}
+    for p in paths:
+        filtered_repo.update(
+            {k: v for k, v in repo.items() if p in k.parents or p == k}
+        )
+    return filtered_repo
 
 
 def analyze_maintainability(repo: Dict[str, str]) -> Dict[str, Dict]:
@@ -34,7 +44,7 @@ def analyze_maintainability(repo: Dict[str, str]) -> Dict[str, Dict]:
 
 def write_output(maintainability_metrics: Dict[str, MaintainabilityMetrics]) -> None:
     aggregated_metrics = {
-        filepath: metrics.__dict__
+        filepath.as_posix(): metrics.__dict__
         for filepath, metrics in maintainability_metrics.items()
     }
 
@@ -42,9 +52,16 @@ def write_output(maintainability_metrics: Dict[str, MaintainabilityMetrics]) -> 
         json.dump(aggregated_metrics, f, indent=4)
 
 
-def main() -> None:
+def main(paths: List[Path]) -> None:
     pathspec = get_ignored_patterns(Path(".gitignore"))
-    repo = collect_text_from_files(Path("."), pathspec)
+    repo = collect_text_from_files(pathspec)
+
+    filtered_repo = filter_repo_by_paths(repo, paths)
+
+    print([str(path) for path in repo.keys()])
+    print([str(path) for path in filtered_repo.keys()])
+
+    raise Exception("test")
 
     maintainability_metrics = analyze_maintainability(repo)
     write_output(maintainability_metrics)

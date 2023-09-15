@@ -40,3 +40,4 @@ extensions = [
 ]
 
 min_num_lines = 20
+output_file = "output.json"

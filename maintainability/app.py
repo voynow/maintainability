@@ -1,12 +1,12 @@
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from llm_blocks import block_factory
 
 from .models import MaintainabilityMetrics
-from .utils import collect_text_from_files, get_ignored_patterns, config
+from .utils import filter_repo_by_paths, config
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,21 +32,20 @@ def analyze_maintainability(repo: Dict[str, str]) -> Dict[str, Dict]:
     return result
 
 
-def write_output(maintainability_metrics: Dict[str, MaintainabilityMetrics]) -> None:
+def write_output(
+    maintainability_metrics: Dict[str, MaintainabilityMetrics],
+) -> None:
     aggregated_metrics = {
-        filepath: metrics.__dict__
+        filepath.as_posix(): metrics.__dict__
         for filepath, metrics in maintainability_metrics.items()
     }
 
-    with open("metrics.json", "w") as f:
-        json.dump(aggregated_metrics, f, indent=4)
+    json.dump(aggregated_metrics, open(config["output_file"], "w"))
 
 
-def main() -> None:
-    pathspec = get_ignored_patterns(Path(".gitignore"))
-    repo = collect_text_from_files(Path("."), pathspec)
-
-    maintainability_metrics = analyze_maintainability(repo)
+def main(paths: List[Path]) -> None:
+    filtered_repo = filter_repo_by_paths(paths)
+    maintainability_metrics = analyze_maintainability(filtered_repo)
     write_output(maintainability_metrics)
 
 

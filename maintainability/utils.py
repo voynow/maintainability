@@ -1,7 +1,7 @@
 import io
 import logging
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import toml
 from pathspec import PathSpec
@@ -26,25 +26,38 @@ def read_text(path: Path) -> str:
 
 
 def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
-    try:
+    if gitignore_path.exists():
         gitignore_content = read_text(gitignore_path)
         return PathSpec.from_lines(GitWildMatchPattern, gitignore_content.splitlines())
-    except FileNotFoundError:
+    else:
         logging.warning(".gitignore not found. No files will be ignored.")
         return PathSpec.from_lines(GitWildMatchPattern, [])
 
 
-def collect_text_from_files(dir_path: Path, pathspec: PathSpec) -> Dict[Path, str]:
+def load_files(basepath: Path = Path(".")) -> Dict[Path, str]:
+    """Recursively collect all text from files under basepath"""
     result = {}
-    for path in dir_path.iterdir():
+    for path in basepath.iterdir():
         if pathspec.match_file(str(path)):
             continue
         if path.is_file():
             if path.suffix in config["extensions"]:
-                result[path.name] = read_text(path)
+                result[path] = read_text(path)
         elif path.is_dir():
-            result.update(collect_text_from_files(path, pathspec))
+            result.update(load_files(path))
     return result
 
 
+def filter_repo_by_paths(paths: List[Path]) -> Dict[Path, str]:
+    """Filter the repo dictionary to only include files under the directories in paths"""
+    filtered_repo = {}
+    for p in paths:
+        filtered_repo.update(
+            {k: v for k, v in repo.items() if p in k.parents or p == k}
+        )
+    return filtered_repo
+
+
 config = load_toml()
+pathspec = get_ignored_patterns(Path(".gitignore"))
+repo = load_files()

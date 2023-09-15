@@ -161,4 +161,4 @@ cython_debug/
 
 
 # Custom ignore list
-output.json
+metrics.json

@@ -1,18 +1,21 @@
+import logging
+import uuid
 from pathlib import Path
 from typing import List
-import uuid
-from . import analytics
-from . import utils
+
+from . import config, utils
 
 
 def main(paths: List[Path]) -> None:
     filtered_repo = utils.filter_repo_by_paths(paths)
-    maintainability_metrics = analytics.analyze_maintainability(filtered_repo)
-
     session_id = str(uuid.uuid4())
-    composite_metrics = {
-        filepath: utils.compose_metrics(filepath, metrics, session_id)
-        for filepath, metrics in maintainability_metrics.items()
-    }
+
+    composite_metrics = {}
+    for filepath, code in filtered_repo.items():
+        if len(code.splitlines()) > config.MIN_NUM_LINES:
+            logging.info(f"Processing {filepath}")
+            composite_metrics[filepath] = utils.compose_metrics(
+                filepath, code, session_id
+            )
 
     utils.write_metrics(composite_metrics)

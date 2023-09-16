@@ -1,9 +1,11 @@
+import json
 import os
 import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
+from llm_blocks import block_factory
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
 from supabase import Client, create_client
@@ -11,8 +13,8 @@ from supabase import Client, create_client
 from . import config, models
 
 
-def get_general_metrics(root_path: Path, session_id: str) -> models.GeneralMetrics:
-    project_name = root_path.parents[-1].name
+def get_general_metrics(path: Path, session_id: str) -> models.GeneralMetrics:
+    project_name = path.parents[-1].name
     timestamp = datetime.utcnow().isoformat()
     return models.GeneralMetrics(project_name, timestamp, session_id)
 
@@ -22,15 +24,35 @@ def get_file_metrics(filepath: Path) -> models.FileMetrics:
     language = filepath.suffix.lstrip(".")
     content = read_text(filepath)
     loc = len(content.splitlines())
-    return models.FileMetrics(file_size, language, content, loc)
+    return models.FileMetrics(
+        file_size=file_size, loc=loc, language=language, content=content
+    )
+
+
+def get_maintainability_metrics(
+    filepath: Path, code: str
+) -> models.MaintainabilityMetrics:
+    llm = block_factory.get(
+        "template",
+        template=config.PROMPT,
+        temperature=config.TEMPERATURE,
+        model_name=config.MODEL_NAME,
+    )
+    response = llm(filepath=filepath, code=code)
+    return models.MaintainabilityMetrics(**json.loads(response))
 
 
 def compose_metrics(
-    filepath: Path, maintainability: models.MaintainabilityMetrics, session_id: str
+    filepath: Path, code: str, session_id: str
 ) -> models.CompositeMetrics:
+    maintainability_metrics = get_maintainability_metrics(filepath, code)
     file_metrics = get_file_metrics(filepath)
     general_metrics = get_general_metrics(filepath, session_id)
-    return models.CompositeMetrics(maintainability, file_metrics, general_metrics)
+    return models.CompositeMetrics(
+        maintainability=maintainability_metrics,
+        file_info=file_metrics,
+        general_info=general_metrics,
+    )
 
 
 def connect_to_supabase() -> Client:
@@ -60,6 +82,11 @@ def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> None:
         }
         for filepath, metrics in metrics.items()
     ]
+    # print all types of insert_data[0]
+    for k, v in insert_data[0].items():
+        print(k, type(v))
+
+    print(insert_data[0])
 
     table = connect_to_supabase().table("maintainability")
     data, count = table.insert(insert_data).execute()

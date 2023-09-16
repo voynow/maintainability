@@ -37,3 +37,5 @@ EXTENSIONS = [
 
 MIN_NUM_LINES = 20
 OUTPUT_FILE = "output.json"
+MODEL_NAME = "gpt-3.5-turbo-16k"
+TEMPERATURE = 0.0

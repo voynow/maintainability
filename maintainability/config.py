@@ -1,4 +1,4 @@
-prompt = """You are a highly respected tech lead participating in a code review of {filepath}:
+PROMPT = """You are a highly respected tech lead participating in a code review of {filepath}:
 {code}
 
 Be strict and critical. Evaluate this code across key maintainability metrics:
@@ -16,7 +16,7 @@ Respond with proper JSON only with the following example format:
 "debug_error_handling": 3
 """
 
-extensions = [
+EXTENSIONS = [
     ".py",
     ".js",
     ".java",
@@ -39,5 +39,5 @@ extensions = [
     ".css",
 ]
 
-min_num_lines = 20
-output_file = "output.json"
+MIN_NUM_LINES = 20
+OUTPUT_FILE = "output.json"

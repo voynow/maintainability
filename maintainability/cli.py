@@ -2,8 +2,7 @@ from pathlib import Path
 
 import click
 
-from . import app
-
+from . import main
 
 options = {
     "multiple": True,
@@ -16,5 +15,8 @@ options = {
 @click.command()
 @click.option("--paths", **options)
 def cli(paths):
-    """Run the maintainability analysis"""
-    app.main([Path(path) for path in paths])
+    main.main([Path(path) for path in paths])
+
+
+if __name__ == "__main__":
+    cli()

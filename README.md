@@ -1,45 +1,42 @@
-# Maintainability
+# Maintainability Analyzer 🛠️
 
-Maintainability is a Python application that analyzes the maintainability of your codebase. It provides metrics such as readability, design quality, testability, consistency, and debug error handling for each file in your repository.
+![GitHub stars](https://img.shields.io/github/stars/voynow/maintainability?style=social)
+![PyPI](https://img.shields.io/pypi/v/maintainability)
 
-## 📚 Table of Contents
-- [Why Use Maintainability](#why-use-maintainability)
-- [Repository Structure](#repository-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
+Maintainability Analyzer is a Python-based tool designed to analyze the maintainability of your codebase. It uses advanced AI models to evaluate various aspects of your code, such as readability, design quality, testability, consistency, and error handling.
 
-## 🎯 Why Use Maintainability
-Maintainability is a key aspect of any software project. This tool helps you to keep track of the maintainability of your codebase, providing you with valuable insights that can guide your refactoring efforts. It's easy to use and integrates seamlessly into your development workflow.
+## Why Use Maintainability Analyzer? 🎯
 
-## 🏗️ Repository Structure
+In the world of software development, maintainability is key. The easier your code is to understand and modify, the more efficient your development process will be. This tool provides a comprehensive analysis of your code's maintainability, giving you valuable insights that can help you improve your code quality.
+
+## Repo Structure 📁
+
 ```
 maintainability
-├── maintainability
-│   ├── __init__.py
-│   ├── app.py
-│   ├── cli.py
-│   ├── models.py
-│   ├── utils.py
-├── metrics.json
-├── test_package_install.sh
+├── analytics.py
+├── cli.py
+├── main.py
+├── models.py
+├── utils.py
+└── __init__.py
 ```
 
-## 💻 Installation
-To install the Maintainability Analyzer, you can use pip:
+## How to Use 🚀
+
+Here's a simple example of how to use the Maintainability Analyzer:
+
 ```bash
 pip install maintainability
+
+maintainability --paths path/to/folder path/to/file.py path/to/etc
 ```
 
-## 🚀 Usage
-To analyze the maintainability of your codebase, simply run the following command in your terminal:
-```bash
-maintainability
-```
-This will generate a `metrics.json` file in your current directory, containing the maintainability metrics for each file in your repository.
+This will generate a JSON file (`output.json`) containing the maintainability metrics for each file in the specified paths.
 
-## 🤝 Contributing
-Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) to get started.
+## Conclusion 🎉
 
-## 📝 License
-This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE.md) file for details.
+Maintainability Analyzer is a powerful tool for any developer looking to improve their code quality. By providing detailed metrics on various aspects of maintainability, it allows you to identify areas of improvement and make your codebase more efficient and easier to work with. Give it a try today!
+
+## License 📄
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

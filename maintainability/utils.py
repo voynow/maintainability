@@ -20,8 +20,9 @@ def get_general_metrics(root_path: Path, session_id: str) -> models.GeneralMetri
 def get_file_metrics(filepath: Path) -> models.FileMetrics:
     file_size = os.path.getsize(filepath)
     language = filepath.suffix.lstrip(".")
-    loc = len(open(filepath, "r").readlines())
-    return models.FileMetrics(file_size, language, loc)
+    content = read_text(filepath)
+    loc = len(content.splitlines())
+    return models.FileMetrics(file_size, language, content, loc)
 
 
 def compose_metrics(
@@ -66,8 +67,13 @@ def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> None:
 
 
 def read_text(path: Path) -> str:
+    if path in file_cache:
+        return file_cache[path]
+
     with open(path, "r") as file:
-        return file.read()
+        content = file.read()
+        file_cache[path] = content
+        return content
 
 
 def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
@@ -100,4 +106,5 @@ def filter_repo_by_paths(paths: List[Path]) -> Dict[Path, str]:
     return filtered_repo
 
 
+file_cache = {}
 pathspec = get_ignored_patterns(Path(".gitignore"))

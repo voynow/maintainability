@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 
 
@@ -15,7 +14,8 @@ class MaintainabilityMetrics:
 class FileMetrics:
     file_size: int
     loc: int
-    file: str
+    language: str
+    content: str
 
 
 @dataclass

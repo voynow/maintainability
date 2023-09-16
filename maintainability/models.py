@@ -1,6 +1,5 @@
+import os
 from dataclasses import dataclass
-from typing import Dict
-import json
 
 
 @dataclass
@@ -12,12 +11,21 @@ class MaintainabilityMetrics:
     debug_error_handling: int
 
 
-def write_metrics(maintainability_metrics: Dict[str, MaintainabilityMetrics]) -> None:
-    """write to json file"""
+@dataclass
+class FileMetrics:
+    file_size: int
+    language: str
+    loc: int
 
-    aggregated_metrics = {
-        filepath.as_posix(): metrics.__dict__
-        for filepath, metrics in maintainability_metrics.items()
-    }
 
-    json.dump(aggregated_metrics, open("output.json", "w"))
+@dataclass
+class GeneralMetrics:
+    project_name: str
+    timestamp: str
+
+
+@dataclass
+class CompositeMetrics:
+    maintainability: MaintainabilityMetrics
+    file_info: FileMetrics
+    general_info: GeneralMetrics

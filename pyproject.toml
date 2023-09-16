@@ -32,6 +32,7 @@ python = "^3.10"
 click = "*"
 llm_blocks = "0.3.7"
 pathspec = "*"
+supabase = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli:cli"

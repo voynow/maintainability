@@ -1,10 +1,53 @@
+from datetime import datetime
+import os
 from pathlib import Path
 from typing import Dict, List
 
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
+from supabase import Client, create_client
 
-from . import config
+from . import config, models
+
+
+def get_general_metrics(root_path: Path) -> models.GeneralMetrics:
+    project_name = root_path.parents[-1].name
+    timestamp = datetime.utcnow().isoformat()
+    return models.GeneralMetrics(project_name, timestamp)
+
+
+def get_file_metrics(filepath: Path) -> models.FileMetrics:
+    file_size = os.path.getsize(filepath)
+    language = filepath.suffix.lstrip(".")
+    loc = len(open(filepath, "r").readlines())
+    return models.FileMetrics(file_size, language, loc)
+
+
+def compose_metrics(
+    filepath: Path, maintainability: models.MaintainabilityMetrics
+) -> models.CompositeMetrics:
+    file_metrics = get_file_metrics(filepath)
+    general_metrics = get_general_metrics(filepath)
+    return models.CompositeMetrics(maintainability, file_metrics, general_metrics)
+
+
+def connect_to_supabase() -> Client:
+    """Connect to Supabase database"""
+    return create_client(
+        os.environ.get("SUPABASE_URL"),
+        os.environ.get("SUPABASE_KEY"),
+    )
+
+
+def write_metrics(
+    maintainability_metrics: Dict[Path, models.MaintainabilityMetrics]
+) -> None:
+    insert_data = {}  # Needs to be implemented, should be unstructured data
+
+    table = connect_to_supabase().table("maintainability")
+    data, count = table.insert(maintainability_metrics).execute()
+
+    print(data, count)
 
 
 def read_text(path: Path) -> str:

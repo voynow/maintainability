@@ -8,12 +8,8 @@ testability: Ease to write unit tests. 1=Hard, 10=Easy
 consistency: Naming and coding conventions. 1=Inconsistent, 10=Consistent
 debug & error handling: Availability of logs and error-handling. 1=Poor, 10=Excellent
 
-Respond with proper JSON only with the following example format:
-"readability": 2,
-"design_quality": 7,
-"testability": 4,
-"consistency": 6,
-"debug_error_handling": 3
+Respond with JSON only, no other text or comments, with the following keys:
+readability, design_quality, testability, consistency, debug_error_handling
 """
 
 EXTENSIONS = [

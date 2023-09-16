@@ -1,5 +1,6 @@
-from datetime import datetime
 import os
+import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
@@ -10,10 +11,10 @@ from supabase import Client, create_client
 from . import config, models
 
 
-def get_general_metrics(root_path: Path) -> models.GeneralMetrics:
+def get_general_metrics(root_path: Path, session_id: str) -> models.GeneralMetrics:
     project_name = root_path.parents[-1].name
     timestamp = datetime.utcnow().isoformat()
-    return models.GeneralMetrics(project_name, timestamp)
+    return models.GeneralMetrics(project_name, timestamp, session_id)
 
 
 def get_file_metrics(filepath: Path) -> models.FileMetrics:
@@ -24,10 +25,10 @@ def get_file_metrics(filepath: Path) -> models.FileMetrics:
 
 
 def compose_metrics(
-    filepath: Path, maintainability: models.MaintainabilityMetrics
+    filepath: Path, maintainability: models.MaintainabilityMetrics, session_id: str
 ) -> models.CompositeMetrics:
     file_metrics = get_file_metrics(filepath)
-    general_metrics = get_general_metrics(filepath)
+    general_metrics = get_general_metrics(filepath, session_id)
     return models.CompositeMetrics(maintainability, file_metrics, general_metrics)
 
 
@@ -39,14 +40,28 @@ def connect_to_supabase() -> Client:
     )
 
 
-def write_metrics(
-    maintainability_metrics: Dict[Path, models.MaintainabilityMetrics]
-) -> None:
-    insert_data = {}  # Needs to be implemented, should be unstructured data
+def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> None:
+    insert_data = [
+        {
+            "primary_id": str(uuid.uuid4()),
+            "file_path": str(filepath),
+            "readability": metrics.maintainability.readability,
+            "design_quality": metrics.maintainability.design_quality,
+            "testability": metrics.maintainability.testability,
+            "consistency": metrics.maintainability.consistency,
+            "debug_error_handling": metrics.maintainability.debug_error_handling,
+            "file_size": metrics.file_info.file_size,
+            "language": metrics.file_info.language,
+            "loc": metrics.file_info.loc,
+            "project_name": metrics.general_info.project_name,
+            "timestamp": metrics.general_info.timestamp,
+            "session_id": metrics.general_info.session_id,
+        }
+        for filepath, metrics in metrics.items()
+    ]
 
     table = connect_to_supabase().table("maintainability")
-    data, count = table.insert(maintainability_metrics).execute()
-
+    data, count = table.insert(insert_data).execute()
     print(data, count)
 
 

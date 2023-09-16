@@ -14,14 +14,15 @@ class MaintainabilityMetrics:
 @dataclass
 class FileMetrics:
     file_size: int
-    language: str
     loc: int
+    file: str
 
 
 @dataclass
 class GeneralMetrics:
     project_name: str
     timestamp: str
+    session_id: str
 
 
 @dataclass

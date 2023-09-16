@@ -18,4 +18,5 @@ def main(paths: List[Path]) -> None:
                 filepath, code, session_id
             )
 
-    utils.write_metrics(composite_metrics)
+    response = utils.write_metrics(composite_metrics)
+    logging.info(f"Response: {response}")

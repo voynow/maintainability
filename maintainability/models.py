@@ -19,14 +19,8 @@ class FileMetrics:
 
 
 @dataclass
-class GeneralMetrics:
-    project_name: str
-    timestamp: str
-    session_id: str
-
-
-@dataclass
 class CompositeMetrics:
     maintainability: MaintainabilityMetrics
     file_info: FileMetrics
-    general_info: GeneralMetrics
+    timestamp: str
+    session_id: str

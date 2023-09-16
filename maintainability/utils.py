@@ -3,7 +3,7 @@ import os
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from llm_blocks import block_factory
 from pathspec import PathSpec
@@ -11,12 +11,6 @@ from pathspec.patterns import GitWildMatchPattern
 from supabase import Client, create_client
 
 from . import config, models
-
-
-def get_general_metrics(path: Path, session_id: str) -> models.GeneralMetrics:
-    project_name = path.parents[-1].name
-    timestamp = datetime.utcnow().isoformat()
-    return models.GeneralMetrics(project_name, timestamp, session_id)
 
 
 def get_file_metrics(filepath: Path) -> models.FileMetrics:
@@ -47,11 +41,11 @@ def compose_metrics(
 ) -> models.CompositeMetrics:
     maintainability_metrics = get_maintainability_metrics(filepath, code)
     file_metrics = get_file_metrics(filepath)
-    general_metrics = get_general_metrics(filepath, session_id)
     return models.CompositeMetrics(
         maintainability=maintainability_metrics,
         file_info=file_metrics,
-        general_info=general_metrics,
+        timestamp=datetime.utcnow().isoformat(),
+        session_id=session_id,
     )
 
 
@@ -63,7 +57,7 @@ def connect_to_supabase() -> Client:
     )
 
 
-def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> None:
+def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> Tuple:
     insert_data = [
         {
             "primary_id": str(uuid.uuid4()),
@@ -76,21 +70,14 @@ def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> None:
             "file_size": metrics.file_info.file_size,
             "language": metrics.file_info.language,
             "loc": metrics.file_info.loc,
-            "project_name": metrics.general_info.project_name,
-            "timestamp": metrics.general_info.timestamp,
-            "session_id": metrics.general_info.session_id,
+            "content": metrics.file_info.content,
+            "timestamp": metrics.timestamp,
+            "session_id": metrics.session_id,
         }
         for filepath, metrics in metrics.items()
     ]
-    # print all types of insert_data[0]
-    for k, v in insert_data[0].items():
-        print(k, type(v))
-
-    print(insert_data[0])
-
     table = connect_to_supabase().table("maintainability")
-    data, count = table.insert(insert_data).execute()
-    print(data, count)
+    return table.insert(insert_data).execute()
 
 
 def read_text(path: Path) -> str:

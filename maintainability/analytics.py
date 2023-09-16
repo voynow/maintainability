@@ -22,7 +22,7 @@ def analyze_maintainability(repo: Dict[str, str]) -> Dict[str, Dict]:
     )
     result = {}
     for filepath, code in repo.items():
-        if len(code.splitlines()) > config["min_num_lines"]:
+        if len(code.splitlines()) > config.MIN_NUM_LINES:
             logging.info(f"Analyzing {filepath}")
             response = block(filepath=filepath, code=code)
             result[filepath] = analyze_code(response)

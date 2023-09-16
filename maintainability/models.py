@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict
+import json
 
 
 @dataclass
@@ -12,4 +13,11 @@ class MaintainabilityMetrics:
 
 
 def write_metrics(maintainability_metrics: Dict[str, MaintainabilityMetrics]) -> None:
-    raise NotImplementedError
+    """write to json file"""
+
+    aggregated_metrics = {
+        filepath.as_posix(): metrics.__dict__
+        for filepath, metrics in maintainability_metrics.items()
+    }
+
+    json.dump(aggregated_metrics, open("output.json", "w"))

@@ -1,8 +1,7 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class MaintainabilityMetrics:
+class MaintainabilityMetrics(BaseModel):
     readability: int
     design_quality: int
     testability: int
@@ -10,16 +9,14 @@ class MaintainabilityMetrics:
     debug_error_handling: int
 
 
-@dataclass
-class FileMetrics:
+class FileMetrics(BaseModel):
     file_size: int
     loc: int
     language: str
     content: str
 
 
-@dataclass
-class CompositeMetrics:
+class CompositeMetrics(BaseModel):
     maintainability: MaintainabilityMetrics
     file_info: FileMetrics
     timestamp: str

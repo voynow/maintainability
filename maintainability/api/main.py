@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from typing import Dict
+from maintainability.common.models import CompositeMetrics
+from maintainability.common import utils
 
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
+@app.post("/submit_metrics")
+async def submit_metrics(metrics: Dict[str, CompositeMetrics]):
+    utils.write_metrics(metrics)
+    return {"status": "ok", "message": "Metrics submitted successfully."}

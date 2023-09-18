@@ -57,11 +57,11 @@ def connect_to_supabase() -> Client:
     )
 
 
-def write_metrics(metrics: Dict[Path, models.CompositeMetrics]) -> Tuple:
+def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
     insert_data = [
         {
             "primary_id": str(uuid.uuid4()),
-            "file_path": str(filepath),
+            "file_path": filepath,
             "readability": metrics.maintainability.readability,
             "design_quality": metrics.maintainability.design_quality,
             "testability": metrics.maintainability.testability,

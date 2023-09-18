@@ -4,7 +4,28 @@ from main import app
 client = TestClient(app)
 
 
-def test_read_root():
-    response = client.get("/")
+def test_submit_metrics():
+    response = client.post(
+        "/submit_metrics",
+        json={
+            "/test/path/testfile.py": {
+                "maintainability": {
+                    "readability": 1,
+                    "design_quality": 2,
+                    "testability": 3,
+                    "consistency": 4,
+                    "debug_error_handling": 5,
+                },
+                "file_info": {
+                    "file_size": 1000,
+                    "loc": 100,
+                    "language": "python",
+                    "content": "print('hello world')",
+                },
+                "timestamp": "timestamp",
+                "session_id": "88888888-8888-8888-8888-888888888888",
+            }
+        },
+    )
     assert response.status_code == 200
-    assert response.json() == {"message": "Hello, World!"}
+    assert "status" in response.json()

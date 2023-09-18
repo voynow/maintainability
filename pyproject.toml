@@ -33,6 +33,9 @@ click = "*"
 llm_blocks = "0.3.7"
 pathspec = "*"
 supabase = "*"
+fastapi = "*"
+uvicorn = "*"
+
 
 [tool.poetry.scripts]
-maintainability = "maintainability.cli:cli"
+maintainability = "maintainability.cli.cli:cli"

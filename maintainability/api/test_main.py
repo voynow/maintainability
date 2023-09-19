@@ -29,3 +29,13 @@ def test_submit_metrics():
     )
     assert response.status_code == 200
     assert "status" in response.json()
+
+
+def test_extract_metrics():
+    response = client.post(
+        "/extract_metrics",
+        json={"/test/path/testfile.py": "print('hello world')"},
+    )
+    print("Hello0000")
+    print("Hello", response.json())
+    assert response.status_code == 200

@@ -25,6 +25,7 @@ ignore = [
     ".gitignore",
     "config.py",
     "README.md",
+    ".pytest_cache",
 ]
 
 [tool.poetry.dependencies]

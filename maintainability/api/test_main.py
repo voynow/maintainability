@@ -36,6 +36,4 @@ def test_extract_metrics():
         "/extract_metrics",
         json={"/test/path/testfile.py": "print('hello world')"},
     )
-    print("Hello0000")
-    print("Hello", response.json())
     assert response.status_code == 200

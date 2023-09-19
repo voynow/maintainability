@@ -9,6 +9,11 @@ from . import models
 app = FastAPI()
 
 
+@app.get("/health")
+def read_root():
+    return {"status": "ok"}
+
+
 @app.post("/submit_metrics")
 async def submit_metrics(metrics: Dict[str, models.CompositeMetrics]):
     try:

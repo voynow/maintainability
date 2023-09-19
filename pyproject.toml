@@ -26,6 +26,7 @@ ignore = [
     "config.py",
     "README.md",
     ".pytest_cache",
+    ".vercel",
 ]
 
 [tool.poetry.dependencies]

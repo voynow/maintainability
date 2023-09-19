@@ -5,7 +5,7 @@ from typing import List, Dict
 
 import click
 
-from maintainability.api import config, utils
+from maintainability.api.src import config, utils
 
 options = {
     "multiple": True,

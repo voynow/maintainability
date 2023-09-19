@@ -2,16 +2,20 @@ import uuid
 from pathlib import Path
 from typing import Dict
 
-import config
-import utils
+from . import config, utils
 from fastapi import FastAPI, HTTPException
-from models import CompositeMetrics
+from . import models
 
 app = FastAPI()
 
 
+@app.get("/health")
+def read_root():
+    return {"status": "ok"}
+
+
 @app.post("/submit_metrics")
-async def submit_metrics(metrics: Dict[str, CompositeMetrics]):
+async def submit_metrics(metrics: Dict[str, models.CompositeMetrics]):
     try:
         utils.write_metrics(metrics)
     except Exception as e:

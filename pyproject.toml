@@ -25,6 +25,7 @@ ignore = [
     ".gitignore",
     "config.py",
     "README.md",
+    ".pytest_cache",
 ]
 
 [tool.poetry.dependencies]
@@ -33,6 +34,9 @@ click = "*"
 llm_blocks = "0.3.7"
 pathspec = "*"
 supabase = "*"
+fastapi = "*"
+uvicorn = "*"
+
 
 [tool.poetry.scripts]
-maintainability = "maintainability.cli:cli"
+maintainability = "maintainability.cli.cli:cli"

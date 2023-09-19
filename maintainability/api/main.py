@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException
-from typing import Dict
-from maintainability.common.models import CompositeMetrics
-from maintainability.common import utils, config
-from pathlib import Path
 import uuid
+from pathlib import Path
+from typing import Dict
+
+import config
+import utils
+from fastapi import FastAPI, HTTPException
+from models import CompositeMetrics
 
 app = FastAPI()
 

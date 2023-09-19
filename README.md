@@ -1,42 +1,85 @@
-# Maintainability Analyzer 🛠️
+# Maintainability API & CLI 🛠️
 
 ![GitHub stars](https://img.shields.io/github/stars/voynow/maintainability?style=social)
 ![PyPI](https://img.shields.io/pypi/v/maintainability)
 
-Maintainability Analyzer is a Python-based tool designed to analyze the maintainability of your codebase. It uses advanced AI models to evaluate various aspects of your code, such as readability, design quality, testability, consistency, and error handling.
+Maintainability is a powerful tool that allows you to analyze the maintainability of your codebase. It provides a FastAPI based API and a command-line interface (CLI) to interact with the API. The application calculates various metrics related to code maintainability such as readability, design quality, testability, consistency, and debug error handling.
 
-## Why Use Maintainability Analyzer? 🎯
+## Why Use Maintainability? 🚀
 
-In the world of software development, maintainability is key. The easier your code is to understand and modify, the more efficient your development process will be. This tool provides a comprehensive analysis of your code's maintainability, giving you valuable insights that can help you improve your code quality.
+Maintainability is designed to help you improve the quality of your codebase. It provides you with detailed metrics about your code, which can help you identify areas that need improvement. By using Maintainability, you can ensure that your code is easy to understand, modify, and test, which can save you a lot of time and effort in the long run.
 
-## Repo Structure 📁
+## Repo Structure 📂
 
 ```
 maintainability
-├── analytics.py
-├── cli.py
-├── main.py
-├── models.py
-├── utils.py
-└── __init__.py
+├── api
+│   ├── requirements.txt
+│   ├── src
+│   │   ├── main.py
+│   │   ├── models.py
+│   │   ├── test_main.py
+│   │   └── utils.py
+│   └── vercel.json
+└── cli
+    ├── cli.py
+    └── __init__.py
 ```
 
-## How to Use 🚀
+## Usage 🖥️
 
-Here's a simple example of how to use the Maintainability Analyzer:
+### CLI
+
+The CLI provides a simple way to interact with the API. Here's an example of how to use it:
 
 ```bash
-pip install maintainability
-
-maintainability --paths path/to/folder path/to/file.py path/to/etc
+python cli.py --paths /path/to/your/code
 ```
 
-This will generate a JSON file (`output.json`) containing the maintainability metrics for each file in the specified paths.
+This command will analyze the code in the specified paths and return the maintainability metrics.
+
+### API
+
+The API provides two main endpoints:
+
+- `POST /submit_metrics`: This endpoint allows you to submit your metrics to the API. Here's an example of how to use it:
+
+```python
+import requests
+
+data = {
+    "/test/path/testfile.py": {
+        "maintainability": {
+            "readability": 1,
+            "design_quality": 2,
+            "testability": 3,
+            "consistency": 4,
+            "debug_error_handling": 5,
+        },
+        "file_info": {
+            "file_size": 1000,
+            "loc": 100,
+            "language": "python",
+            "content": "print('hello world')",
+        },
+        "timestamp": "timestamp",
+        "session_id": "88888888-8888-8888-8888-888888888888",
+    }
+}
+
+response = requests.post("http://localhost:8000/submit_metrics", json=data)
+```
+
+- `POST /extract_metrics`: This endpoint allows you to extract metrics from your code. Here's an example of how to use it:
+
+```python
+import requests
+
+data = {"/test/path/testfile.py": "print('hello world')"}
+
+response = requests.post("http://localhost:8000/extract_metrics", json=data)
+```
 
 ## Conclusion 🎉
 
-Maintainability Analyzer is a powerful tool for any developer looking to improve their code quality. By providing detailed metrics on various aspects of maintainability, it allows you to identify areas of improvement and make your codebase more efficient and easier to work with. Give it a try today!
-
-## License 📄
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+Maintainability is a powerful tool for improving the quality of your codebase. By providing detailed metrics about your code, it can help you identify areas that need improvement and ensure that your code is easy to understand, modify, and test. Give it a try today!

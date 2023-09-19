@@ -29,6 +29,7 @@ def call_api(endpoint: str, payload: Optional[Dict] = None):
 
 def call_api_wrapper(endpoint: str, payload: Optional[Dict] = None):
     try:
+        logger.info(f"Endpoint: {endpoint} Payload: {payload}")
         response = call_api(endpoint, payload)
     except Exception as e:
         raise Exception(f"Failed to call API: {e}")

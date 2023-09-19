@@ -112,10 +112,11 @@ def load_files(basepath: Path = Path(".")) -> Dict[Path, str]:
 
 def filter_repo_by_paths(paths: List[Path]) -> Dict[Path, str]:
     repo = load_files()
+
     filtered_repo = {}
     for p in paths:
         filtered_repo.update(
-            {k: v for k, v in repo.items() if p in k.parents or p == k}
+            {k.as_posix(): v for k, v in repo.items() if p in k.parents or p == k}
         )
     return filtered_repo
 

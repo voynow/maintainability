@@ -28,6 +28,7 @@ async def extract_metrics(repo: Dict[str, str]):
     session_id = str(uuid.uuid4())
     composite_metrics: Dict[str, metrics_manager.CompositeMetrics] = {}
     try:
+        logger.info("Inside /extract_metrics endpoint")
         for filepath, code in repo.items():
             if len(code.splitlines()) > config.MIN_NUM_LINES:
                 logger.info(f"Composing metrics for {filepath}")
@@ -35,5 +36,6 @@ async def extract_metrics(repo: Dict[str, str]):
                     Path(filepath), code, session_id
                 )
     except Exception as e:
+        logger.exception("An error occurred in /extract_metrics")
         raise HTTPException(status_code=500, detail=str(e))
     return composite_metrics

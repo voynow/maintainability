@@ -28,12 +28,11 @@ async def extract_metrics(repo: Dict[str, str]):
     session_id = str(uuid.uuid4())
     composite_metrics: Dict[str, metrics_manager.CompositeMetrics] = {}
     try:
-        print("(test print statement) Inside /extract_metrics endpoint")
+        print("Inside /extract_metrics endpoint")
         logger.info("Inside /extract_metrics endpoint")
         for filepath, code in repo.items():
             if len(code.splitlines()) > config.MIN_NUM_LINES:
-                print(f"(test print statement) Composing metrics for {filepath}")
-                logger.info(f"Composing metrics for {filepath}")
+                print(f"Composing metrics for {filepath}")
                 composite_metrics[filepath] = metrics_manager.compose_metrics(
                     Path(filepath), code, session_id
                 )

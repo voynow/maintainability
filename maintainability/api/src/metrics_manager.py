@@ -14,20 +14,25 @@ from . import config, models
 def get_maintainability_metrics(
     filepath: Path, code: str
 ) -> models.MaintainabilityMetrics:
+    print("metrics_manager.py: get_maintainability_metrics()")
     llm = block_factory.get(
         "template",
         template=config.PROMPT,
         temperature=config.TEMPERATURE,
         model_name=config.MODEL_NAME,
     )
+    print("metrics_manager.py: get_maintainability_metrics() Calling llm()")
     response = llm(filepath=filepath, code=code)
+    print("metrics_manager.py: get_maintainability_metrics() llm() returned")
     return models.MaintainabilityMetrics(**json.loads(response))
 
 
 def get_file_metrics(filepath: Path, content: str) -> models.FileMetrics:
+    print("metrics_manager.py: get_file_metrics()")
     file_size = len(content.encode("utf-8"))
     language = filepath.suffix.lstrip(".")
     loc = len(content.splitlines())
+    print("metrics_manager.py: get_file_metrics() returning"
     return models.FileMetrics(
         file_size=file_size, loc=loc, language=language, content=content
     )
@@ -36,8 +41,10 @@ def get_file_metrics(filepath: Path, content: str) -> models.FileMetrics:
 def compose_metrics(
     filepath: Path, code: str, session_id: str
 ) -> models.CompositeMetrics:
+    print("metrics_manager.py: compose_metrics()")
     maintainability_metrics = get_maintainability_metrics(filepath, code)
     file_metrics = get_file_metrics(filepath, code)
+    print("metrics_manager.py: compose_metrics() returning")
     return models.CompositeMetrics(
         maintainability=maintainability_metrics,
         file_info=file_metrics,

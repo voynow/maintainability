@@ -20,7 +20,7 @@ options = {
 
 def call_api(endpoint: str, payload: Optional[Dict] = None):
     response = requests.post(
-        f"https://maintainability-poicq0m3h-voynow.vercel.app/{endpoint}",
+        f"https://maintainability-my2yb8q1e-voynow.vercel.app/{endpoint}",
         json=payload,
         headers={"Content-Type": "application/json"},
     )

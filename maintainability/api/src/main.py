@@ -34,14 +34,12 @@ def api_endpoint_wrapper(func):
 
 
 @app.post("/submit_metrics")
-@api_endpoint_wrapper
 async def submit_metrics(metrics: Dict[str, models.CompositeMetrics]):
     utils.write_metrics(metrics)
     return {"status": "ok", "message": "Metrics submitted successfully."}
 
 
 @app.post("/extract_metrics")
-@api_endpoint_wrapper
 async def extract_metrics(repo: Dict[str, str]):
     session_id = str(uuid.uuid4())
     composite_metrics: Dict[str, utils.CompositeMetrics] = {}

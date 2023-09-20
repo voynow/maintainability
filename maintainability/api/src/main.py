@@ -28,6 +28,7 @@ async def extract_metrics(repo: Dict[str, str]):
     session_id = str(uuid.uuid4())
     composite_metrics: Dict[str, metrics_manager.CompositeMetrics] = {}
     try:
+        print("(test print statement) Inside /extract_metrics endpoint")
         logger.info("Inside /extract_metrics endpoint")
         for filepath, code in repo.items():
             if len(code.splitlines()) > config.MIN_NUM_LINES:

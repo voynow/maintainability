@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Dict
 
 from fastapi import FastAPI, HTTPException
-from fastapi.logger import logger as fastapi_logger
 
 from . import config, metrics_manager, models
 
@@ -29,14 +28,14 @@ async def extract_metrics(repo: Dict[str, str]):
     session_id = str(uuid.uuid4())
     composite_metrics: Dict[str, metrics_manager.CompositeMetrics] = {}
     try:
-        fastapi_logger.info("Inside /extract_metrics endpoint")
+        logger.info("Inside /extract_metrics endpoint")
         for filepath, code in repo.items():
             if len(code.splitlines()) > config.MIN_NUM_LINES:
-                fastapi_logger.info(f"Composing metrics for {filepath}")
+                logger.info(f"Composing metrics for {filepath}")
                 composite_metrics[filepath] = metrics_manager.compose_metrics(
                     Path(filepath), code, session_id
                 )
     except Exception as e:
-        fastapi_logger.exception("An error occurred in /extract_metrics")
+        logger.exception("An error occurred in /extract_metrics")
         raise HTTPException(status_code=500, detail=str(e))
     return composite_metrics

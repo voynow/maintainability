@@ -1,3 +1,4 @@
+import json
 import logging
 from pathlib import Path
 from typing import Dict, Optional
@@ -19,7 +20,7 @@ options = {
 
 def call_api(endpoint: str, payload: Optional[Dict] = None):
     response = requests.post(
-        f"https://maintainability.vercel.app/{endpoint}",
+        f"https://maintainability-oe0kpuu87-voynow.vercel.app/{endpoint}",
         json=payload,
         headers={"Content-Type": "application/json"},
     )
@@ -28,37 +29,40 @@ def call_api(endpoint: str, payload: Optional[Dict] = None):
 
 
 def call_api_wrapper(endpoint: str, payload: Optional[Dict] = None):
+    """
+    Wrapper for calling the API. Handles errors and logging
+
+    :param endpoint: API endpoint to call
+    :param payload: Payload to send to the API
+    :return: Response from the API
+    """
     try:
-        logger.info(f"Initiating API call to {endpoint} with payload: {payload}")
         response = call_api(endpoint, payload)
-        logger.info(f"Received successful response from {endpoint}")
+
     except requests.HTTPError as e:
         logger.error(
-            f"HTTPError when calling {endpoint}. Status code: {e.response.status_code}, Response: {e.response.content}"
+            f"HTTPError on {endpoint} with code={e.response.status_code}, Response: {e.response.content}"
         )
-        raise
+        raise requests.HTTPError(json.loads(e.response.content)["detail"])
+
     except Exception as e:
         logger.error(f"Unexpected error when calling {endpoint}: {e}")
-        raise
+        raise e
+
     return response
 
 
 @click.command()
 @click.option("--paths", **options)
 def cli(paths):
-    try:
-        logger.info(f"CLI started with paths: {paths}")
-        filtered_repo = utils.filter_repo_by_paths([Path(path) for path in paths])
-        extracted_metrics = call_api_wrapper(
-            endpoint="extract_metrics", payload=filtered_repo
-        )
-        submit_metrics = call_api_wrapper(
-            endpoint="submit_metrics", payload=extracted_metrics
-        )
-        logger.info(f"Metrics submitted successfully: {submit_metrics}")
-    except Exception as e:
-        logger.error(f"CLI execution failed: {e}")
-        raise
+    filtered_repo = utils.filter_repo_by_paths([Path(path) for path in paths])
+    extracted_metrics = call_api_wrapper(
+        endpoint="extract_metrics", payload=filtered_repo
+    )
+    submit_metrics = call_api_wrapper(
+        endpoint="submit_metrics", payload=extracted_metrics
+    )
+    logger.info(f"SUCCESS: {submit_metrics}")
 
 
 if __name__ == "__main__":

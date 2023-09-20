@@ -17,22 +17,6 @@ def read_root():
     return {"status": "ok"}
 
 
-def api_endpoint_wrapper(func):
-    async def wrapper(*args, **kwargs):
-        try:
-            logger.info(
-                f"Invoking API {func.__name__} with arguments {args} and keyword arguments {kwargs}"
-            )
-            return await func(*args, **kwargs)
-        except Exception as e:
-            logger.error(
-                f"Exception in API {func.__name__}: {e}. Arguments were {args}, {kwargs}"
-            )
-            raise HTTPException(status_code=500, detail=str(e))
-
-    return wrapper
-
-
 @app.post("/submit_metrics")
 async def submit_metrics(metrics: Dict[str, models.CompositeMetrics]):
     utils.write_metrics(metrics)

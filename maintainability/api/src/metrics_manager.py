@@ -32,7 +32,7 @@ def get_file_metrics(filepath: Path, content: str) -> models.FileMetrics:
     file_size = len(content.encode("utf-8"))
     language = filepath.suffix.lstrip(".")
     loc = len(content.splitlines())
-    print("metrics_manager.py: get_file_metrics() returning"
+    print("metrics_manager.py: get_file_metrics() returning")
     return models.FileMetrics(
         file_size=file_size, loc=loc, language=language, content=content
     )

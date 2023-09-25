@@ -6,7 +6,7 @@ from typing import Dict, Optional
 import click
 import requests
 
-from maintainability.api.src import utils
+from . import file_operations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ options = {
 
 def call_api(endpoint: str, payload: Optional[Dict] = None):
     response = requests.post(
-        f"https://maintainability-oe0kpuu87-voynow.vercel.app/{endpoint}",
+        f"https://maintainability.vercel.app/{endpoint}",
         json=payload,
         headers={"Content-Type": "application/json"},
     )
@@ -55,7 +55,7 @@ def call_api_wrapper(endpoint: str, payload: Optional[Dict] = None):
 @click.command()
 @click.option("--paths", **options)
 def cli(paths):
-    filtered_repo = utils.filter_repo_by_paths([Path(path) for path in paths])
+    filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
     extracted_metrics = call_api_wrapper(
         endpoint="extract_metrics", payload=filtered_repo
     )

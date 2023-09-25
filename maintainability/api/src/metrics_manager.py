@@ -3,44 +3,48 @@ import os
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 from llm_blocks import block_factory
-from pathspec import PathSpec
-from pathspec.patterns import GitWildMatchPattern
 from supabase import Client, create_client
 
 from . import config, models
 
 
-def get_file_metrics(filepath: Path) -> models.FileMetrics:
-    file_size = os.path.getsize(filepath)
-    language = filepath.suffix.lstrip(".")
-    content = read_text(filepath)
-    loc = len(content.splitlines())
-    return models.FileMetrics(
-        file_size=file_size, loc=loc, language=language, content=content
-    )
-
-
 def get_maintainability_metrics(
     filepath: Path, code: str
 ) -> models.MaintainabilityMetrics:
+    print("metrics_manager.py: get_maintainability_metrics()")
     llm = block_factory.get(
         "template",
         template=config.PROMPT,
         temperature=config.TEMPERATURE,
         model_name=config.MODEL_NAME,
     )
+    print("metrics_manager.py: get_maintainability_metrics() Calling llm()")
     response = llm(filepath=filepath, code=code)
+    print("metrics_manager.py: get_maintainability_metrics() llm() returned")
     return models.MaintainabilityMetrics(**json.loads(response))
+
+
+def get_file_metrics(filepath: Path, content: str) -> models.FileMetrics:
+    print("metrics_manager.py: get_file_metrics()")
+    file_size = len(content.encode("utf-8"))
+    language = filepath.suffix.lstrip(".")
+    loc = len(content.splitlines())
+    print("metrics_manager.py: get_file_metrics() returning")
+    return models.FileMetrics(
+        file_size=file_size, loc=loc, language=language, content=content
+    )
 
 
 def compose_metrics(
     filepath: Path, code: str, session_id: str
 ) -> models.CompositeMetrics:
+    print("metrics_manager.py: compose_metrics()")
     maintainability_metrics = get_maintainability_metrics(filepath, code)
-    file_metrics = get_file_metrics(filepath)
+    file_metrics = get_file_metrics(filepath, code)
+    print("metrics_manager.py: compose_metrics() returning")
     return models.CompositeMetrics(
         maintainability=maintainability_metrics,
         file_info=file_metrics,
@@ -78,48 +82,3 @@ def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
     ]
     table = connect_to_supabase().table("maintainability")
     return table.insert(insert_data).execute()
-
-
-def read_text(path: Path) -> str:
-    if path in file_cache:
-        return file_cache[path]
-
-    with open(path, "r") as file:
-        content = file.read()
-        file_cache[path] = content
-        return content
-
-
-def get_ignored_patterns(gitignore_path: Path) -> PathSpec:
-    if gitignore_path.exists():
-        gitignore_content = read_text(gitignore_path)
-        return PathSpec.from_lines(GitWildMatchPattern, gitignore_content.splitlines())
-    return PathSpec.from_lines(GitWildMatchPattern, [])
-
-
-def load_files(basepath: Path = Path(".")) -> Dict[Path, str]:
-    result = {}
-    for path in basepath.iterdir():
-        if pathspec.match_file(str(path)):
-            continue
-        if path.is_file():
-            if path.suffix in config.EXTENSIONS:
-                result[path] = read_text(path)
-        elif path.is_dir():
-            result.update(load_files(path))
-    return result
-
-
-def filter_repo_by_paths(paths: List[Path]) -> Dict[Path, str]:
-    repo = load_files()
-
-    filtered_repo = {}
-    for p in paths:
-        filtered_repo.update(
-            {k.as_posix(): v for k, v in repo.items() if p in k.parents or p == k}
-        )
-    return filtered_repo
-
-
-file_cache = {}
-pathspec = get_ignored_patterns(Path(".gitignore"))

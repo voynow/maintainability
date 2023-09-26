@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
-from main import app
+from api.src import main
 
-client = TestClient(app)
+client = TestClient(main.app)
 
 
 def test_submit_metrics():
@@ -10,19 +10,19 @@ def test_submit_metrics():
         json={
             "/test/path/testfile.py": {
                 "maintainability": {
-                    "readability": 1,
-                    "design_quality": 2,
-                    "testability": 3,
-                    "consistency": 4,
-                    "debug_error_handling": 5,
+                    "readability": 0,
+                    "design_quality": 0,
+                    "testability": 0,
+                    "consistency": 0,
+                    "debug_error_handling": 0,
                 },
                 "file_info": {
-                    "file_size": 1000,
-                    "loc": 100,
-                    "language": "python",
-                    "content": "print('hello world')",
+                    "file_size": 0,
+                    "loc": 0,
+                    "language": "test",
+                    "content": "test",
                 },
-                "timestamp": "timestamp",
+                "timestamp": "test",
                 "session_id": "88888888-8888-8888-8888-888888888888",
             }
         },

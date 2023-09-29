@@ -29,7 +29,6 @@ async def extract_metrics(repo: Dict[str, str]):
     composite_metrics: Dict[str, metrics_manager.CompositeMetrics] = {}
     try:
         print("Inside /extract_metrics endpoint")
-        logger.info("Inside /extract_metrics endpoint")
         for filepath, code in repo.items():
             if len(code.splitlines()) > config.MIN_NUM_LINES:
                 print(f"Composing metrics for {filepath}")

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -16,6 +17,8 @@ options = {
     "help": "List of paths to analyze",
     "default": ["."],
 }
+
+API_URL = os.environ.get("API_URL", "https://maintainability.vercel.app/")
 
 
 def call_api(endpoint: str, payload: Optional[Dict] = None):

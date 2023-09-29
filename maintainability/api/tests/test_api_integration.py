@@ -10,6 +10,33 @@ def test_client():
     yield client
 
 
+def get_test_content() -> str:
+    return """
+        from dataclasses import dataclass
+
+        @dataclass
+        class MaintainabilityMetrics:
+            readability: int
+            design_quality: int
+            testability: int
+            consistency: int
+            debug_error_handling: int
+
+        @dataclass
+        class FileMetrics:
+            file_size: int
+            loc: int
+            language: str
+            content: str
+
+        @dataclass
+        class CompositeMetrics:
+            maintainability: MaintainabilityMetrics
+            file_info: FileMetrics
+            timestamp: str
+            session_id: str"""
+
+
 def generate_test_metrics():
     """Helper function to generate test metrics"""
     return {
@@ -25,7 +52,7 @@ def generate_test_metrics():
                 "file_size": 23,
                 "loc": 1,
                 "language": "python",
-                "content": "print('Hello, World!')",
+                "content": get_test_content(),
             },
             "timestamp": "2023-09-27T00:00:00Z",
             "session_id": "88888888-8888-8888-8888-888888888888",
@@ -58,7 +85,7 @@ def test_extract_metrics_with_valid_data(test_client):
 
 def test_extract_metrics_with_invalid_data(test_client):
     """Test /extract_metrics route with invalid data"""
-    response = test_client.post("/extract_metrics", json={"invalid": "data"})
+    response = test_client.post("/extract_metrics", json={"invalid": -1})
     assert response.status_code == 422
 
 

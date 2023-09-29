@@ -1,0 +1,34 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install API dependencies
+      run: pip install -r maintainability/api/requirements.txt
+
+    - name: Install CLI dependencies
+      run: pip install -r maintainability/cli/requirements.txt
+
+    - name: Install Test dependencies
+      run: pip install -r requirements_test.txt
+
+
+    - name: Run tests
+      run: ./path/to/your/test_script.sh

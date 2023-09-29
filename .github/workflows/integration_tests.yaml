@@ -1,4 +1,4 @@
-name: Run Tests
+name: Integration Tests
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       run: pip install -r maintainability/cli/requirements.txt
 
     - name: Install Test dependencies
-      run: pip install -r requirements_test.txt
+      run: pip install -r requirements.dev.txt
 
 
     - name: Run tests

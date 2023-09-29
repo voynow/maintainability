@@ -28,6 +28,9 @@ jobs:
 
     - name: Make script executable
       run: chmod +x ./integration_tests.sh
+    
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
 
     - name: Run tests
       run: ./integration_tests.sh

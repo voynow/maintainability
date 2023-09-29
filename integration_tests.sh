@@ -11,7 +11,7 @@ ls
 echo "done ls"
 
 # Start the API server in the background
-uvicorn api.src.main:app --port 8000 &
+uvicorn maintainability.api.src.main:app --port 8000 &
 API_PID=$!
 sleep 5
 

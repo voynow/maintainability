@@ -28,4 +28,4 @@ jobs:
 
 
     - name: Run tests
-      run: ./path/to/your/test_script.sh
+      run: ./integration_tests.sh

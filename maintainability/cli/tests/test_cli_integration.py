@@ -1,6 +1,5 @@
-import requests_mock
-from cli.src import cli
 from click.testing import CliRunner
+from maintainability.cli.src import cli
 
 
 def test_cli_command():

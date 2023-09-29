@@ -1,0 +1,40 @@
+name: Integration Tests
+
+on:
+  push:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install API dependencies
+      run: pip install -r maintainability/api/requirements.txt
+
+    - name: Install CLI dependencies
+      run: pip install -r maintainability/cli/requirements.txt
+
+    - name: Install Test dependencies
+      run: pip install -r requirements.dev.txt
+
+    - name: Make script executable
+      run: chmod +x ./integration_tests.sh
+    
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+
+    - name: Run tests
+      run: ./integration_tests.sh

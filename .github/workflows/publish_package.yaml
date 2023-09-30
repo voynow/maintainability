@@ -1,4 +1,4 @@
-name: Check Version and Publish
+name: Publish to PyPI
 
 on:
   push:
@@ -32,7 +32,11 @@ jobs:
     - name: Check and Publish
       run: |
         if [[ "$CURRENT_VERSION" != "$LATEST_TAG" ]]; then
+          git config --global user.email "voynow99@gmail.com"
+          git config --global user.name "voy"
           git tag $CURRENT_VERSION
-          git push origin $CURRENT_VERSION
+          git push origin $CURRENT_VERSION --follow-tags
           poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
         fi
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}

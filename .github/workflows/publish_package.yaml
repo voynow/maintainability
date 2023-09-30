@@ -33,9 +33,10 @@ jobs:
       run: |
         if [[ "$CURRENT_VERSION" != "$LATEST_TAG" ]]; then
           git config --global user.email "voynow99@gmail.com"
-          git config --global user.name "voy"
+          git config --global user.name "voynow"
           git tag $CURRENT_VERSION
-          git push origin $CURRENT_VERSION --follow-tags
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/voynow/maintainability.git
+          git push origin $CURRENT_VERSION
           poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
         fi
       env:

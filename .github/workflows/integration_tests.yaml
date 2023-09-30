@@ -21,14 +21,11 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install API dependencies
-      run: pip install -r maintainability/api/requirements.txt
+    - name: Install Poetry
+      run: pip install poetry
 
-    - name: Install CLI dependencies
-      run: pip install -r maintainability/cli/requirements.txt
-
-    - name: Install Test dependencies
-      run: pip install -r requirements.dev.txt
+    - name: Install dependencies
+      run: poetry install
 
     - name: Make script executable
       run: chmod +x ./integration_tests.sh

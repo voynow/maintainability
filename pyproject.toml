@@ -4,15 +4,30 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "maintainability"
-version = "0.1.5"
+version = "0.2.0"
 description = "Codebase Maintainability Analyzer"
 authors = ["voynow <voynow99@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+include = ["maintainability/cli/**/*"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "*"
+pathspec = "*"
+supabase = "*"
+llm_blocks = "0.3.7"
+fastapi = "*"
+uvicorn = "*"
+requests = "*"
+pytest = "*"
+
+
+[tool.poetry.scripts]
+maintainability = "maintainability.cli.src.cli:cli"
 
 [tool.turbo_docs]
 ignore = [
-    "pyproject.toml",
     "__pycache__",
     "venv",
     "build",
@@ -28,16 +43,3 @@ ignore = [
     ".pytest_cache",
     ".vercel",
 ]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-click = "*"
-llm_blocks = "0.3.7"
-pathspec = "*"
-supabase = "*"
-fastapi = "*"
-uvicorn = "*"
-
-
-[tool.poetry.scripts]
-maintainability = "maintainability.cli.cli:cli"

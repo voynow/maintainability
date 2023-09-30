@@ -15,9 +15,9 @@ set -e
 export API_URL=http://localhost:8000
 
 # Start the API server in the background
-uvicorn maintainability.api.src.main:app --port 8000 &
+poetry run uvicorn maintainability.api.src.main:app --port 8000 &
 API_PID=$!
 sleep 5
 
 # Run the integration tests
-pytest
+poetry run pytest

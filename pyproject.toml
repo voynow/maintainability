@@ -4,11 +4,12 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "maintainability"
-version = "0.1.5"
+version = "0.2.0"
 description = "Codebase Maintainability Analyzer"
 authors = ["voynow <voynow99@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+include = ["maintainability/cli/**/*"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -23,7 +24,7 @@ pytest = "*"
 
 
 [tool.poetry.scripts]
-maintainability = "maintainability.cli.cli:cli"
+maintainability = "maintainability.cli.src.cli:cli"
 
 [tool.turbo_docs]
 ignore = [

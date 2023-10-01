@@ -3,7 +3,7 @@
     "name": "maintainability",
     "builds": [
         {
-            "src": "/src/main.py",
+            "src": "maintainability/api/src/main.py",
             "use": "@vercel/python",
             "config": {
                 "buildCommand": "pip install poetry && poetry install"
@@ -13,7 +13,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/src/main.py"
+            "dest": "maintainability/api/src/main.py"
         }
     ]
 }

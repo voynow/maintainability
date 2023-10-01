@@ -3,17 +3,14 @@
     "name": "maintainability",
     "builds": [
         {
-            "src": "maintainability/api/src/main.py",
-            "use": "@now/python",
-            "config": {
-                "maxLambdaSize": "50mb"
-            }
+            "src": "/api/main.py",
+            "use": "@vercel/python"
         }
     ],
     "routes": [
         {
-            "src": "/(.*)",
-            "dest": "maintainability/api/src/main.py"
+            "src": "/api/(.*)",
+            "dest": "/api/main.py"
         }
     ]
 }

@@ -3,17 +3,17 @@
     "name": "maintainability",
     "builds": [
         {
-            "src": "/src/main.py",
-            "use": "@vercel/python",
+            "src": "maintainability/api/src/main.py",
+            "use": "@now/python",
             "config": {
-                "buildCommand": "ls && cwd && pip install poetry && poetry install"
+                "maxLambdaSize": "50mb"
             }
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/src/main.py"
+            "dest": "maintainability/api/src/main.py"
         }
     ]
 }

@@ -42,4 +42,5 @@ ignore = [
     "README.md",
     ".pytest_cache",
     ".vercel",
+    "vercel.json",
 ]

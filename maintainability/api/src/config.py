@@ -12,29 +12,6 @@ Respond with JSON only, no other text or comments, with the following keys:
 readability, design_quality, testability, consistency, debug_error_handling
 """
 
-EXTENSIONS = [
-    ".py",
-    ".js",
-    ".java",
-    ".c",
-    ".cpp",
-    ".h",
-    ".cs",
-    ".go",
-    ".rb",
-    ".php",
-    ".swift",
-    ".ts",
-    ".kt",
-    ".rs",
-    ".scala",
-    ".m",
-    ".sh",
-    ".sql",
-    ".html",
-    ".css",
-]
-
 MIN_NUM_LINES = 20
 OUTPUT_FILE = "output.json"
 MODEL_NAME = "gpt-3.5-turbo-16k"

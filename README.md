@@ -1,85 +1,75 @@
-# Maintainability API & CLI 🛠️
+# Maintainability - Codebase Maintainability Analyzer
 
-![GitHub stars](https://img.shields.io/github/stars/voynow/maintainability?style=social)
+![GitHub stars](https://img.shields.io/github/stars/voynow/maintainability)
 ![PyPI](https://img.shields.io/pypi/v/maintainability)
 
-Maintainability is a powerful tool that allows you to analyze the maintainability of your codebase. It provides a FastAPI based API and a command-line interface (CLI) to interact with the API. The application calculates various metrics related to code maintainability such as readability, design quality, testability, consistency, and debug error handling.
+Maintainability is a Python CLI -> API workflow that innovates on static code analysis using large language models (GPT). It provides a comprehensive analysis of your codebase's maintainability, focusing on readability, design quality, testability, consistency, and debug error handling. 
 
 ## Why Use Maintainability? 🚀
 
-Maintainability is designed to help you improve the quality of your codebase. It provides you with detailed metrics about your code, which can help you identify areas that need improvement. By using Maintainability, you can ensure that your code is easy to understand, modify, and test, which can save you a lot of time and effort in the long run.
+In the era of AI, why stick to traditional static code analysis? Maintainability leverages the power of GPT models to provide a more in-depth and intelligent analysis of your codebase. It's not just about finding bugs or syntax errors; it's about improving the quality of your code. 
+
+Imagine a future where this tool is integrated into your CI/CD pipeline, continuously analyzing and improving your codebase. That's the future Maintainability is building towards.
 
 ## Repo Structure 📂
 
 ```
-maintainability
-├── api
-│   ├── requirements.txt
-│   ├── src
-│   │   ├── main.py
-│   │   ├── models.py
-│   │   ├── test_main.py
-│   │   └── utils.py
-│   └── vercel.json
-└── cli
-    ├── cli.py
-    └── __init__.py
+.
+├── .github
+│   └── workflows
+│       ├── integration_tests.yaml
+│       └── publish_package.yaml
+├── maintainability
+│   ├── api
+│   │   ├── requirements.txt
+│   │   ├── src
+│   │   │   ├── main.py
+│   │   │   ├── metrics_manager.py
+│   │   │   ├── models.py
+│   │   │   └── __init__.py
+│   │   └── vercel.json
+│   └── cli
+│       ├── file_operations.py
+│       ├── main.py
+│       └── __init__.py
+├── tests
+│   ├── test_api_integration.py
+│   └── test_cli_integration.py
+├── integration_tests.sh
+├── pyproject.toml
+└── README.md
 ```
 
-## Usage 🖥️
+## Usage 💻
 
-### CLI
-
-The CLI provides a simple way to interact with the API. Here's an example of how to use it:
+To use Maintainability, you can run it from the command line with the following command:
 
 ```bash
-python cli.py --paths /path/to/your/code
+maintainability --paths /path/to/your/code
 ```
 
-This command will analyze the code in the specified paths and return the maintainability metrics.
+This will analyze the code at the specified path and return a comprehensive maintainability report.
 
-### API
+## Example 📖
 
-The API provides two main endpoints:
+Here's an example of how you can use Maintainability to analyze a Python file:
 
-- `POST /submit_metrics`: This endpoint allows you to submit your metrics to the API. Here's an example of how to use it:
-
-```python
-import requests
-
-data = {
-    "/test/path/testfile.py": {
-        "maintainability": {
-            "readability": 1,
-            "design_quality": 2,
-            "testability": 3,
-            "consistency": 4,
-            "debug_error_handling": 5,
-        },
-        "file_info": {
-            "file_size": 1000,
-            "loc": 100,
-            "language": "python",
-            "content": "print('hello world')",
-        },
-        "timestamp": "timestamp",
-        "session_id": "88888888-8888-8888-8888-888888888888",
-    }
-}
-
-response = requests.post("http://localhost:8000/submit_metrics", json=data)
+```bash
+maintainability --paths /path/to/your/python/file.py
 ```
 
-- `POST /extract_metrics`: This endpoint allows you to extract metrics from your code. Here's an example of how to use it:
+This will return a maintainability report for `file.py`, providing insights into its readability, design quality, testability, consistency, and debug error handling.
 
-```python
-import requests
+## Future Plans 🌈
 
-data = {"/test/path/testfile.py": "print('hello world')"}
+We're working towards integrating Maintainability into GitHub Actions as a CI/CD step. This will allow you to continuously analyze and improve your codebase's maintainability with every push.
 
-response = requests.post("http://localhost:8000/extract_metrics", json=data)
-```
+Stay tuned for more updates!
 
-## Conclusion 🎉
+## Contributing 🤝
 
-Maintainability is a powerful tool for improving the quality of your codebase. By providing detailed metrics about your code, it can help you identify areas that need improvement and ensure that your code is easy to understand, modify, and test. Give it a try today!
+Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) for details on how to contribute to this project.
+
+## License 📄
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -4,12 +4,10 @@
     "builds": [
         {
             "src": "main.py",
-            "use": "@vercel/python",
-            "config": {
-                "buildCommand": "ls && cwd"
-            }
+            "use": "@vercel/python"
         }
     ],
+    "buildCommand": "ls && cwd",
     "routes": [
         {
             "src": "/api/(.*)",

@@ -27,7 +27,7 @@ jobs:
 
     - name: Get Latest Tag
       id: get_tag
-      run: echo "LATEST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+      run: echo "LATEST_TAG=$(git describe --tags --abbrev=0 || echo '')" >> $GITHUB_ENV
 
     - name: Debug Info
       run: echo "CURRENT_VERSION=$CURRENT_VERSION, LATEST_TAG=$LATEST_TAG"
@@ -42,3 +42,14 @@ jobs:
         username: ${{ secrets.PYPI_USERNAME }}
         password: ${{ secrets.PYPI_PASSWORD }}
         build: true
+
+    - name: Configure Git User
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Create and Push Tag
+      if: env.CURRENT_VERSION != env.LATEST_TAG
+      run: |
+        git tag $CURRENT_VERSION
+        git push origin $CURRENT_VERSION

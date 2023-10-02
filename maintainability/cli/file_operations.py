@@ -4,7 +4,7 @@ from typing import Dict, List
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
 
-from maintainability.api.src import config
+from . import config
 
 
 def read_text(path: Path) -> str:

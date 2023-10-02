@@ -24,7 +24,7 @@ pytest = "*"
 
 
 [tool.poetry.scripts]
-maintainability = "maintainability.cli.src.cli:cli"
+maintainability = "maintainability.cli.main:cli_runner"
 
 [tool.turbo_docs]
 ignore = [

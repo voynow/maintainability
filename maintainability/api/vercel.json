@@ -7,7 +7,6 @@
             "use": "@vercel/python"
         }
     ],
-    "buildCommand": "ls && cwd",
     "routes": [
         {
             "src": "/api/(.*)",

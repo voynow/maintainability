@@ -30,6 +30,7 @@ jobs:
       run: echo "LATEST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
     - name: Publish Package
+      run: echo "CURRENT_VERSION=$CURRENT_VERSION, LATEST_TAG=$LATEST_TAG"
       if: env.CURRENT_VERSION != env.LATEST_TAG
       uses: celsiusnarhwal/poetry-publish@v2
       with:

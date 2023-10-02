@@ -22,7 +22,6 @@ uvicorn = "*"
 requests = "*"
 pytest = "*"
 
-
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.src.main:cli_runner"
 

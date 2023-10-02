@@ -1,23 +1,27 @@
 #!/bin/bash
 
-# Function to clean up background process
 cleanup() {
-  kill -9 $API_PID
+  if [[ -n $API_PID ]]; then
+    taskkill //PID $API_PID //F 2>/dev/null || true
+  fi
 }
 
-# Register cleanup function to run on script exit
 trap cleanup EXIT
 
-# Exit on error
-set -e
+# Kill existing process on port 8000
+OLD_PID=$(netstat -ano | findstr :8000 | awk '{print $5}' | head -n 1)
+if [[ -n $OLD_PID ]]; then
+  taskkill //PID $OLD_PID //F
+fi
 
-# Set the API_URL environment variable to the local API server
+# Start API
 export API_URL=http://localhost:8000
-
-# Start the API server in the background
+export PYTHONPATH="$PWD"
 poetry run uvicorn maintainability.api.src.main:app --port 8000 &
 API_PID=$!
-sleep 5
 
-# Run the integration tests
-poetry run pytest
+# Give API time to start
+sleep 4
+
+# Run tests
+poetry run pytest || exit 1

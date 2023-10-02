@@ -57,7 +57,7 @@ def call_api_wrapper(endpoint: str, payload: Optional[Dict] = None):
 
 @click.command()
 @click.option("--paths", **options)
-def cli(paths):
+def cli_runner(paths):
     filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
     extracted_metrics = call_api_wrapper(
         endpoint="extract_metrics", payload=filtered_repo
@@ -69,4 +69,4 @@ def cli(paths):
 
 
 if __name__ == "__main__":
-    cli()
+    cli_runner()

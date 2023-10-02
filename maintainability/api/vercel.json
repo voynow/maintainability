@@ -4,10 +4,7 @@
     "builds": [
         {
             "src": "/src/main.py",
-            "use": "@vercel/python",
-            "config": {
-                "buildCommand": "pip install poetry && poetry install"
-            }
+            "use": "@vercel/python"
         }
     ],
     "routes": [

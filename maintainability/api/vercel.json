@@ -3,14 +3,14 @@
     "name": "maintainability",
     "builds": [
         {
-            "src": "maintainability/api/src/main.py",
+            "src": "main.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "maintainability/api/src/main.py"
+            "dest": "main.py"
         }
     ]
 }

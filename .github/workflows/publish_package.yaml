@@ -52,4 +52,6 @@ jobs:
       if: env.CURRENT_VERSION != env.LATEST_TAG
       run: |
         git tag $CURRENT_VERSION
+        git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/voynow/maintainability.git
         git push origin $CURRENT_VERSION
+

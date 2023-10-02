@@ -25,6 +25,9 @@ jobs:
       id: get_version
       run: echo "CURRENT_VERSION=$(poetry version -s)" >> $GITHUB_ENV
 
+    - name: Fetch all tags
+      run: git fetch --tags
+
     - name: Get Latest Tag
       id: get_tag
       run: echo "LATEST_TAG=$(git describe --tags --abbrev=0 || echo '')" >> $GITHUB_ENV

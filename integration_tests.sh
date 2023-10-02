@@ -17,7 +17,7 @@ fi
 # Start API
 export API_URL=http://localhost:8000
 export PYTHONPATH="$PWD"
-poetry run uvicorn maintainability.api.main:app --port 8000 &
+poetry run uvicorn maintainability.api.src.main:app --port 8000 &
 API_PID=$!
 
 # Give API time to start

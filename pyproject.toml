@@ -24,7 +24,7 @@ pytest = "*"
 
 
 [tool.poetry.scripts]
-maintainability = "maintainability.cli.main:cli_runner"
+maintainability = "maintainability.cli.src.main:cli_runner"
 
 [tool.turbo_docs]
 ignore = [
@@ -42,5 +42,4 @@ ignore = [
     "README.md",
     ".pytest_cache",
     ".vercel",
-    "vercel.json",
 ]

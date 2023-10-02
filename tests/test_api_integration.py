@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from maintainability.api import main
+from maintainability.api.src import main
 
 
 # Fixture for test client

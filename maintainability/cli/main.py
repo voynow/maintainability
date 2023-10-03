@@ -40,13 +40,22 @@ def call_api_wrapper(endpoint: str, payload: Optional[Dict] = None):
     :return: Response from the API
     """
     try:
+        logger.info(f"Sending payload of {len(payload.keys())} files to {endpoint}")
         response = call_api(endpoint, payload)
 
     except requests.HTTPError as e:
+        status_code = e.response.status_code
+        response_content = e.response.content.decode("utf-8")
+
+        try:
+            detail = json.loads(response_content)["detail"]
+        except json.JSONDecodeError:
+            detail = response_content
+
         logger.error(
-            f"HTTPError on {endpoint} with code={e.response.status_code}, Response: {e.response.content}"
+            f"HTTPError on {endpoint} with code={status_code}, Detail: {detail}"
         )
-        raise requests.HTTPError(json.loads(e.response.content)["detail"])
+        raise requests.HTTPError(detail, response=e.response)
 
     except Exception as e:
         logger.error(f"Unexpected error when calling {endpoint}: {e}")

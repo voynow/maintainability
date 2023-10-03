@@ -3,7 +3,7 @@ import uuid
 from pathlib import Path
 from typing import Dict
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from . import config, io_operations, metrics_manager, models
 
@@ -30,7 +30,7 @@ async def extract_metrics(repo: Dict[str, str]):
     try:
         for filepath, code in repo.items():
             if len(code.splitlines()) > config.MIN_NUM_LINES:
-                io_operations.logger(f"Processing {filepath}..."
+                io_operations.logger(f"Processing {filepath}...")
                 composite_metrics[filepath] = metrics_manager.compose_metrics(
                     Path(filepath), code, session_id
                 )

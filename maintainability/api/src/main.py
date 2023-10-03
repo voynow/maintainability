@@ -23,7 +23,7 @@ async def submit_metrics(metrics: Dict[str, models.CompositeMetrics]):
     return {"status": "ok", "message": "Metrics submitted successfully."}
 
 
-def compose_repo_metrics(repo: Dict[str, str], session_id: str):
+def compose_repo_metrics(repo: Dict[str, str]):
     session_id = str(uuid.uuid4())
     composite_metrics: Dict[str, models.CompositeMetrics] = {}
 
@@ -33,20 +33,20 @@ def compose_repo_metrics(repo: Dict[str, str], session_id: str):
                 f"Skipping {filepath} because it has less than {config.MIN_NUM_LINES} lines of code."
             )
         else:
-            if filepath.startswith("test") or filepath.endswith("test.py"):
+            if filepath.startswith("test") or Path(filepath).stem.endswith("test"):
                 io_operations.logger(f"Skipping {filepath} because it is a test file.")
             else:
                 io_operations.logger(f"Processing {filepath}...")
                 composite_metrics[filepath] = metrics_manager.compose_metrics(
-                    Path(filepath), code, session_id
+                    filepath, code, session_id
                 )
+    return composite_metrics
 
 
 @app.post("/extract_metrics")
 async def extract_metrics(repo: Dict[str, str]):
     try:
-        composite_metrics = compose_repo_metrics(repo)
+        return compose_repo_metrics(repo)
     except Exception as e:
         logger.exception("An error occurred in /extract_metrics")
         raise HTTPException(status_code=500, detail=str(e))
-    return composite_metrics

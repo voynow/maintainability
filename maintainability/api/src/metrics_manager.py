@@ -49,10 +49,10 @@ def get_maintainability_metrics(
 
 def get_file_metrics(filepath: Path, content: str) -> models.FileMetrics:
     file_size = len(content.encode("utf-8"))
-    language = filepath.suffix.lstrip(".")
+    extension = filepath.split(".")[-1] if "." in filepath else ""
     loc = len(content.splitlines())
     return models.FileMetrics(
-        file_size=file_size, loc=loc, language=language, content=content
+        file_size=file_size, loc=loc, extension=extension, content=content
     )
 
 

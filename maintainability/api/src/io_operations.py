@@ -35,7 +35,7 @@ def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
             "consistency": metrics.maintainability.consistency,
             "debug_error_handling": metrics.maintainability.debug_error_handling,
             "file_size": metrics.file_info.file_size,
-            "language": metrics.file_info.language,
+            "extension": metrics.file_info.extension,
             "loc": metrics.file_info.loc,
             "content": metrics.file_info.content,
             "timestamp": metrics.timestamp,

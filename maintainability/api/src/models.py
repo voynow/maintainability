@@ -12,7 +12,7 @@ class MaintainabilityMetrics(BaseModel):
 class FileMetrics(BaseModel):
     file_size: int
     loc: int
-    language: str
+    extension: str
     content: str
 
 

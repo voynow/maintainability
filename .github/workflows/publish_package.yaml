@@ -12,8 +12,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -23,23 +21,9 @@ jobs:
     - name: Install Poetry
       run: pip install poetry
 
-    - name: Get Current Version
-      id: get_version
-      run: echo "CURRENT_VERSION=$(poetry version -s)" >> $GITHUB_ENV
-
-    - name: Fetch all tags
-      run: git fetch --tags
-
-    - name: Get Latest Tag
-      id: get_tag
-      run: echo "LATEST_TAG=$(git describe --tags --abbrev=0 || echo '')" >> $GITHUB_ENV
-
-    - name: Debug Info
-      run: echo "CURRENT_VERSION=$CURRENT_VERSION, LATEST_TAG=$LATEST_TAG"
-      if: env.CURRENT_VERSION != env.LATEST_TAG
-
     - name: Publish Package
-      if: env.CURRENT_VERSION != env.LATEST_TAG
+      id: publish_step
+      continue-on-error: true
       uses: celsiusnarhwal/poetry-publish@v2
       with:
         python-version: '3.10'
@@ -48,15 +32,5 @@ jobs:
         password: ${{ secrets.PYPI_PASSWORD }}
         build: true
 
-    - name: Configure Git User
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-
-    - name: Create and Push Tag
-      if: env.CURRENT_VERSION != env.LATEST_TAG
-      run: |
-        git tag $CURRENT_VERSION
-        git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/voynow/maintainability.git
-        git push origin $CURRENT_VERSION
-
+    - name: Check Publish Outcome
+      run: echo "Publish step completed with ${{ steps.publish_step.outcome }} status."

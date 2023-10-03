@@ -889,6 +889,17 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "pytz"
+version = "2023.3.post1"
+description = "World timezone definitions, modern and historical"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pytz-2023.3.post1-py2.py3-none-any.whl", hash = "sha256:ce42d816b81b68506614c11e8937d3aa9e41007ceb50bfdcb0749b921bf646c7"},
+    {file = "pytz-2023.3.post1.tar.gz", hash = "sha256:7b4fddbeb94a1eba4b557da24f19fdf9db575192544270a9101d8509f9f43d7b"},
+]
+
+[[package]]
 name = "realtime"
 version = "1.0.0"
 description = ""
@@ -998,13 +1009,13 @@ test = ["pylint", "pytest", "pytest-black", "pytest-cov", "pytest-pylint"]
 
 [[package]]
 name = "supabase"
-version = "1.1.0"
+version = "1.1.1"
 description = "Supabase client for Python."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "supabase-1.1.0-py3-none-any.whl", hash = "sha256:08fb46a10406847de34d45017224b1e5dcf2c0174569f395fd2d3406329523d6"},
-    {file = "supabase-1.1.0.tar.gz", hash = "sha256:180ae43462ed9f73172864908f53b1a0f58b7e7caa1455897380ab9106e08948"},
+    {file = "supabase-1.1.1-py3-none-any.whl", hash = "sha256:6a98021ad1ced3f9e287c01dcad04641d07697a78e3538a3a6352d8c67836325"},
+    {file = "supabase-1.1.1.tar.gz", hash = "sha256:06499b97c05fc2f2c42aab05e2ccd3f34aca2ee573ed82f1b750f59099d0a574"},
 ]
 
 [package.dependencies]
@@ -1073,13 +1084,13 @@ files = [
 
 [[package]]
 name = "urllib3"
-version = "2.0.5"
+version = "2.0.6"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "urllib3-2.0.5-py3-none-any.whl", hash = "sha256:ef16afa8ba34a1f989db38e1dbbe0c302e4289a47856990d0682e374563ce35e"},
-    {file = "urllib3-2.0.5.tar.gz", hash = "sha256:13abf37382ea2ce6fb744d4dad67838eec857c9f4f57009891805e0b5e123594"},
+    {file = "urllib3-2.0.6-py3-none-any.whl", hash = "sha256:7a7c7003b000adf9e7ca2a377c9688bbc54ed41b985789ed576570342a375cd2"},
+    {file = "urllib3-2.0.6.tar.gz", hash = "sha256:b19e1a85d206b56d7df1d5e683df4a7725252a964e3993648dd0fb5a1c157564"},
 ]
 
 [package.extras]
@@ -1275,4 +1286,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f41b31e8a5ed4319695542971e140e18716ddef28d505cd1bb7ee50424e8dfd5"
+content-hash = "7a3aec950ef9b5600c04304462ca9bf168636d1a65492e397d4911e5cafcba54"

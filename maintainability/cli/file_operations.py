@@ -32,7 +32,7 @@ def load_files(basepath: Path = Path(".")) -> Dict[Path, str]:
     return result
 
 
-def filter_repo_by_paths(paths: List[Path]) -> Dict[Path, str]:
+def filter_repo_by_paths(paths: List[Path]) -> Dict[str, str]:
     repo = load_files()
 
     filtered_repo = {}

@@ -1,5 +1,8 @@
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
+
 from maintainability.api.src import main
 
 
@@ -26,7 +29,7 @@ def get_test_content() -> str:
         class FileMetrics:
             file_size: int
             loc: int
-            language: str
+            extension: str
             content: str
 
         @dataclass
@@ -51,7 +54,7 @@ def generate_test_metrics():
             "file_info": {
                 "file_size": 23,
                 "loc": 1,
-                "language": "python",
+                "extension": "py",
                 "content": get_test_content(),
             },
             "timestamp": "2023-09-27T00:00:00Z",
@@ -77,7 +80,8 @@ def test_submit_metrics_with_invalid_data(test_client):
 def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
     response = test_client.post(
-        "/extract_metrics", json={"/test/path/testfile.py": "print('hello world')"}
+        "/extract_metrics",
+        json={"/test/path/testfile.py": "print('hello world')\n" * 100},
     )
     assert response.status_code == 200
     assert isinstance(response.json(), dict)

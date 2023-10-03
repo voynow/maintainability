@@ -21,9 +21,10 @@ fastapi = "*"
 uvicorn = "*"
 requests = "*"
 pytest = "*"
+pytz = "*"
 
 [tool.poetry.scripts]
-maintainability = "maintainability.cli.src.main:cli_runner"
+maintainability = "maintainability.cli.main:cli_runner"
 
 [tool.turbo_docs]
 ignore = [

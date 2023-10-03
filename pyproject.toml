@@ -21,6 +21,7 @@ fastapi = "*"
 uvicorn = "*"
 requests = "*"
 pytest = "*"
+pytz = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.main:cli_runner"

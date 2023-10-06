@@ -1,9 +1,45 @@
 {
     "version": 2,
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/node"
+        }
+    ],
     "routes": [
         {
+            "src": "/static/(.*)",
+            "headers": {
+                "cache-control": "s-maxage=31536000,immutable"
+            },
+            "dest": "/static/$1"
+        },
+        {
+            "src": "/favicon.ico",
+            "dest": "/favicon.ico"
+        },
+        {
+            "src": "/manifest.json",
+            "dest": "/manifest.json"
+        },
+        {
+            "src": "/asset-manifest.json",
+            "dest": "/asset-manifest.json"
+        },
+        {
+            "src": "/precache-manifest.(.*)",
+            "dest": "/precache-manifest.$1"
+        },
+        {
+            "src": "/service-worker.js",
+            "dest": "/service-worker.js",
+            "headers": {
+                "cache-control": "s-maxage=0"
+            }
+        },
+        {
             "src": "/(.*)",
-            "dest": "/"
+            "dest": "/index.html"
         }
     ]
 }

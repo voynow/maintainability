@@ -1,23 +1,9 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "package.json",
-            "use": "@vercel/node"
-        }
-    ],
     "routes": [
         {
-            "src": "^/([^/]+/)?_next/",
-            "dest": "$0"
-        },
-        {
-            "src": "^/([^/]+/)?static/",
-            "dest": "$0"
-        },
-        {
-            "src": ".*",
-            "dest": "/index.html"
+            "src": "/(.*)",
+            "dest": "/"
         }
     ]
 }

@@ -48,4 +48,5 @@ ignore = [
     "integration_tests.sh",
     "pyproject.toml",
     "node_modules",
+    "package-lock.json",
 ]

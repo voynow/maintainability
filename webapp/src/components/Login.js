@@ -13,3 +13,5 @@ const Login = ({ setIsLoggedIn }) => {
         </div>
     );
 };
+
+export default Login;

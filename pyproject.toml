@@ -42,4 +42,11 @@ ignore = [
     "README.md",
     ".pytest_cache",
     ".vercel",
+    ".github",
+    "maintainability",
+    "tests",
+    "integration_tests.sh",
+    "pyproject.toml",
+    "node_modules",
+    "package-lock.json",
 ]

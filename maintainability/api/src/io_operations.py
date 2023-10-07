@@ -59,5 +59,4 @@ def get_user(email: str) -> Dict:
 
     if response.data:
         return response.data[0]
-    else:
-        raise ValueError(f"User {email} not found.")
+    return None

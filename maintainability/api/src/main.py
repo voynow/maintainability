@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import Dict
 import uuid
 
-from fastapi import FastAPI, HTTPException, Depends, Form
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import JSONResponse
 from jose import jwt
 from passlib.context import CryptContext
 
@@ -90,12 +91,13 @@ async def login_for_access_token(token_request: models.TokenRequest):
 
     # Fetch user from DB
     user = io_operations.get_user(email)
-    print(user)
 
     if not user or not pwd_context.verify(password, user["password"]):
-        print("Erroring out")
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
-    print("Passed")
+        logger.warning(f"Unauthorized login attempt: email={email}")
+        return JSONResponse(
+            status_code=401, content={"detail": "Incorrect email or password"}
+        )
+
     access_token = jwt.encode(
         {"sub": email}, os.getenv("JWT_SECRET", "your-secret-key"), algorithm="HS256"
     )

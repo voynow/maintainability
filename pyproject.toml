@@ -22,6 +22,9 @@ uvicorn = "*"
 requests = "*"
 pytest = "*"
 pytz = "*"
+python-jose = "*"
+bcrypt = "*"
+python-multipart = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.main:cli_runner"
@@ -43,7 +46,7 @@ ignore = [
     ".pytest_cache",
     ".vercel",
     ".github",
-    "maintainability",
+    "maintainability/cli/",
     # "webapp",
     "tests",
     "integration_tests.sh",

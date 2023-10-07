@@ -8,6 +8,7 @@ const Login = () => {
     const { setIsLoggedIn } = useAppContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleLogin = async () => {
         try {
@@ -18,8 +19,11 @@ const Login = () => {
             const { access_token } = response.data;
             localStorage.setItem("access_token", access_token);
             setIsLoggedIn(true);
+            setErrorMessage('');
         } catch (err) {
-            console.error("Login failed:", err);
+            const errorMessage = err.response?.data?.detail || 'Login failed';
+            console.error(`Login failed: ${errorMessage}, status code: ${err.response?.status}`);
+            setErrorMessage(errorMessage);
         }
     };
 
@@ -45,6 +49,7 @@ const Login = () => {
                 <p className="mt-4">
                     New here? <a href="/register" className="text-blue-400 underline">Register</a>
                 </p>
+                {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
         </div>
     );

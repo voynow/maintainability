@@ -35,7 +35,7 @@ class CompositeMetrics(BaseModel):
 class User(BaseModel):
     """user information including roles and API key"""
 
-    username: str
+    email: str
     hashed_password: str = Field(..., alias="password")
     role: str
 

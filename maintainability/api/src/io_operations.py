@@ -47,7 +47,7 @@ def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
     return table.insert(insert_data).execute()
 
 
-def write_user(username: str, hashed_password: str, role: str = "user") -> None:
-    user_data = {"username": username, "hashed_password": hashed_password, "role": role}
+def write_user(email: str, hashed_password: str, role: str = "user") -> None:
+    user_data = {"email": email, "hashed_password": hashed_password, "role": role}
     table = connect_to_supabase().table("users")
     table.insert(user_data).execute()

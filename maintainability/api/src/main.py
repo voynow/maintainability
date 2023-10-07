@@ -5,7 +5,7 @@ from typing import Dict
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import jwt
 from passlib.context import CryptContext
 
 from . import config, io_operations, metrics_manager, models
@@ -61,25 +61,25 @@ async def extract_metrics(repo: Dict[str, str]):
 def register(user: models.UserCreate):
     hashed_password = pwd_context.hash(user.password)
     try:
-        io_operations.write_user(user.username, hashed_password)
+        io_operations.write_user(user.email, hashed_password)
     except Exception as e:
         logger.exception("An error occurred in /register")
         raise HTTPException(status_code=500, detail=str(e))
 
     return {
-        "username": user.username,
+        "email": user.email,
         "hashed_password": hashed_password,
         "role": user.role,
     }
 
 
 @app.post("/token", response_model=models.Token)
-def login_for_access_token(username: str, password: str):
+def login_for_access_token(email: str, password: str):
     # Replace this with your actual user authentication logic
-    user = {"username": username, "password": pwd_context.hash(password)}
+    user = {"email": email, "password": pwd_context.hash(password)}
 
     if not pwd_context.verify(password, user["password"]):
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
 
-    access_token = jwt.encode({"sub": username}, "your-secret-key", algorithm="HS256")
+    access_token = jwt.encode({"sub": email}, "your-secret-key", algorithm="HS256")
     return {"access_token": access_token, "token_type": "bearer"}

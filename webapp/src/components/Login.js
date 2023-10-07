@@ -8,7 +8,7 @@ const Login = () => {
         const response = await fetch("/token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: "yourUsername", password: "yourPassword" })
+            body: JSON.stringify({ email: "yourEmail", password: "yourPassword" })
         });
         const data = await response.json();
         localStorage.setItem("access_token", data.access_token);

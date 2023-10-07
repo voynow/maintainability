@@ -1,75 +1,60 @@
-# Maintainability - Codebase Maintainability Analyzer
+# Maintainability 🛠️
 
-![GitHub stars](https://img.shields.io/github/stars/voynow/maintainability)
+![GitHub](https://img.shields.io/github/stars/voynow/maintainability)
 ![PyPI](https://img.shields.io/pypi/v/maintainability)
 
-Maintainability is a Python CLI -> API workflow that innovates on static code analysis using large language models (GPT). It provides a comprehensive analysis of your codebase's maintainability, focusing on readability, design quality, testability, consistency, and debug error handling. 
+This repository contains a full-stack application for tracking code maintainability and quality. The frontend is a work-in-progress. The backend is a Python-based API that uses machine learning to evaluate various dimensions of code maintainability.
 
-## Why Use Maintainability? 🚀
+## 🚀 Why Use This Repo?
 
-In the era of AI, why stick to traditional static code analysis? Maintainability leverages the power of GPT models to provide a more in-depth and intelligent analysis of your codebase. It's not just about finding bugs or syntax errors; it's about improving the quality of your code. 
+Here a comprehensive solution for tracking and improving the maintainability of your codebase is provided. It uses advanced machine learning techniques to evaluate your code on various dimensions such as readability, design quality, testability, consistency, and error handling. The results are then stored in a database and can be accessed via a web-based dashboard.
 
-Imagine a future where this tool is integrated into your CI/CD pipeline, continuously analyzing and improving your codebase. That's the future Maintainability is building towards.
-
-## Repo Structure 📂
+## 📚 Repo Structure
 
 ```
 .
 ├── .github
-│   └── workflows
+│   ├── workflows
 │       ├── integration_tests.yaml
 │       └── publish_package.yaml
 ├── maintainability
 │   ├── api
 │   │   ├── requirements.txt
 │   │   ├── src
+│   │   │   ├── io_operations.py
 │   │   │   ├── main.py
 │   │   │   ├── metrics_manager.py
 │   │   │   ├── models.py
 │   │   │   └── __init__.py
-│   │   └── vercel.json
-│   └── cli
-│       ├── file_operations.py
-│       ├── main.py
-│       └── __init__.py
-├── tests
-│   ├── test_api_integration.py
-│   └── test_cli_integration.py
-├── integration_tests.sh
-├── pyproject.toml
-└── README.md
+│   │   ├── vercel.json
+│   ├── cli
+│   │   ├── file_operations.py
+│   │   ├── main.py
+│   │   └── __init__.py
+├── webapp
+│   ├── .env.development
+│   ├── .env.production
+│   ├── package.json
+│   ├── public
+│   │   └── index.html
+│   ├── src
+│   │   ├── App.js
+│   │   ├── AppContext.js
+│   │   ├── axiosConfig.js
+│   │   ├── components
+│   │   │   ├── Analytics.js
+│   │   │   ├── APIKeys.js
+│   │   │   ├── Login.js
+│   │   │   ├── Main.js
+│   │   │   ├── Payments.js
+│   │   │   ├── Profile.js
+│   │   │   └── Register.js
+│   │   ├── index.css
+│   │   └── index.js
+│   ├── tailwind.config.js
+│   └── vercel.json
 ```
 
-## Usage 💻
+## 🎉 Conclusion
 
-To use Maintainability, you can run it from the command line with the following command:
-
-```bash
-maintainability --paths /path/to/your/code
-```
-
-This will analyze the code at the specified path and return a comprehensive maintainability report.
-
-## Example 📖
-
-Here's an example of how you can use Maintainability to analyze a Python file:
-
-```bash
-maintainability --paths /path/to/your/python/file.py
-```
-
-This will return a maintainability report for `file.py`, providing insights into its readability, design quality, testability, consistency, and debug error handling.
-
-## Future Plans 🌈
-
-We're working towards integrating Maintainability into GitHub Actions as a CI/CD step. This will allow you to continuously analyze and improve your codebase's maintainability with every push.
-
-Stay tuned for more updates!
-
-## Contributing 🤝
-
-Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) for details on how to contribute to this project.
-
-## License 📄
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This repo provides a powerful tool for tracking and improving the maintainability of your code. By using advanced machine learning techniques, it provides insights into your code that would be difficult to obtain otherwise. The frontend is still a work-in-progress, but once completed, it will provide a user-friendly interface for viewing and analyzing the collected metrics.

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MaintainabilityMetrics(BaseModel):
@@ -36,7 +36,7 @@ class User(BaseModel):
     """user information including roles and API key"""
 
     username: str
-    password: str
+    hashed_password: str = Field(..., alias="password")
     role: str
 
 

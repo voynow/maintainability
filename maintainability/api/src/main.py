@@ -57,6 +57,22 @@ async def extract_metrics(repo: Dict[str, str]):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/register", response_model=models.UserCreate)
+def register(user: models.UserCreate):
+    hashed_password = pwd_context.hash(user.password)
+    try:
+        io_operations.write_user(user.username, hashed_password)
+    except Exception as e:
+        logger.exception("An error occurred in /register")
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {
+        "username": user.username,
+        "hashed_password": hashed_password,
+        "role": user.role,
+    }
+
+
 @app.post("/token", response_model=models.Token)
 def login_for_access_token(username: str, password: str):
     # Replace this with your actual user authentication logic

@@ -36,8 +36,13 @@ class User(BaseModel):
     """user information including roles and API key"""
 
     email: str
-    hashed_password: str = Field(..., alias="password")
+    password: str  # hashed password
     role: str
+
+
+class TokenRequest(BaseModel):
+    email: str
+    password: str
 
 
 class Token(BaseModel):

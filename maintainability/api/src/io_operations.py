@@ -48,6 +48,16 @@ def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
 
 
 def write_user(email: str, hashed_password: str, role: str = "user") -> None:
-    user_data = {"email": email, "hashed_password": hashed_password, "role": role}
+    user_data = {"email": email, "password": hashed_password, "role": role}
     table = connect_to_supabase().table("users")
     table.insert(user_data).execute()
+
+
+def get_user(email: str) -> Dict:
+    table = connect_to_supabase().table("users")
+    response = table.select("email, password, role").eq("email", email).execute()
+
+    if response.data:
+        return response.data[0]
+    else:
+        raise ValueError(f"User {email} not found.")

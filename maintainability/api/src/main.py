@@ -1,10 +1,12 @@
 import logging
-import uuid
+import os
 from pathlib import Path
 from typing import Dict
+import uuid
 
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import FastAPI, HTTPException, Depends, Form
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from passlib.context import CryptContext
 
@@ -15,6 +17,14 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
@@ -57,8 +67,8 @@ async def extract_metrics(repo: Dict[str, str]):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/register", response_model=models.UserCreate)
-def register(user: models.UserCreate):
+@app.post("/register", response_model=models.User)
+def register(user: models.User):
     hashed_password = pwd_context.hash(user.password)
     try:
         io_operations.write_user(user.email, hashed_password)
@@ -68,18 +78,25 @@ def register(user: models.UserCreate):
 
     return {
         "email": user.email,
-        "hashed_password": hashed_password,
+        "password": hashed_password,
         "role": user.role,
     }
 
 
 @app.post("/token", response_model=models.Token)
-def login_for_access_token(email: str, password: str):
-    # Replace this with your actual user authentication logic
-    user = {"email": email, "password": pwd_context.hash(password)}
+async def login_for_access_token(token_request: models.TokenRequest):
+    email = token_request.email
+    password = token_request.password
 
-    if not pwd_context.verify(password, user["password"]):
+    # Fetch user from DB
+    user = io_operations.get_user(email)
+    print(user)
+
+    if not user or not pwd_context.verify(password, user["password"]):
+        print("Erroring out")
         raise HTTPException(status_code=401, detail="Incorrect email or password")
-
-    access_token = jwt.encode({"sub": email}, "your-secret-key", algorithm="HS256")
+    print("Passed")
+    access_token = jwt.encode(
+        {"sub": email}, os.getenv("JWT_SECRET", "your-secret-key"), algorithm="HS256"
+    )
     return {"access_token": access_token, "token_type": "bearer"}

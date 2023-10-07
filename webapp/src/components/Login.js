@@ -1,11 +1,20 @@
 import { useAppContext } from '../AppContext';
+import axios from 'axios';
 
 const Login = () => {
     const { setIsLoggedIn } = useAppContext();
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
+        const response = await fetch("/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: "yourUsername", password: "yourPassword" })
+        });
+        const data = await response.json();
+        localStorage.setItem("access_token", data.access_token);
         setIsLoggedIn(true);
     };
+
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">

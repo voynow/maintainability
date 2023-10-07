@@ -57,44 +57,13 @@ async def extract_metrics(repo: Dict[str, str]):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
-    encoded_jwt = jwt.encode(to_encode, "your-secret-key", algorithm="HS256")
-    return encoded_jwt
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
 @app.post("/token", response_model=models.Token)
 def login_for_access_token(username: str, password: str):
     # Replace this with your actual user authentication logic
-    user = {"username": username, "password": get_password_hash(password)}
+    user = {"username": username, "password": pwd_context.hash(password)}
 
-    if not verify_password(password, user["password"]):
+    if not pwd_context.verify(password, user["password"]):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    access_token = create_access_token(data={"sub": username})
+    access_token = jwt.encode({"sub": username}, "your-secret-key", algorithm="HS256")
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-    )
-    try:
-        payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-
-    # Add logic to retrieve user from DB here
-    return username

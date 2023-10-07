@@ -9,12 +9,22 @@ export const useAppContext = () => {
 export const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentPage, setCurrentPage] = useState('Analytics');
+    const [accessToken, setAccessToken] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+            setAccessToken(token);
+        }
+    }, []);
 
     const value = {
         isLoggedIn,
         setIsLoggedIn,
         currentPage,
-        setCurrentPage
+        setCurrentPage,
+        accessToken,
+        setAccessToken,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

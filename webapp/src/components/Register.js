@@ -3,16 +3,16 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const history = useHistory();
 
     const handleRegister = async () => {
-        const navigate = useNavigate();
         try {
             await axios.post("/register", {
                 email,
-                password
+                password,
+                role: "some_default_role"
             });
             navigate('/login');
         } catch (err) {
@@ -24,7 +24,7 @@ const Register = () => {
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
-                <h1 className="text-2xl mb-4">Register for Maintainability</h1>
+                <h1 className="text-xl mb-4">Welcome to Maintainability!</h1>
                 <input
                     type="text"
                     placeholder="Email"
@@ -40,6 +40,9 @@ const Register = () => {
                 <button onClick={handleRegister} className="p-3 w-full bg-green-500 text-white rounded">
                     Register
                 </button>
+                <p className="mt-4">
+                    Already have an account? <a href="/login" className="text-blue-500 underline">Log In</a>
+                </p>
             </div>
         </div>
     );

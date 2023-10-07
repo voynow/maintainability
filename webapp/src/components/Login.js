@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../AppContext';
 import axios from 'axios';
 import '../axiosConfig';
-
 
 const Login = () => {
     const { setIsLoggedIn } = useAppContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [mounted, setMounted] = useState(true);
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
 
     const handleLogin = async () => {
         try {
@@ -16,21 +21,25 @@ const Login = () => {
                 email,
                 password,
             });
-            const { access_token } = response.data;
-            localStorage.setItem("access_token", access_token);
-            setIsLoggedIn(true);
-            setErrorMessage('');
+            if (mounted) {
+                const { access_token } = response.data;
+                localStorage.setItem("access_token", access_token);
+                setIsLoggedIn(true);
+                setErrorMessage('');
+            }
         } catch (err) {
-            const errorMessage = err.response?.data?.detail || 'Login failed';
-            console.error(`Login failed: ${errorMessage}, status code: ${err.response?.status}`);
-            setErrorMessage(errorMessage);
+            if (mounted) {
+                const errMsg = err.response?.data?.detail || 'Login failed';
+                console.error(`Login failed: ${errMsg}, status code: ${err.response?.status}`);
+                setErrorMessage(errMsg);
+            }
         }
     };
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
-                <h1 className="text-2xl mb-4">Welcome to Maintainability</h1>
+                <h1 className="text-4xl mb-4">Maintainability</h1>
                 <input
                     type="text"
                     placeholder="Email"

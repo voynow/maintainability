@@ -2,6 +2,8 @@ from pydantic import BaseModel
 
 
 class MaintainabilityMetrics(BaseModel):
+    """various dimensions of code maintainability"""
+
     readability: int = 0
     design_quality: int = 0
     testability: int = 0
@@ -10,6 +12,8 @@ class MaintainabilityMetrics(BaseModel):
 
 
 class FileMetrics(BaseModel):
+    """File analysis metadata and content"""
+
     file_size: int
     loc: int
     extension: str
@@ -17,7 +21,27 @@ class FileMetrics(BaseModel):
 
 
 class CompositeMetrics(BaseModel):
+    """
+    Composiiton of maintainability, file metrics, and user information
+    TODO add user_id
+    """
+
     maintainability: MaintainabilityMetrics
     file_info: FileMetrics
     timestamp: str
     session_id: str
+
+
+class User(BaseModel):
+    """user information including roles and API key"""
+
+    username: str
+    password: str
+    role: str
+
+
+class Token(BaseModel):
+    """JWT token information"""
+
+    access_token: str
+    token_type: str  # generally 'bearer'

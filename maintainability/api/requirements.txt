@@ -2,3 +2,4 @@ llm_blocks==0.3.7
 supabase==1.0.4
 fastapi==0.103.1
 pytz
+PyJWT

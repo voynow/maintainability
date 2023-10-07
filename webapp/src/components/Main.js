@@ -1,44 +1,32 @@
-import React, { useState } from 'react';
-import NavButton from './common/NavButton';
+import React from 'react';
+import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
 import Analytics from './Analytics';
 import APIKeys from './APIKeys';
 import Payments from './Payments';
 import Profile from './Profile';
 
 const Main = () => {
-  const [currentPage, setCurrentPage] = useState('Analytics');
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'Analytics':
-        return <Analytics />;
-      case 'API Keys':
-        return <APIKeys />;
-      case 'Payments':
-        return <Payments />;
-      case 'Profile':
-        return <Profile />;
-      default:
-        return <Analytics />;
-    }
-  };
-
   return (
-    <div className='flex flex-col h-full p-8 bg-white rounded-lg shadow-md w-full'>
-      <nav className='mb-4 flex justify-between items-center'>
-        <button onClick={() => setCurrentPage('Analytics')}>
-          Home
-        </button>
-        <div>
-          <NavButton label="API Keys" onClick={() => setCurrentPage('API Keys')} />
-          <NavButton label="Payments" onClick={() => setCurrentPage('Payments')} />
-          <NavButton label="Profile" onClick={() => setCurrentPage('Profile')} />
+    <BrowserRouter>
+      <div className='flex flex-col h-full p-8 bg-white rounded-lg shadow-md w-full'>
+        <nav className='mb-4 flex justify-between items-center'>
+          <Link to="/">Home</Link>
+          <div>
+            <Link to="/apikeys">API Keys</Link>
+            <Link to="/payments">Payments</Link>
+            <Link to="/profile">Profile</Link>
+          </div>
+        </nav>
+        <div id='content' className='flex flex-col items-center'>
+          <Routes>
+            <Route index element={<Analytics />} />
+            <Route path="/apikeys" element={<APIKeys />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/profile" element={<Profile />} />
+          </Routes>
         </div>
-      </nav>
-      <div id='content' className='flex flex-col items-center'>
-        {renderPage()}
       </div>
-    </div>
+    </BrowserRouter>
   );
 };
 

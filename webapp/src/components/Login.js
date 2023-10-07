@@ -1,4 +1,8 @@
-const Login = ({ setIsLoggedIn }) => {
+import { useAppContext } from '../AppContext';
+
+const Login = () => {
+    const { setIsLoggedIn } = useAppContext();
+
     const handleLogin = () => {
         setIsLoggedIn(true);
     };

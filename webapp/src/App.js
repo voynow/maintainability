@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Login from './components/Login';
 import Main from './components/Main';
+import { useAppContext } from './AppContext';
 
 const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn, setIsLoggedIn } = useAppContext();
 
     return (
         <div className="h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
-            {isLoggedIn ? <Main /> : <Login setIsLoggedIn={setIsLoggedIn} />}
+            {isLoggedIn ? <Main /> : <Login />}
         </div>
     );
 };

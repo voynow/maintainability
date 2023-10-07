@@ -42,6 +42,9 @@ const Login = () => {
                 <button onClick={handleLogin} className="p-3 w-full bg-green-500 text-white rounded">
                     Login
                 </button>
+                <p className="mt-4">
+                    New here? <a href="/register" className="text-blue-400 underline">Register</a>
+                </p>
             </div>
         </div>
     );

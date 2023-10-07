@@ -4,6 +4,7 @@ import Analytics from './Analytics';
 import APIKeys from './APIKeys';
 import Payments from './Payments';
 import Profile from './Profile';
+import Register from './Register';
 
 const Main = () => {
   return (
@@ -20,6 +21,7 @@ const Main = () => {
         <div id='content' className='flex flex-col items-center'>
           <Routes>
             <Route index element={<Analytics />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/apikeys" element={<APIKeys />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/profile" element={<Profile />} />

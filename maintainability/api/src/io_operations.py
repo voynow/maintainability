@@ -60,3 +60,23 @@ def get_user(email: str) -> Dict:
     if response.data:
         return response.data[0]
     return None
+
+
+def api_key_exists(api_key: str) -> bool:
+    table = connect_to_supabase().table("api_keys")
+    response = table.select("api_key").eq('"api_key"', api_key).execute()
+
+    if response.data:
+        return True
+    return False
+
+
+def write_api_key(api_key: str, user: str, creation_date: datetime, status: str):
+    api_key_data = {
+        "api_key": api_key,
+        "user": user,
+        "creation_date": creation_date,
+        "status": status,
+    }
+    table = connect_to_supabase().table("api_keys")
+    table.insert(api_key_data).execute()

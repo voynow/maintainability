@@ -1,14 +1,16 @@
+import base64
 import logging
 import os
+import secrets
+import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Dict
-import uuid
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from passlib.context import CryptContext
 
@@ -99,7 +101,6 @@ async def login_for_access_token(token_request: models.TokenRequest):
     email = token_request.email
     password = token_request.password
 
-    # Fetch user from DB
     user = io_operations.get_user(email)
 
     if not user or not pwd_context.verify(password, user["password"]):
@@ -112,3 +113,21 @@ async def login_for_access_token(token_request: models.TokenRequest):
         {"sub": email}, os.getenv("JWT_SECRET", "your-secret-key"), algorithm="HS256"
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.post("/generate_key")
+async def generate_key(user: models.User):
+    random_bytes = secrets.token_bytes(32)
+    api_key = base64.urlsafe_b64encode(random_bytes).decode("utf-8")
+
+    while io_operations.api_key_exists(api_key):
+        random_bytes = secrets.token_bytes(32)
+        api_key = base64.urlsafe_b64encode(random_bytes).decode("utf-8")
+
+    io_operations.write_api_key(
+        api_key=api_key,
+        user=user["email"],
+        creation_date=datetime.utcnow().isoformat(),
+        status="active",
+    )
+    return {"api_key": api_key}

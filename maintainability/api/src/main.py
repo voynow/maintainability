@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
+from fastapi import Request
 from jose import jwt
 from passlib.context import CryptContext
 
@@ -26,6 +27,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception("An unhandled exception occurred")
+    return JSONResponse(
+        status_code=500,
+        content={"message": "Internal Server Error"},
+    )
 
 
 @app.get("/health")

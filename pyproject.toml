@@ -25,6 +25,7 @@ pytz = "*"
 python-jose = "*"
 bcrypt = "*"
 python-multipart = "*"
+passlib = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.main:cli_runner"
@@ -46,7 +47,7 @@ ignore = [
     ".pytest_cache",
     ".vercel",
     ".github",
-    "maintainability/cli/",
+    "maintainability/",
     # "webapp",
     "tests",
     "integration_tests.sh",

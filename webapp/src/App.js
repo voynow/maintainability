@@ -10,7 +10,7 @@ const App = () => {
     const { isLoggedIn } = useAppContext();
 
     return (
-        <div className="h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
+        <div className="h-screen">
             <BrowserRouter>
                 <Routes>
                     <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/" />} />

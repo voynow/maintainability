@@ -24,6 +24,13 @@ def connect_to_supabase() -> Client:
     )
 
 
+def connect_to_supabase_table(table_name: str) -> Client:
+    return create_client(
+        os.environ.get("SUPABASE_URL"),
+        os.environ.get("SUPABASE_KEY"),
+    ).table(table_name)
+
+
 def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
     insert_data = [
         {
@@ -43,18 +50,18 @@ def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
         }
         for filepath, metrics in metrics.items()
     ]
-    table = connect_to_supabase().table("maintainability")
+    table = connect_to_supabase_table("maintainability")
     return table.insert(insert_data).execute()
 
 
-def write_user(email: str, hashed_password: str, role: str = "user") -> None:
+def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:
     user_data = {"email": email, "password": hashed_password, "role": role}
-    table = connect_to_supabase().table("users")
-    table.insert(user_data).execute()
+    table = connect_to_supabase_table("users")
+    return table.insert(user_data).execute()
 
 
 def get_user(email: str) -> Dict:
-    table = connect_to_supabase().table("users")
+    table = connect_to_supabase_table("users")
     response = table.select("email, password, role").eq("email", email).execute()
 
     if response.data:
@@ -63,7 +70,7 @@ def get_user(email: str) -> Dict:
 
 
 def api_key_exists(api_key: str) -> bool:
-    table = connect_to_supabase().table("api_keys")
+    table = connect_to_supabase_table("api_keys")
     response = table.select("api_key").eq('"api_key"', api_key).execute()
 
     if response.data:
@@ -71,12 +78,14 @@ def api_key_exists(api_key: str) -> bool:
     return False
 
 
-def write_api_key(api_key: str, user: str, creation_date: datetime, status: str):
+def write_api_key(
+    api_key: str, user: str, creation_date: datetime, status: str
+) -> Tuple:
     api_key_data = {
         "api_key": api_key,
         "user": user,
         "creation_date": creation_date,
         "status": status,
     }
-    table = connect_to_supabase().table("api_keys")
-    table.insert(api_key_data).execute()
+    table = connect_to_supabase_table("api_keys")
+    return table.insert(api_key_data).execute()

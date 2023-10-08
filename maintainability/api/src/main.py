@@ -115,14 +115,16 @@ async def login_for_access_token(token_request: models.TokenRequest):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+def generate_new_api_key():
+    random_bytes = secrets.token_bytes(32)
+    return base64.urlsafe_b64encode(random_bytes).decode("utf-8")
+
+
 @app.post("/generate_key")
 async def generate_key(user: models.User):
-    random_bytes = secrets.token_bytes(32)
-    api_key = base64.urlsafe_b64encode(random_bytes).decode("utf-8")
-
+    api_key = generate_new_api_key()
     while io_operations.api_key_exists(api_key):
-        random_bytes = secrets.token_bytes(32)
-        api_key = base64.urlsafe_b64encode(random_bytes).decode("utf-8")
+        api_key = generate_new_api_key()
 
     io_operations.write_api_key(
         api_key=api_key,

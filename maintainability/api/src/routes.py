@@ -66,14 +66,14 @@ async def login_for_access_token(token_request: models.TokenRequest):
 
 
 @router.post("/generate_key")
-async def generate_key(user: models.User):
+async def generate_key(email_obj: Dict[str, str]):
     api_key = routes_helper.generate_new_api_key()
     while io_operations.api_key_exists(api_key):
         api_key = routes_helper.generate_new_api_key()
 
     io_operations.write_api_key(
         api_key=api_key,
-        user=user["email"],
+        user=email_obj["email"],
         creation_date=datetime.utcnow().isoformat(),
         status="active",
     )

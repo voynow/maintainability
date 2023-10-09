@@ -33,7 +33,7 @@ class CompositeMetrics(BaseModel):
 
 
 class User(BaseModel):
-    """user information including roles and API key"""
+    """user information"""
 
     email: str
     password: str  # hashed password

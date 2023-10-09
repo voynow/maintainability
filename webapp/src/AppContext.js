@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentPage, setCurrentPage] = useState('Analytics');
     const [accessToken, setAccessToken] = useState(null);
+    const [email, setEmail] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem("access_token");
@@ -25,6 +26,8 @@ export const AppProvider = ({ children }) => {
         setCurrentPage,
         accessToken,
         setAccessToken,
+        email,
+        setEmail,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from . import middleware, routes
+from . import routes
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,5 +15,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.middleware("http")(middleware.api_key_middleware)
+app.middleware("http")(routes.api_key_middleware)
 app.include_router(routes.router)

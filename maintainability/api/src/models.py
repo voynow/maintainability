@@ -50,3 +50,12 @@ class Token(BaseModel):
 
     access_token: str
     token_type: str  # generally 'bearer'
+
+
+class APIKey(BaseModel):
+    """API key information"""
+
+    api_key: str
+    user: str
+    creation_date: str
+    status: str = Field("active", description="active or inactive")

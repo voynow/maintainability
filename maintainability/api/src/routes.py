@@ -3,12 +3,27 @@ from datetime import datetime
 from typing import Dict
 
 import jwt
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse
 from jose import jwt
 
 from . import io_operations, models, routes_helper
 
 router = APIRouter()
+
+
+async def api_key_middleware(request: Request, call_next):
+    if request.url.path in ["/submit_metrics", "/extract_metrics"]:
+        api_key = request.headers.get("X-API-KEY", None)
+        if api_key is None:
+            return JSONResponse(
+                status_code=400, content={"detail": "API key header missing"}
+            )
+        if not io_operations.api_key_exists(api_key):
+            return JSONResponse(status_code=401, content={"detail": "Invalid API Key"})
+
+    response = await call_next(request)
+    return response
 
 
 @router.get("/health")
@@ -43,6 +58,7 @@ async def login_for_access_token(token_request: models.TokenRequest):
     password = token_request.password
     routes_helper.validate_user(email, password)
 
+    # TODO add secret key
     access_token = jwt.encode(
         {"sub": email}, os.getenv("JWT_SECRET", "your-secret-key"), algorithm="HS256"
     )

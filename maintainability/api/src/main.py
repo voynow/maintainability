@@ -15,5 +15,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.middleware("http")(middleware.add_session_id)
+app.middleware("http")(middleware.api_key_middleware)
 app.include_router(routes.router)

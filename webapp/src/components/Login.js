@@ -4,7 +4,6 @@ import axios from 'axios';
 import '../axiosConfig';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 
 const Login = () => {
     const { setIsLoggedIn, setEmail: setGlobalEmail } = useAppContext();
@@ -41,40 +40,35 @@ const Login = () => {
     };
 
     return (
-        <Box
-            sx={{
-                backgroundColor: (theme) => theme.palette.primary.main,
-                height: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}
-        >
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-blue-300 via-blue-500 to-blue-600">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
-                <h1 className="text-3xl mb-4">Maintainability</h1>
+                <h1 className="text-4xl mb-4 font-semibold text-gray-800">Maintainability</h1>
                 <TextField
                     type="text"
                     placeholder="Email"
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mb-4 p-1 border rounded w-full"
+                    className="mb-4 p-1 w-full rounded border-2"
                 />
                 <TextField
                     type="password"
                     placeholder="Password"
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mb-4 p-1 border rounded w-full"
+                    className="mb-4 p-1 w-full rounded border-2"
                 />
-                <Button onClick={handleLogin} className="p-3 w-full bg-green-500 text-white rounded">
+                <button
+                    onClick={handleLogin}
+                    className="p-3 w-full bg-blue-500 text-white rounded-lg hover:bg-blue-300 focus:outline-none focus:ring focus:ring-blue-200">
                     Login
-                </Button>
+                </button>
                 <p className="mt-4">
-                    New here? <a href="/register" className="text-blue-400 underline">Register</a>
+                    New here?&nbsp;
+                    <a href="/register" className="text-indigo-400 underline hover:text-indigo-500">Register</a>
                 </p>
                 {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
-        </Box>
+        </div>
     );
 };
+
 
 export default Login;

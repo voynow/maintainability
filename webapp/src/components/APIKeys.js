@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Button from '@mui/material/Button';
 import { useAppContext } from '../AppContext';
 
 const APIKeys = () => {
@@ -44,42 +45,9 @@ const APIKeys = () => {
         }
     };
 
-    const deleteApiKey = async (apiKey) => {
-        try {
-            await axios.delete(`/api_keys/${apiKey}`);
-            setApiKeys(apiKeys.filter(key => key.api_key !== apiKey));
-        } catch (err) {
-            setError('Failed to delete API key.');
-        }
-    };
-
-    const copyToClipboard = (apiKey) => {
-        navigator.clipboard.writeText(apiKey).catch(err => {
-            setError('Failed to copy API key.');
-        });
-    };
-
     return (
         <div className="space-y-4">
-            <div className="flex space-x-2">
-                <input
-                    type="text"
-                    placeholder="API Key Name"
-                    value={newKeyName}
-                    onChange={(e) => setNewKeyName(e.target.value)}
-                    className="border p-2 rounded"
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={generateApiKey}
-                    disabled={loading || !newKeyName}
-                >
-                    {loading ? <CircularProgress size={24} /> : 'Generate New Key'}
-                </Button>
-            </div>
-
-            <Table style={{ width: '100%', tableLayout: 'fixed' }}>
+            <Table className="min-w-full bg-white rounded-lg shadow-md">
                 <TableHead>
                     <TableRow>
                         <TableCell style={{ width: '5%' }}>#</TableCell>
@@ -93,7 +61,7 @@ const APIKeys = () => {
                         <TableRow key={index}>
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{keyObj.name}</TableCell>
-                            <TableCell style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <TableCell>
                                 {revealKey === keyObj.api_key ? keyObj.api_key : '****************'}
                             </TableCell>
                             <TableCell>
@@ -108,8 +76,24 @@ const APIKeys = () => {
                 </TableBody>
             </Table>
 
-
             {error && <Typography variant="body2" color="error">{error}</Typography>}
+
+            <div className="flex space-x-2 mt-4">
+                <TextField
+                    type="text"
+                    placeholder="New Key Name"
+                    value={newKeyName}
+                    onChange={(e) => setNewKeyName(e.target.value)}
+                    className="p-1 w-full rounded border-2"
+                />
+                <button
+                    onClick={generateApiKey}
+                    disabled={loading || !newKeyName}
+                    className="bg-blue-500 text-white rounded-lg hover:bg-blue-300 focus:outline-none focus:ring focus:ring-blue-200"
+                >
+                    {loading ? <CircularProgress size={24} /> : '+'}
+                </button>
+            </div>
         </div>
     );
 };

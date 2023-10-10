@@ -66,15 +66,32 @@ async def login_for_access_token(token_request: models.TokenRequest):
 
 
 @router.post("/generate_key")
-async def generate_key(email_obj: Dict[str, str]):
+async def generate_key(new_key: Dict[str, str]):
     api_key = routes_helper.generate_new_api_key()
     while io_operations.api_key_exists(api_key):
         api_key = routes_helper.generate_new_api_key()
 
     io_operations.write_api_key(
         api_key=api_key,
-        user=email_obj["email"],
+        user=new_key["email"],
+        name=new_key["name"],
         creation_date=datetime.utcnow().isoformat(),
         status="active",
     )
     return {"api_key": api_key}
+
+
+@router.get("/api_keys")
+async def list_api_keys(email: str):
+    api_keys = io_operations.list_api_keys(email)
+    print(api_keys)
+    return {"api_keys": api_keys}
+
+
+@router.delete("/api_keys/{api_key}")
+async def remove_api_key(api_key: str):
+    if io_operations.api_key_exists(api_key):
+        io_operations.delete_api_key(api_key)
+        return {"message": "API key deleted successfully"}
+    else:
+        return {"message": "API key not found"}, 404

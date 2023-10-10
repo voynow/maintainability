@@ -6,8 +6,7 @@ import Typography from '@mui/material/Typography';
 import { useAppContext } from '../AppContext';
 
 const APIKeys = () => {
-    const [apiKey, setApiKey] = useState(null);
-    const [apiKeys, setApiKeys] = useState([]); // new state
+    const [apiKeys, setApiKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { email } = useAppContext();
@@ -18,10 +17,9 @@ const APIKeys = () => {
                 const response = await axios.get('/api_keys', { params: { email } });
                 setApiKeys(response.data.api_keys);
             } catch (err) {
-                console.error('Failed to fetch API keys:', err);
+                setError('Failed to fetch API keys.');
             }
         };
-
         fetchApiKeys();
     }, []);
 
@@ -30,33 +28,46 @@ const APIKeys = () => {
         setError(null);
         try {
             const response = await axios.post('/generate_key', { email });
-            setApiKey(response.data.api_key);
-            setApiKeys([...apiKeys, response.data.api_key]); // update the list
+            setApiKeys([...apiKeys, response.data]);
         } catch (err) {
-            setError('Failed to generate API key. Please try again.');
+            setError('Failed to generate API key.');
         } finally {
             setLoading(false);
         }
     };
 
-    const deleteApiKey = async (keyToDelete) => {
+    const deleteApiKey = async (apiKey) => {
         try {
-            await axios.delete(`/api_keys/${keyToDelete}`);
-            setApiKeys(apiKeys.filter(key => key !== keyToDelete)); // update the list
+            await axios.delete(`/api_keys/${apiKey}`);
+            setApiKeys(apiKeys.filter(key => key.api_key !== apiKey));
         } catch (err) {
-            console.error('Failed to delete API key:', err);
+            setError('Failed to delete API key.');
         }
     };
 
+    const copyToClipboard = (apiKey) => {
+        navigator.clipboard.writeText(apiKey).catch(err => {
+            setError('Failed to copy API key.');
+        });
+    };
+
     return (
-        <div>
-            <Button variant="contained" color="primary" onClick={generateApiKey} disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : 'Generate API Key'}
+        <div className="space-y-4">
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={generateApiKey}
+                disabled={loading}
+            >
+                {loading ? <CircularProgress size={24} /> : 'Generate New Key'}
             </Button>
             {apiKeys.map((keyObj, index) => (
-                <div key={index}>
+                <div key={index} className="flex justify-between items-center">
                     <Typography variant="body1">{keyObj.api_key}</Typography>
-                    <Button variant="outlined" onClick={() => deleteApiKey(keyObj.api_key)}>Delete</Button>
+                    <div className="space-x-2">
+                        <Button variant="outlined" onClick={() => deleteApiKey(keyObj.api_key)}>Delete</Button>
+                        <Button variant="outlined" onClick={() => copyToClipboard(keyObj.api_key)}>Copy</Button>
+                    </div>
                 </div>
             ))}
             {error && <Typography variant="body2" color="error">{error}</Typography>}

@@ -100,4 +100,4 @@ def list_api_keys(email: str) -> List[Dict]:
 
 def delete_api_key(api_key: str) -> None:
     table = connect_to_supabase_table("api_keys")
-    table.delete().eq('"api_key"', api_key).execute()
+    return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()

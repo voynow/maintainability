@@ -20,7 +20,7 @@ options = {
     "base_url": {
         "type": str,
         "help": "Base API URL",
-        "default": "https://maintainability.vercel.app",
+        "default": "https://maintainabilityapi.vercel.app",
     },
 }
 

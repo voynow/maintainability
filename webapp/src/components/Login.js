@@ -4,6 +4,7 @@ import axios from 'axios';
 import '../axiosConfig';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 
 const Login = () => {
     const { setIsLoggedIn, setEmail: setGlobalEmail } = useAppContext();
@@ -40,7 +41,16 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
+        <Box
+            sx={{
+                backgroundColor: (theme) => theme.palette.primary.main,
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
+        >
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-3xl mb-4">Maintainability</h1>
                 <TextField
@@ -63,7 +73,7 @@ const Login = () => {
                 </p>
                 {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
-        </div>
+        </Box>
     );
 };
 

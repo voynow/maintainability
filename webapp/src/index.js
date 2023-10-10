@@ -1,10 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { AppProvider } from './AppContext';
-import './index.css';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './theme';
+import App from './App';
+
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#5687C1',
+        },
+    },
+});
 
 ReactDOM.render(
     <React.StrictMode>

@@ -47,7 +47,7 @@ ignore = [
     ".pytest_cache",
     ".vercel",
     ".github",
-    # "maintainability/",
+    "maintainability/",
     # "webapp",
     "tests",
     "integration_tests.sh",

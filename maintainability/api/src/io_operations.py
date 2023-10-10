@@ -79,11 +79,12 @@ def api_key_exists(api_key: str) -> bool:
 
 
 def write_api_key(
-    api_key: str, user: str, creation_date: datetime, status: str
+    api_key: str, user: str, name: str, creation_date: datetime, status: str
 ) -> Tuple:
     api_key_data = {
         "api_key": api_key,
         "user": user,
+        "name": name,
         "creation_date": creation_date,
         "status": status,
     }

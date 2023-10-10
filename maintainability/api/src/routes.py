@@ -78,3 +78,18 @@ async def generate_key(email_obj: Dict[str, str]):
         status="active",
     )
     return {"api_key": api_key}
+
+
+@router.get("/api_keys")
+async def list_api_keys(email: str):
+    api_keys = io_operations.list_api_keys(email)
+    return {"api_keys": api_keys}
+
+
+@router.delete("/api_keys/{api_key}")
+async def remove_api_key(api_key: str):
+    if io_operations.api_key_exists(api_key):
+        io_operations.delete_api_key(api_key)
+        return {"message": "API key deleted successfully"}
+    else:
+        return {"message": "API key not found"}, 404

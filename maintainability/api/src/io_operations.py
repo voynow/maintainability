@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 from pytz import utc
 from supabase import Client, create_client
@@ -89,3 +89,15 @@ def write_api_key(
     }
     table = connect_to_supabase_table("api_keys")
     return table.insert(api_key_data).execute()
+
+
+def list_api_keys(email: str) -> List[Dict]:
+    table = connect_to_supabase_table("api_keys")
+    response = table.select("*").eq("user", email).execute()
+
+    return response.data if response.data else []
+
+
+def delete_api_key(api_key: str) -> None:
+    table = connect_to_supabase_table("api_keys")
+    table.delete().eq('"api_key"', api_key).execute()

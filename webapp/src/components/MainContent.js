@@ -3,7 +3,7 @@ import Container from '@mui/material/Container';
 
 const MainContent = ({ children }) => {
     return (
-        <Container>
+        <Container style={{ flex: 1, overflowY: 'auto', marginTop: '64px' }}>
             {children}
         </Container>
     );

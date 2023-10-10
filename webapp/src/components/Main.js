@@ -11,12 +11,18 @@ import Register from './Register';
 import Sidebar from './Sidebar';
 
 const Main = () => {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className='flex flex-row h-full'>
-      <Header />
-      <Sidebar />
-      <MainContent>
-        <div id='content' className='flex flex-col items-center'>
+    <div className='flex flex-col h-full'>
+      <Header toggleSidebar={toggleSidebar} />
+      <div className='flex flex-row flex-grow'>
+        <Sidebar isOpen={sidebarOpen} toggleDrawer={toggleSidebar} />
+        <MainContent>
           <Routes>
             <Route index element={<Analytics />} />
             <Route path="/register" element={<Register />} />
@@ -24,8 +30,8 @@ const Main = () => {
             <Route path="/payments" element={<Payments />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
-        </div>
-      </MainContent>
+        </MainContent>
+      </div>
       <Footer />
     </div>
   );

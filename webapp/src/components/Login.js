@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 const Login = () => {
-    const { setIsLoggedIn } = useAppContext();
+    const { setIsLoggedIn, setEmail: setGlobalEmail } = useAppContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -27,6 +27,7 @@ const Login = () => {
                 const { access_token } = response.data;
                 localStorage.setItem("access_token", access_token);
                 setIsLoggedIn(true);
+                setGlobalEmail(email);
                 setErrorMessage('');
             }
         } catch (err) {

@@ -93,7 +93,7 @@ def write_api_key(
 
 def list_api_keys(email: str) -> List[Dict]:
     table = connect_to_supabase_table("api_keys")
-    response = table.select("*").eq("user", email).execute()
+    response = table.select("*").eq("user", email).eq("status", "active").execute()
 
     return response.data if response.data else []
 

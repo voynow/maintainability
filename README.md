@@ -1,60 +1,71 @@
-# Maintainability 🛠️
+# Maintainability 🚀
 
-![GitHub](https://img.shields.io/github/stars/voynow/maintainability)
-![PyPI](https://img.shields.io/pypi/v/maintainability)
+![GitHub](https://img.shields.io/github/license/voynow/maintainability)
+![GitHub last commit](https://img.shields.io/github/last-commit/voynow/maintainability)
 
-This repository contains a full-stack application for tracking code maintainability and quality. The frontend is a work-in-progress. The backend is a Python-based API that uses machine learning to evaluate various dimensions of code maintainability.
+Unlock the full potential of your codebase! Our platform offers an end-to-end solution to analyze, track, and elevate your code quality. 
 
-## 🚀 Why Use This Repo?
+## 📌 Main Components
 
-Here a comprehensive solution for tracking and improving the maintainability of your codebase is provided. It uses advanced machine learning techniques to evaluate your code on various dimensions such as readability, design quality, testability, consistency, and error handling. The results are then stored in a database and can be accessed via a web-based dashboard.
+1. **🌐 API**: The powerhouse of our platform. Provides robust endpoints for metrics, user management, and more.
+2. **💻 CLI**: Your local companion for fetching key metrics from your codebase and sending them effortlessly to our API.
+3. **🖥️ Frontend**: An intuitive dashboard for real-time insights and management of your account and API keys.
 
-## 📚 Repo Structure
+---
 
-```
-.
-├── .github
-│   ├── workflows
-│       ├── integration_tests.yaml
-│       └── publish_package.yaml
-├── maintainability
-│   ├── api
-│   │   ├── requirements.txt
-│   │   ├── src
-│   │   │   ├── io_operations.py
-│   │   │   ├── main.py
-│   │   │   ├── metrics_manager.py
-│   │   │   ├── models.py
-│   │   │   └── __init__.py
-│   │   ├── vercel.json
-│   ├── cli
-│   │   ├── file_operations.py
-│   │   ├── main.py
-│   │   └── __init__.py
-├── webapp
-│   ├── .env.development
-│   ├── .env.production
-│   ├── package.json
-│   ├── public
-│   │   └── index.html
-│   ├── src
-│   │   ├── App.js
-│   │   ├── AppContext.js
-│   │   ├── axiosConfig.js
-│   │   ├── components
-│   │   │   ├── Analytics.js
-│   │   │   ├── APIKeys.js
-│   │   │   ├── Login.js
-│   │   │   ├── Main.js
-│   │   │   ├── Payments.js
-│   │   │   ├── Profile.js
-│   │   │   └── Register.js
-│   │   ├── index.css
-│   │   └── index.js
-│   ├── tailwind.config.js
-│   └── vercel.json
-```
+## 🌐 API
 
-## 🎉 Conclusion
+Built with FastAPI and backed by a Supabase database, our API is engineered for performance and scalability.
 
-This repo provides a powerful tool for tracking and improving the maintainability of your code. By using advanced machine learning techniques, it provides insights into your code that would be difficult to obtain otherwise. The frontend is still a work-in-progress, but once completed, it will provide a user-friendly interface for viewing and analyzing the collected metrics.
+### 📂 Structure
+
+- `main.py`: Kick-starts the FastAPI application, sets CORS, and routes.
+- `io_operations.py`: Your one-stop for all database operations and logging.
+- `metrics_manager.py`: Where the magic happens! Handles all metrics calculations.
+- `models.py`: Defines Pydantic models for rock-solid data validation.
+- `routes.py`: Home to various API functionalities.
+- `routes_helper.py`: Assists in route operations. Think of it as your API's best friend.
+
+### 🎯 Purpose
+
+The API is the backbone, offering all functionalities from metrics calculation to user management.
+
+---
+
+## 💻 CLI
+
+Designed for ease of use, our CLI tool is all about bringing metrics to your fingertips.
+
+### 📂 Structure
+
+- `main.py`: The command center of the CLI.
+- `file_operations.py`: Reads files and honors `.gitignore`.
+
+### 🎯 Purpose
+
+The CLI is the data collector in our ecosystem, making it a breeze to send metrics to the centralized API.
+
+---
+
+## 🖥️ Frontend
+
+Built with React, our frontend is all about delivering a user-friendly experience.
+
+### 📂 Structure
+
+- `App.js`: The main hub for routing and global state.
+- `components/`: Houses all UI components like Login, Register, and APIKeys.
+- `AppContext.js`: Manages global state via React Context.
+- `axiosConfig.js`: Configures global settings for API calls.
+
+### 🎯 Purpose
+
+The frontend provides a seamless interface for users to manage and view metrics, API keys, and more.
+
+---
+
+## 🌟 Overall Purpose
+
+The Maintainability Analytics Platform aims to be your go-to solution for code quality. 📈 Elevate your codebase by collecting metrics through our CLI, managing data via our robust API, and visualizing insights through our web frontend.
+
+Join us in making code better, one metric at a time! 🤝

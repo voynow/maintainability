@@ -54,6 +54,9 @@ ignore = [
     "pyproject.toml",
     "node_modules",
     "package-lock.json",
-    "package.json",
-    "webapp/.env*",
+    # "package.json",
+    # "webapp/.env*",
+    # "axiosConfig.js",
+    # "ErrorBoundary.js",
+    # "theme.js",
 ]

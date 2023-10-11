@@ -1,35 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, IconButton, ButtonBase } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAppContext } from '../AppContext';
-import { useNavigate } from 'react-router-dom';
+import Profile from './Profile';
+import { Link } from 'react-router-dom';
+import { Box } from '@mui/material';
 
 const Header = ({ toggleSidebar }) => {
-    const navigate = useNavigate();
+    const [popupOpen, setPopupOpen] = useState(false);
     const { email } = useAppContext();
 
-    const goToProfile = () => {
-        navigate('/profile');
+    const togglePopup = () => {
+        setPopupOpen(!popupOpen);
     };
 
     return (
-        <AppBar position="static" sx={{ zIndex: 1201, backgroundColor: '#3b82f6' }}>
-            <Toolbar>
-                <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleSidebar}>
-                    <MenuIcon />
-                </IconButton>
-                <Typography variant="h6" sx={{ fontWeight: 600, flexGrow: 1 }}>
-                    Maintainability
-                </Typography>
-                <ButtonBase onClick={goToProfile} sx={{ borderRadius: '50%' }}>
-                    <AccountCircleIcon sx={{ marginRight: '5px', color: '#FFFFFF' }} />
-                    <Typography variant="body1" sx={{ color: '#FFFFFF' }}>
-                        {email}
+        <>
+            <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#e5e7eb' }}>
+                <Toolbar>
+                    <Box display="flex" alignItems="center">
+                        <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleSidebar} sx={{ color: '#333333' }}>
+                            <MenuIcon />
+                        </IconButton>
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
+                        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            Maintainability
+                        </Link>
                     </Typography>
-                </ButtonBase>
-            </Toolbar>
-        </AppBar>
+                    <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%' }}>
+                        <AccountCircleIcon sx={{ marginRight: '5px', color: '#333333' }} />
+                        <Typography variant="body1" sx={{ color: '#333333' }}>
+                            {email}
+                        </Typography>
+                    </ButtonBase>
+                </Toolbar>
+            </AppBar>
+            <Profile open={popupOpen} onClose={togglePopup} />
+        </>
     );
 };
 

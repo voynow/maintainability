@@ -40,7 +40,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-blue-300 via-blue-500 to-blue-600">
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-gray-100 via-gray-100 to-gray-300">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-4xl mb-4 font-semibold text-gray-800">Maintainability</h1>
                 <TextField

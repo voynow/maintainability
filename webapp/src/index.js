@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createTheme, } from '@mui/material/styles';
 import { AppProvider } from './AppContext';
 import App from './App';
 

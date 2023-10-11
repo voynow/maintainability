@@ -31,7 +31,7 @@ const Header = ({ toggleSidebar }) => {
                     </Typography>
                     <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
                         <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#CD5C5C' }} />
-                        <Typography variant="body1" sx={{ fontSize: '20px', color: '#333333' }}>
+                        <Typography variant="body1" sx={{ fontSize: '18px', color: '#333333' }}>
                             {email}
                         </Typography>
                     </ButtonBase>

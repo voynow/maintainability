@@ -52,7 +52,7 @@ const Login = () => {
                 <TextField
                     type="password"
                     placeholder="Password"
-                    onChange={(e) => setPassword(e.target.value)} b
+                    onChange={(e) => setPassword(e.target.value)}
                     className="mb-4 p-1 w-full rounded border-2"
                 />
                 <button

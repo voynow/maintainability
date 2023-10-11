@@ -164,4 +164,3 @@ cython_debug/
 metrics.json
 .vercel
 node_modules
-.env*

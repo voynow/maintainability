@@ -9,7 +9,7 @@ const Sidebar = ({ isOpen, toggleDrawer }) => {
     return (
         <Drawer variant="temporary" open={isOpen} onClose={toggleDrawer}>
             <List style={{ paddingTop: '80px' }}>
-                {['Home', 'API Keys', 'Payments', 'Profile'].map((text, index) => (
+                {['Home', 'API Keys', 'Payments'].map((text, index) => (
                     <ListItem
                         key={text}
                         component={Link}

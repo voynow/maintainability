@@ -11,7 +11,7 @@ const ProfilePopup = ({ open, onClose }) => {
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#3b82f6' }} />
+                    <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#CD5C5C' }} />
                     <span>{email}'s profile</span>
                 </div>
             </DialogTitle>

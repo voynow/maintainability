@@ -17,7 +17,7 @@ const Header = ({ toggleSidebar }) => {
 
     return (
         <>
-            <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#f3f4f6' }}>
+            <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#FDF2E9' }}>
                 <Toolbar>
                     <Box display="flex" alignItems="center">
                         <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleSidebar} sx={{ color: '#333333' }}>
@@ -30,7 +30,7 @@ const Header = ({ toggleSidebar }) => {
                         </Link>
                     </Typography>
                     <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
-                        <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#3b82f6' }} />
+                        <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#CD5C5C' }} />
                         <Typography variant="body1" sx={{ fontSize: '20px', color: '#333333' }}>
                             {email}
                         </Typography>

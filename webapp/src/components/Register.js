@@ -24,7 +24,7 @@ const Register = () => {
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-red-400 via-orange-200 to-yellow-100">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-3xl mb-4">Welcome to Maintainability!</h1>
                 <TextField
@@ -39,11 +39,13 @@ const Register = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="mb-4 p-1 border rounded w-full"
                 />
-                <Button onClick={handleRegister} className="p-3 w-full bg-green-500 text-white rounded">
+                <button
+                    onClick={handleRegister}
+                    className="p-3 w-full bg-yellow-200 text-black rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring focus:ring-red-200">
                     Register
-                </Button>
+                </button>
                 <p className="mt-4">
-                    Already have an account? <a href="/login" className="text-blue-500 underline">Log In</a>
+                    Already have an account? <a href="/login" className="text-red-400 underline hover:text-red-500">Log In</a>
                 </p>
             </div>
         </div>

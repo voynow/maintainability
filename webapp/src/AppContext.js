@@ -9,23 +9,13 @@ export const useAppContext = () => {
 export const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentPage, setCurrentPage] = useState('Analytics');
-    const [accessToken, setAccessToken] = useState(null);
     const [email, setEmail] = useState(null);
-
-    useEffect(() => {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-            setAccessToken(token);
-        }
-    }, []);
 
     const value = {
         isLoggedIn,
         setIsLoggedIn,
         currentPage,
         setCurrentPage,
-        accessToken,
-        setAccessToken,
         email,
         setEmail,
     };

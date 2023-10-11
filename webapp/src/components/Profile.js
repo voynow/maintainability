@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Avatar } from '@mui/material';
 import { useAppContext } from '../AppContext';
-import AccountCircle from '@mui/icons-material/AccountCircle';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 
 const ProfilePopup = ({ open, onClose }) => {
@@ -11,10 +11,8 @@ const ProfilePopup = ({ open, onClose }) => {
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Avatar style={{ marginRight: '16px' }}>
-                        <AccountCircle />
-                    </Avatar>
-                    <span>{email}'s Profile</span>
+                    <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#3b82f6' }} />
+                    <span>{email}'s profile</span>
                 </div>
             </DialogTitle>
             <DialogContent>

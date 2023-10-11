@@ -17,7 +17,7 @@ const Header = ({ toggleSidebar }) => {
 
     return (
         <>
-            <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#e5e7eb' }}>
+            <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#f3f4f6' }}>
                 <Toolbar>
                     <Box display="flex" alignItems="center">
                         <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleSidebar} sx={{ color: '#333333' }}>
@@ -29,9 +29,9 @@ const Header = ({ toggleSidebar }) => {
                             Maintainability
                         </Link>
                     </Typography>
-                    <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%' }}>
-                        <AccountCircleIcon sx={{ marginRight: '5px', color: '#333333' }} />
-                        <Typography variant="body1" sx={{ color: '#333333' }}>
+                    <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
+                        <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#3b82f6' }} />
+                        <Typography variant="body1" sx={{ fontSize: '20px', color: '#333333' }}>
                             {email}
                         </Typography>
                     </ButtonBase>

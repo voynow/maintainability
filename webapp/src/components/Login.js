@@ -57,7 +57,7 @@ const Login = () => {
                 />
                 <button
                     onClick={handleLogin}
-                    className="p-3 w-full bg-blue-500 text-white rounded-lg hover:bg-blue-300 focus:outline-none focus:ring focus:ring-blue-200">
+                    className="p-3 w-full bg-blue-300 text-white rounded-lg hover:bg-blue-300 focus:outline-none focus:ring focus:ring-blue-200">
                     Login
                 </button>
                 <p className="mt-4">

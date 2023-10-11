@@ -12,7 +12,7 @@ const App = () => {
 
     return (
         <ErrorBoundary>
-            <div className="h-screen">
+            <div className="h-screen" style={{ backgroundColor: '#f3f4f6' }}>
                 <BrowserRouter>
                     <Routes>
                         <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/" />} />

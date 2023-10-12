@@ -24,7 +24,7 @@ const Register = () => {
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-red-400 via-orange-200 to-yellow-100">
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-red-200 via-yellow-100 to-custom-bg">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-3xl mb-4">Welcome to Maintainability!</h1>
                 <TextField

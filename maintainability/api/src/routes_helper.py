@@ -44,4 +44,4 @@ def validate_user(email: str, password: str) -> None:
 
 def generate_new_api_key():
     random_bytes = secrets.token_bytes(32)
-    return base64.urlsafe_b64encode(random_bytes).decode("utf-8")
+    return base64.urlsafe_b64encode(random_bytes).decode("utf-8").rstrip("=")

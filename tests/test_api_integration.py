@@ -1,9 +1,13 @@
-from pathlib import Path
+import os
 
 import pytest
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 from maintainability.api.src import main
+
+load_dotenv()
+MAINTAINABILITY_API_KEY = os.getenv("MAINTAINABILITY_API_KEY")
 
 
 # Fixture for test client
@@ -65,7 +69,10 @@ def generate_test_metrics():
 
 def test_submit_metrics_with_valid_data(test_client):
     """Test /submit_metrics route with valid data"""
-    response = test_client.post("/submit_metrics", json=generate_test_metrics())
+    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
+    response = test_client.post(
+        "/submit_metrics", headers=headers, json=generate_test_metrics()
+    )
     assert response.status_code == 200
     assert "status" in response.json()
     assert response.json()["status"] == "ok"
@@ -73,14 +80,19 @@ def test_submit_metrics_with_valid_data(test_client):
 
 def test_submit_metrics_with_invalid_data(test_client):
     """Test /submit_metrics route with invalid data"""
-    response = test_client.post("/submit_metrics", json={"invalid": "data"})
+    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
+    response = test_client.post(
+        "/submit_metrics", headers=headers, json={"invalid": "data"}
+    )
     assert response.status_code == 422
 
 
 def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
+    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     response = test_client.post(
         "/extract_metrics",
+        headers=headers,
         json={"/test/path/testfile.py": "print('hello world')\n" * 100},
     )
     assert response.status_code == 200
@@ -89,7 +101,10 @@ def test_extract_metrics_with_valid_data(test_client):
 
 def test_extract_metrics_with_invalid_data(test_client):
     """Test /extract_metrics route with invalid data"""
-    response = test_client.post("/extract_metrics", json={"invalid": -1})
+    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
+    response = test_client.post(
+        "/extract_metrics", headers=headers, json={"invalid": -1}
+    )
     assert response.status_code == 422
 
 

@@ -22,10 +22,20 @@ options = {
         "help": "Base API URL",
         "default": "https://maintainabilityapi.vercel.app",
     },
+    "api_key": {
+        "type": str,
+        "help": "Registered API key for authentication",
+        "required": True,
+    },
 }
 
 
-def call_api_wrapper(base_url: str, endpoint: str, payload: Optional[Dict] = None):
+def call_api_wrapper(
+    base_url: str,
+    endpoint: str,
+    payload: Optional[Dict] = None,
+    api_key: Optional[str] = None,
+):
     """
     Wrapper for calling the API. Handles errors and logging
 
@@ -34,12 +44,15 @@ def call_api_wrapper(base_url: str, endpoint: str, payload: Optional[Dict] = Non
     :return: Response from the API
     """
     url = f"{base_url}/{endpoint}"
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["X-API-KEY"] = api_key
     try:
         logger.info(f"Sending payload of {len(payload.keys())} files to {endpoint}")
         response = requests.post(
             url=url,
             json=payload,
-            headers={"Content-Type": "application/json"},
+            headers=headers,
         )
         response.raise_for_status()
 
@@ -67,13 +80,20 @@ def call_api_wrapper(base_url: str, endpoint: str, payload: Optional[Dict] = Non
 @click.command()
 @click.option("--paths", **options["paths"])
 @click.option("--base_url", **options["base_url"])
-def cli_runner(paths, base_url):
+@click.option("--api_key", **options["api_key"])
+def cli_runner(paths, base_url, api_key):
     filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
     extracted_metrics = call_api_wrapper(
-        base_url=base_url, endpoint="extract_metrics", payload=filtered_repo
+        base_url=base_url,
+        endpoint="extract_metrics",
+        payload=filtered_repo,
+        api_key=api_key,
     )
     submit_metrics = call_api_wrapper(
-        base_url=base_url, endpoint="submit_metrics", payload=extracted_metrics
+        base_url=base_url,
+        endpoint="submit_metrics",
+        payload=extracted_metrics,
+        api_key=api_key,
     )
     logger.info(f"SUCCESS: {submit_metrics}")
 

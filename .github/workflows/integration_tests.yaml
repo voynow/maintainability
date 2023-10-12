@@ -36,5 +36,5 @@ jobs:
 
     - name: Run tests
       run: ./integration_tests.sh
-      with:
+      env:
         MAINTAINABILITY_API_KEY: ${{ secrets.MAINTAINABILITY_API_KEY }}

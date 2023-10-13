@@ -24,7 +24,7 @@ const Register = () => {
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-red-200 via-yellow-100 to-custom-bg">
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-white via-blue-100 to-blue-200">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-3xl mb-4">Welcome to Maintainability!</h1>
                 <TextField
@@ -41,7 +41,7 @@ const Register = () => {
                 />
                 <button
                     onClick={handleRegister}
-                    className="p-3 w-full bg-yellow-200 text-black rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring focus:ring-red-200">
+                    className="p-3 w-full bg-red-200 text-black rounded-lg hover:bg-red-300 focus:outline-none focus:ring focus:ring-red-200">
                     Register
                 </button>
                 <p className="mt-4">

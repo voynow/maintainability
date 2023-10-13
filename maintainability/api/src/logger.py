@@ -1,6 +1,6 @@
 import logging
 import inspect
-from io_operations import write_log
+from . import io_operations
 
 
 class SupabaseHandler(logging.Handler):
@@ -12,7 +12,7 @@ class SupabaseHandler(logging.Handler):
         filename = frame.f_code.co_filename
         lineno = frame.f_lineno
         loc = f"File: {filename}, Line: {lineno}"
-        write_log(loc, message)
+        io_operations.write_log(loc, message)
 
 
 def setup_logger():

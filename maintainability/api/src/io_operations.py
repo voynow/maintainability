@@ -9,13 +9,6 @@ from supabase import Client, create_client
 from . import models
 
 
-def logger(log: str, level: str = "INFO", max_length: int = 250) -> None:
-    """Vercel serverless does not support logging, here we use print instead"""
-    truncated_log = log if len(log) <= max_length else log[:max_length] + "..."
-    timestamp = datetime.now(utc).isoformat()
-    print(f"{timestamp} [{level}]: {truncated_log}")  # noqa: T001
-
-
 def connect_to_supabase() -> Client:
     """Connect to Supabase database"""
     return create_client(

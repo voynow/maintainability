@@ -6,7 +6,8 @@ from pydantic import ValidationError
 
 from llm_blocks import block_factory
 
-from . import config, io_operations, models
+from . import config, io_operations, models, logger
+
 
 MAX_RETRIES = 3  # Maximum number of retries for LLM interaction
 
@@ -25,7 +26,7 @@ def validate_response(response: str) -> Dict:
         data = json.loads(response)
         return data
     except (json.JSONDecodeError, ValidationError) as e:
-        io_operations.logger(f"Invalid LLM response: {e}", level="ERROR")
+        logger.logger(f"Invalid LLM response: {e}")
         return None
 
 
@@ -34,16 +35,16 @@ def get_maintainability_metrics(
 ) -> models.MaintainabilityMetrics:
     llm = get_llm()
     for attempt in range(MAX_RETRIES):
-        io_operations.logger(f"LLM request: filepath={filepath}, code={code}")
+        logger.logger(f"LLM request: filepath={filepath}, code={code}")
         response = llm(filepath=filepath, code=code)
-        io_operations.logger(f"LLM response: {response}")
+        logger.logger(f"LLM response: {response}")
 
         validated_response = validate_response(response)
         if validated_response:
             return models.MaintainabilityMetrics(**validated_response)
 
-        io_operations.logger(f"Retry attempt {attempt+1} failed", level="WARNING")
-    io_operations.logger("Max retries reached. Returning default metrics.")
+        logger.logger(f"Retry attempt {attempt+1} failed")
+    logger.logger("Max retries reached. Returning default metrics.")
     return models.MaintainabilityMetrics()
 
 

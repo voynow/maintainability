@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import logging
-from . import routes
+from . import routes, logger
 
-logging.basicConfig(level=logging.INFO)
+logger.setup_logger()
 
 app = FastAPI()
 

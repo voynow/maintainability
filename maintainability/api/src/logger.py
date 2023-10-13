@@ -1,30 +1,27 @@
 import logging
 import inspect
-from sqlalchemy import create_engine
+from io_operations import write_log
 
 
-class DatabaseHandler(logging.Handler):
-    def __init__(self, db_url):
-        logging.Handler.__init__(self)
-        self.db_url = db_url
-        self.engine = create_engine(self.db_url)
+class SupabaseHandler(logging.Handler):
+    """Custom logging handler that sends logs to Supabase"""
 
     def emit(self, record):
         message = self.format(record)
-        with self.engine.connect() as conn:
-            conn.execute("INSERT INTO logs (message) VALUES (?)", (message,))
+        frame = inspect.currentframe().f_back.f_back
+        filename = frame.f_code.co_filename
+        lineno = frame.f_lineno
+        loc = f"File: {filename}, Line: {lineno}"
+        write_log(loc, message)
 
 
-def setup_logger(db_url):
+def setup_logger():
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-    db_handler = DatabaseHandler(db_url)
-    logger.addHandler(db_handler)
+    handler = SupabaseHandler()
+    logger.addHandler(handler)
     return logger
 
 
 def logger(message):
-    frame = inspect.currentframe().f_back
-    filename = frame.f_code.co_filename
-    lineno = frame.f_lineno
-    logging.info(f"{message} -- File: {filename}, Line: {lineno}")
+    logging.info(message)

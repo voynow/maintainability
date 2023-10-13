@@ -95,3 +95,9 @@ def list_api_keys(email: str) -> List[Dict]:
 def delete_api_key(api_key: str) -> None:
     table = connect_to_supabase_table("api_keys")
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
+
+
+def write_log(loc: str, text: str) -> Tuple:
+    log_data = {"loc": loc, "text": text}
+    table = connect_to_supabase_table("logs")
+    return table.insert(log_data).execute()

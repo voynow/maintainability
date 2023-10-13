@@ -1,4 +1,5 @@
 import os
+from uuid import uuid4
 
 import pytest
 from dotenv import load_dotenv
@@ -10,11 +11,14 @@ load_dotenv()
 MAINTAINABILITY_API_KEY = os.getenv("MAINTAINABILITY_API_KEY")
 
 
-# Fixture for test client
 @pytest.fixture(scope="module")
 def test_client():
     client = TestClient(main.app)
     yield client
+
+
+def unique_email():
+    return f"test+{uuid4()}@example.com"
 
 
 def get_test_content() -> str:
@@ -117,9 +121,9 @@ def test_health_route(test_client):
 
 
 @pytest.fixture(scope="module")
-def generated_api_key(auth_client):
+def generated_api_key(test_client):
     new_key = {"email": "fixture@test.com", "name": "fixturekey"}
-    response = auth_client.post("/generate_key", json=new_key)
+    response = test_client.post("/generate_key", json=new_key)
     if response.status_code == 200 and "api_key" in response.json():
         return response.json()["api_key"]
     else:
@@ -128,7 +132,7 @@ def generated_api_key(auth_client):
 
 def test_successful_registration(test_client):
     user_data = {
-        "email": "registration@test.com",
+        "email": unique_email(),
         "password": "test",
         "role": "user",
     }
@@ -163,8 +167,8 @@ def test_list_api_keys(test_client):
     assert isinstance(response.json()["api_keys"], list)
 
 
-def test_invalidate_api_key(auth_client, generated_api_key):
-    response = auth_client.delete(f"/api_keys/{generated_api_key}")
+def test_invalidate_api_key(test_client, generated_api_key):
+    response = test_client.delete(f"/api_keys/{generated_api_key}")
     assert response.status_code == 200
     assert "message" in response.json()
     assert response.json()["message"] == "API key deleted successfully"

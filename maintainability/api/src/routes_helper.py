@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 from typing import Dict
 
-from fastapi.responses import JSONResponse
+from fastapi import HTTPException
 from passlib.context import CryptContext
 
 from . import config, io_operations, metrics_manager, models
@@ -36,10 +36,10 @@ def validate_user(email: str, password: str) -> None:
     user = io_operations.get_user(email)
 
     if not user or not pwd_context.verify(password, user["password"]):
-        io_operations.logger.warning(f"Unauthorized login attempt: email={email}")
-        return JSONResponse(
-            status_code=401, content={"detail": "Incorrect email or password"}
+        io_operations.logger(
+            f"Unauthorized login attempt: email={email}", level="warning"
         )
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
 
 
 def generate_new_api_key():

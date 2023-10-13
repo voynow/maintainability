@@ -114,3 +114,57 @@ def test_health_route(test_client):
     assert response.status_code == 200
     assert "status" in response.json()
     assert response.json()["status"] == "ok"
+
+
+@pytest.fixture(scope="module")
+def generated_api_key(auth_client):
+    new_key = {"email": "fixture@test.com", "name": "fixturekey"}
+    response = auth_client.post("/generate_key", json=new_key)
+    if response.status_code == 200 and "api_key" in response.json():
+        return response.json()["api_key"]
+    else:
+        pytest.fail("Failed to generate API key for tests.")
+
+
+def test_successful_registration(test_client):
+    user_data = {
+        "email": "registration@test.com",
+        "password": "test",
+        "role": "user",
+    }
+    response = test_client.post("/register", json=user_data)
+    assert response.status_code == 200
+    assert "email" in response.json()
+
+
+def test_successful_login(test_client):
+    token_request = {"email": "login@test.com", "password": "test"}
+    response = test_client.post("/token", json=token_request)
+    assert response.status_code == 200
+    assert "access_token" in response.json()
+
+
+def test_unsuccessful_login(test_client):
+    token_request = {"email": "unsuccessfullogin@test.com", "password": "wrongpassword"}
+    response = test_client.post("/token", json=token_request)
+    assert response.status_code == 401
+
+
+def test_generate_api_key(test_client):
+    new_key = {"email": "genapikey@test.com", "name": "testkey"}
+    response = test_client.post("/generate_key", json=new_key)
+    assert response.status_code == 200
+    assert "api_key" in response.json()
+
+
+def test_list_api_keys(test_client):
+    response = test_client.get("/api_keys?email=listapikey@test.com")
+    assert response.status_code == 200
+    assert isinstance(response.json()["api_keys"], list)
+
+
+def test_invalidate_api_key(auth_client, generated_api_key):
+    response = auth_client.delete(f"/api_keys/{generated_api_key}")
+    assert response.status_code == 200
+    assert "message" in response.json()
+    assert response.json()["message"] == "API key deleted successfully"

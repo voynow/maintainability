@@ -21,9 +21,9 @@ class ValidModelResponse(BaseModel):
 class Maintainability(BaseModel):
     """
     Composiiton of maintainability, file metrics, and user information
-    TODO add user_id
     """
 
+    user_email: str
     project_name: str
     file_path: str
     readability: int = 0

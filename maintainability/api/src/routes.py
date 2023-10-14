@@ -34,9 +34,13 @@ def read_root():
 
 
 @router.post("/extract_metrics", response_model=models.ValidModelResponse)
-async def extract_metrics(extract_metrics: models.ExtractMetrics):
+async def extract_metrics(extract_metrics: models.ExtractMetrics, request: Request):
     try:
+        user_email = io_operations.get_email_via_api_key(
+            request.headers.get("X-API-KEY", None)
+        )
         return routes_helper.extract_metrics(
+            user_email,
             extract_metrics.project_name,
             extract_metrics.session_id,
             extract_metrics.filepath,

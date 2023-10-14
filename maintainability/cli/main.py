@@ -7,7 +7,7 @@ import uuid
 import click
 import requests
 
-from . import file_operations, config
+from . import file_operations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -84,35 +84,24 @@ def call_api_wrapper(
 @click.option("--api_key", **options["api_key"])
 def cli_runner(paths, base_url, api_key):
     session_id = str(uuid.uuid4())
-    filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
+
+    repo = file_operations.load_files()
+    target_paths = [Path(path) for path in paths]
+    filtered_repo = file_operations.filter_repo(repo, target_paths)
 
     for filepath, content in filtered_repo.items():
-        if len(content.splitlines()) < config.MIN_NUM_LINES:
-            logger.info(
-                f"Skipping {filepath} because it has less than {config.MIN_NUM_LINES} lines of code."
-            )
-            continue
-
-        if filepath.startswith("test") or Path(filepath).stem.endswith("test"):
-            logger.info(f"Skipping {filepath} because it is a test file.")
-            continue
-
-        try:
-            logger.info(f"Processing {filepath}...")
-            response = call_api_wrapper(
-                base_url=base_url,
-                endpoint="extract_metrics",
-                payload={
-                    "file_content": content,
-                    "filepath": filepath,
-                    "session_id": session_id,
-                },
-                api_key=api_key,
-            )
-            logger.info(f"Metrics submitted for {filepath}. Session ID: {session_id}")
-
-        except Exception as e:
-            logger.error(f"Error processing {filepath}: {e}")
+        logger.info(f"{session_id} sending {filepath} to extract_metrics")
+        response = call_api_wrapper(
+            base_url=base_url,
+            endpoint="extract_metrics",
+            payload={
+                "file_content": content,
+                "filepath": filepath,
+                "session_id": session_id,
+            },
+            api_key=api_key,
+        )
+        logger.info(f"{session_id} extract_metrics response: {response}")
 
 
 if __name__ == "__main__":

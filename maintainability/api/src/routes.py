@@ -34,9 +34,13 @@ def read_root():
 
 
 @router.post("/extract_metrics", response_model=models.ValidModelResponse)
-async def extract_metrics(filepath: str, file_content: str, session_id: str):
+async def extract_metrics(extract_metrics: models.ExtractMetrics):
     try:
-        return routes_helper.extract_metrics(filepath, file_content, session_id)
+        return routes_helper.extract_metrics(
+            extract_metrics.filepath,
+            extract_metrics.file_content,
+            extract_metrics.session_id,
+        )
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

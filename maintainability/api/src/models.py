@@ -1,6 +1,12 @@
 from pydantic import BaseModel, Field
 
 
+class ExtractMetrics(BaseModel):
+    filepath: str
+    file_content: str
+    session_id: str
+
+
 class ValidModelResponse(BaseModel):
     """LLM response validation model"""
 
@@ -17,6 +23,7 @@ class Maintainability(BaseModel):
     TODO add user_id
     """
 
+    file_path: str
     readability: int = 0
     design_quality: int = 0
     testability: int = 0

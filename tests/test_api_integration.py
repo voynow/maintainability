@@ -24,11 +24,13 @@ def unique_email():
 def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
-    response = test_client.post(
-        "/extract_metrics",
-        headers=headers,
-        json={"/test/path/testfile.py": "print('hello world')\n" * 100},
-    )
+    payload = {
+        "filepath": "/test/path/testfile.py",
+        "file_content": "print('hello world')\n" * 100,
+        "session_id": "88888888-8888-8888-8888-888888888888",
+    }
+    response = test_client.post("/extract_metrics", headers=headers, json=payload)
+    print(response.json())
     assert response.status_code == 200
     assert isinstance(response.json(), dict)
 

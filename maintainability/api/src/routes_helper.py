@@ -53,6 +53,7 @@ def extract_metrics(
     maintainability_metrics = get_maintainability_metrics(filepath, content)
     io_operations.write_metrics(
         {
+            "file_path": filepath,
             **maintainability_metrics,
             "file_size": file_size,
             "loc": loc,

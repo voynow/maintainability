@@ -1,9 +1,7 @@
 import os
-import uuid
 from datetime import datetime
 from typing import Dict, Tuple, List
 
-from pytz import utc
 from supabase import Client, create_client
 
 from . import models
@@ -24,7 +22,7 @@ def connect_to_supabase_table(table_name: str) -> Client:
     ).table(table_name)
 
 
-def write_metrics(metrics: Dict[str, models.Maintainability]) -> Tuple:
+def write_metrics(metrics: models.Maintainability) -> Tuple:
     table = connect_to_supabase_table("maintainability")
     return table.insert(metrics).execute()
 

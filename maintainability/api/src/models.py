@@ -2,9 +2,10 @@ from pydantic import BaseModel, Field
 
 
 class ExtractMetrics(BaseModel):
+    project_name: str
+    session_id: str
     filepath: str
     file_content: str
-    session_id: str
 
 
 class ValidModelResponse(BaseModel):
@@ -23,6 +24,7 @@ class Maintainability(BaseModel):
     TODO add user_id
     """
 
+    project_name: str
     file_path: str
     readability: int = 0
     design_quality: int = 0

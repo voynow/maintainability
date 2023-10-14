@@ -37,9 +37,10 @@ def read_root():
 async def extract_metrics(extract_metrics: models.ExtractMetrics):
     try:
         return routes_helper.extract_metrics(
+            extract_metrics.project_name,
+            extract_metrics.session_id,
             extract_metrics.filepath,
             extract_metrics.file_content,
-            extract_metrics.session_id,
         )
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")

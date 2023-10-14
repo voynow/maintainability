@@ -2,6 +2,7 @@ import json
 import logging
 from pathlib import Path
 from typing import Dict, Optional
+import uuid
 
 import click
 import requests
@@ -82,20 +83,25 @@ def call_api_wrapper(
 @click.option("--base_url", **options["base_url"])
 @click.option("--api_key", **options["api_key"])
 def cli_runner(paths, base_url, api_key):
-    filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
-    extracted_metrics = call_api_wrapper(
-        base_url=base_url,
-        endpoint="extract_metrics",
-        payload=filtered_repo,
-        api_key=api_key,
-    )
-    submit_metrics = call_api_wrapper(
-        base_url=base_url,
-        endpoint="submit_metrics",
-        payload=extracted_metrics,
-        api_key=api_key,
-    )
-    logger.info(f"SUCCESS: {submit_metrics}")
+    session_id = str(uuid.uuid4())
+
+    repo = file_operations.load_files()
+    target_paths = [Path(path) for path in paths]
+    filtered_repo = file_operations.filter_repo(repo, target_paths)
+
+    for filepath, content in filtered_repo.items():
+        logger.info(f"{session_id} sending {filepath} to extract_metrics")
+        response = call_api_wrapper(
+            base_url=base_url,
+            endpoint="extract_metrics",
+            payload={
+                "file_content": content,
+                "filepath": filepath,
+                "session_id": session_id,
+            },
+            api_key=api_key,
+        )
+        logger.info(f"{session_id} extract_metrics response: {response}")
 
 
 if __name__ == "__main__":

@@ -1,10 +1,13 @@
+import logging
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
 
 from . import config
+
+logging.basicConfig(level=logging.INFO)
 
 
 def read_text(path: Path) -> str:
@@ -32,14 +35,36 @@ def load_files(basepath: Path = Path(".")) -> Dict[Path, str]:
     return result
 
 
-def filter_repo_by_paths(paths: List[Path]) -> Dict[str, str]:
-    repo = load_files()
+def should_include_file(
+    filepath: Path, content: str, target_path: Path
+) -> Optional[str]:
+    # Check if file is under the target path
+    if target_path not in filepath.parents and filepath != target_path:
+        return f"not found under the target path {target_path}."
 
+    # Check line count
+    if len(content.splitlines()) < config.MIN_NUM_LINES:
+        return f"insufficient lines len()={config.MIN_NUM_LINES}."
+
+    # Check if it's a test file
+    if filepath.name.startswith("test") or filepath.stem.endswith("test"):
+        return f"identified as test file."
+
+    return None
+
+
+def filter_repo(repo: Dict[Path, str], target_paths: List[Path]) -> Dict[str, str]:
     filtered_repo = {}
-    for p in paths:
-        filtered_repo.update(
-            {k.as_posix(): v for k, v in repo.items() if p in k.parents or p == k}
-        )
+    for target_path in target_paths:
+        for filepath, content in repo.items():
+            reason = should_include_file(filepath, content, target_path)
+
+            if reason:
+                logging.info(f"Excluding {filepath}: {reason}")
+                continue
+
+            filtered_repo[filepath.as_posix()] = content
+
     return filtered_repo
 
 

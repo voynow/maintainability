@@ -24,27 +24,9 @@ def connect_to_supabase_table(table_name: str) -> Client:
     ).table(table_name)
 
 
-def write_metrics(metrics: Dict[str, models.CompositeMetrics]) -> Tuple:
-    insert_data = [
-        {
-            "primary_id": str(uuid.uuid4()),
-            "file_path": filepath,
-            "readability": metrics.maintainability.readability,
-            "design_quality": metrics.maintainability.design_quality,
-            "testability": metrics.maintainability.testability,
-            "consistency": metrics.maintainability.consistency,
-            "debug_error_handling": metrics.maintainability.debug_error_handling,
-            "file_size": metrics.file_info.file_size,
-            "extension": metrics.file_info.extension,
-            "loc": metrics.file_info.loc,
-            "content": metrics.file_info.content,
-            "timestamp": metrics.timestamp,
-            "session_id": metrics.session_id,
-        }
-        for filepath, metrics in metrics.items()
-    ]
+def write_metrics(metrics: Dict[str, models.Maintainability]) -> Tuple:
     table = connect_to_supabase_table("maintainability")
-    return table.insert(insert_data).execute()
+    return table.insert(metrics).execute()
 
 
 def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:

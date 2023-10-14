@@ -20,3 +20,5 @@ EXTENSIONS = [
     ".html",
     ".css",
 ]
+
+MIN_NUM_LINES = 20

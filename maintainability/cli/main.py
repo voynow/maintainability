@@ -83,19 +83,13 @@ def call_api_wrapper(
 @click.option("--api_key", **options["api_key"])
 def cli_runner(paths, base_url, api_key):
     filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
-    extracted_metrics = call_api_wrapper(
+    response = call_api_wrapper(
         base_url=base_url,
         endpoint="extract_metrics",
         payload=filtered_repo,
         api_key=api_key,
     )
-    submit_metrics = call_api_wrapper(
-        base_url=base_url,
-        endpoint="submit_metrics",
-        payload=extracted_metrics,
-        api_key=api_key,
-    )
-    logger.info(f"SUCCESS: {submit_metrics}")
+    logger.info(f"SUCCESS: {response}")
 
 
 if __name__ == "__main__":

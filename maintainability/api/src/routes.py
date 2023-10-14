@@ -33,16 +33,11 @@ def read_root():
     return {"status": "ok"}
 
 
-@router.post("/submit_metrics")
-async def submit_metrics(metrics: Dict[str, models.CompositeMetrics]):
-    io_operations.write_metrics(metrics)
-    return {"status": "ok", "message": "Metrics submitted successfully."}
-
-
 @router.post("/extract_metrics")
 async def extract_metrics(repo: Dict[str, str]):
     try:
-        return routes_helper.compose_repo_metrics(repo)
+        metrics = routes_helper.compose_repo_metrics(repo)
+        io_operations.write_metrics(metrics)
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

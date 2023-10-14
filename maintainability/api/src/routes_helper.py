@@ -45,20 +45,18 @@ def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelR
 
 
 def extract_metrics(
-    project_name: str, session_id: str, filepath: str, content: str
+    user_email: str, project_name: str, session_id: str, filepath: str, content: str
 ) -> models.Maintainability:
-    file_size = len(content.encode("utf-8"))
-    extension = filepath.split(".")[-1] if "." in filepath else ""
-    loc = len(content.splitlines())
     maintainability_metrics = get_maintainability_metrics(filepath, content)
     io_operations.write_metrics(
         {
+            "user_email": user_email,
             "project_name": project_name,
             "session_id": session_id,
             "file_path": filepath,
-            "file_size": file_size,
-            "loc": loc,
-            "extension": extension,
+            "file_size": len(content.encode("utf-8")),
+            "loc": len(content.splitlines()),
+            "extension": filepath.split(".")[-1] if "." in filepath else "",
             "content": content,
             **maintainability_metrics,
         }

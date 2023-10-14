@@ -25,6 +25,7 @@ def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     payload = {
+        "project_name": "test_project",
         "filepath": "/test/path/testfile.py",
         "file_content": "print('hello world')\n" * 100,
         "session_id": "88888888-8888-8888-8888-888888888888",

@@ -2,11 +2,12 @@ import json
 import logging
 from pathlib import Path
 from typing import Dict, Optional
+import uuid
 
 import click
 import requests
 
-from . import file_operations
+from . import file_operations, config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -82,14 +83,36 @@ def call_api_wrapper(
 @click.option("--base_url", **options["base_url"])
 @click.option("--api_key", **options["api_key"])
 def cli_runner(paths, base_url, api_key):
+    session_id = str(uuid.uuid4())
     filtered_repo = file_operations.filter_repo_by_paths([Path(path) for path in paths])
-    response = call_api_wrapper(
-        base_url=base_url,
-        endpoint="extract_metrics",
-        payload=filtered_repo,
-        api_key=api_key,
-    )
-    logger.info(f"SUCCESS: {response}")
+
+    for filepath, content in filtered_repo.items():
+        if len(content.splitlines()) < config.MIN_NUM_LINES:
+            logger.info(
+                f"Skipping {filepath} because it has less than {config.MIN_NUM_LINES} lines of code."
+            )
+            continue
+
+        if filepath.startswith("test") or Path(filepath).stem.endswith("test"):
+            logger.info(f"Skipping {filepath} because it is a test file.")
+            continue
+
+        try:
+            logger.info(f"Processing {filepath}...")
+            response = call_api_wrapper(
+                base_url=base_url,
+                endpoint="extract_metrics",
+                payload={
+                    "file_content": content,
+                    "filepath": filepath,
+                    "session_id": session_id,
+                },
+                api_key=api_key,
+            )
+            logger.info(f"Metrics submitted for {filepath}. Session ID: {session_id}")
+
+        except Exception as e:
+            logger.error(f"Error processing {filepath}: {e}")
 
 
 if __name__ == "__main__":

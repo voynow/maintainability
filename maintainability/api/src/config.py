@@ -14,3 +14,4 @@ readability, design_quality, testability, consistency, debug_error_handling
 
 MODEL_NAME = "gpt-3.5-turbo-16k"
 TEMPERATURE = 0.0
+LLM_MAX_RETRIES = 3

@@ -9,13 +9,6 @@ from supabase import Client, create_client
 from . import models
 
 
-def logger(log: str, level: str = "INFO", max_length: int = 250) -> None:
-    """Vercel serverless does not support logging, here we use print instead"""
-    truncated_log = log if len(log) <= max_length else log[:max_length] + "..."
-    timestamp = datetime.now(utc).isoformat()
-    print(f"{timestamp} [{level}]: {truncated_log}")  # noqa: T001
-
-
 def connect_to_supabase() -> Client:
     """Connect to Supabase database"""
     return create_client(
@@ -102,3 +95,9 @@ def list_api_keys(email: str) -> List[Dict]:
 def delete_api_key(api_key: str) -> None:
     table = connect_to_supabase_table("api_keys")
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
+
+
+def write_log(loc: str, text: str) -> Tuple:
+    log_data = {"loc": loc, "text": text}
+    table = connect_to_supabase_table("logs")
+    return table.insert(log_data).execute()

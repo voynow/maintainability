@@ -50,7 +50,7 @@ ignore = [
     ".github",
     "maintainability/cli",
     "webapp",
-    # "tests",
+    "tests",
     "integration_tests.sh",
     "pyproject.toml",
     "node_modules",

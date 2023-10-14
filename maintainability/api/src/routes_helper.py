@@ -51,7 +51,6 @@ def extract_metrics(
     extension = filepath.split(".")[-1] if "." in filepath else ""
     loc = len(content.splitlines())
     maintainability_metrics = get_maintainability_metrics(filepath, content)
-    logger.logger(f"{extract_metrics.project_name}")
     io_operations.write_metrics(
         {
             "project_name": project_name,

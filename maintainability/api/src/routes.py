@@ -35,7 +35,6 @@ def read_root():
 
 @router.post("/extract_metrics", response_model=models.ValidModelResponse)
 async def extract_metrics(extract_metrics: models.ExtractMetrics):
-    logger.logger(f"{extract_metrics.project_name}")
     try:
         return routes_helper.extract_metrics(
             extract_metrics.project_name,

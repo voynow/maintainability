@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
 
 
-class MaintainabilityMetrics(BaseModel):
-    """various dimensions of code maintainability"""
+class ValidModelResponse(BaseModel):
+    """LLM response validation model"""
 
     readability: int = 0
     design_quality: int = 0
@@ -11,24 +11,21 @@ class MaintainabilityMetrics(BaseModel):
     debug_error_handling: int = 0
 
 
-class FileMetrics(BaseModel):
-    """File analysis metadata and content"""
-
-    file_size: int
-    loc: int
-    extension: str
-    content: str
-
-
-class CompositeMetrics(BaseModel):
+class Maintainability(BaseModel):
     """
     Composiiton of maintainability, file metrics, and user information
     TODO add user_id
     """
 
-    maintainability: MaintainabilityMetrics
-    file_info: FileMetrics
-    timestamp: str
+    readability: int = 0
+    design_quality: int = 0
+    testability: int = 0
+    consistency: int = 0
+    debug_error_handling: int = 0
+    file_size: int
+    loc: int
+    extension: str
+    content: str
     session_id: str
 
 

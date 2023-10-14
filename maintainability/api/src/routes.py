@@ -33,11 +33,10 @@ def read_root():
     return {"status": "ok"}
 
 
-@router.post("/extract_metrics")
-async def extract_metrics(repo: Dict[str, str]):
+@router.post("/extract_metrics", response_model=models.ValidModelResponse)
+async def extract_metrics(filepath: str, file_content: str, session_id: str):
     try:
-        metrics = routes_helper.compose_repo_metrics(repo)
-        io_operations.write_metrics(metrics)
+        return routes_helper.extract_metrics(filepath, file_content, session_id)
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

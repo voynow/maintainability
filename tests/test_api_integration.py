@@ -53,16 +53,6 @@ def test_health_route(test_client):
     assert response.json()["status"] == "ok"
 
 
-@pytest.fixture(scope="module")
-def generated_api_key(test_client):
-    new_key = {"email": "fixture@test.com", "name": "fixturekey"}
-    response = test_client.post("/generate_key", json=new_key)
-    if response.status_code == 200 and "api_key" in response.json():
-        return response.json()["api_key"]
-    else:
-        pytest.fail("Failed to generate API key for tests.")
-
-
 def test_successful_registration(test_client):
     user_data = {
         "email": unique_email(),
@@ -100,8 +90,33 @@ def test_list_api_keys(test_client):
     assert isinstance(response.json()["api_keys"], list)
 
 
+@pytest.fixture(scope="module")
+def generated_api_key(test_client):
+    new_key = {"email": "fixture@test.com", "name": "fixturekey"}
+    response = test_client.post("/generate_key", json=new_key)
+    if response.status_code == 200 and "api_key" in response.json():
+        return response.json()["api_key"]
+    else:
+        pytest.fail("Failed to generate API key for tests.")
+
+
 def test_invalidate_api_key(test_client, generated_api_key):
     response = test_client.delete(f"/api_keys/{generated_api_key}")
     assert response.status_code == 200
     assert "message" in response.json()
     assert response.json()["message"] == "API key deleted successfully"
+
+
+def test_get_metrics_with_valid_project(test_client):
+    user_email = "test"
+    project_name = "maintainability"
+    params = {"user_email": user_email, "project_name": project_name}
+    response = test_client.get("/get_metrics", params=params)
+
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    for metric in response.json():
+        assert "project_name" in metric
+        assert "user_email" in metric
+        assert "readability" in metric
+        # ommitting other fields for brevity

@@ -8,3 +8,16 @@ body {
     padding: 0;
     background-color: #FDF2E9;
 }
+
+.from-primary {
+    --tw-gradient-from: #FDF2E9;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(253, 242, 233, 0));
+}
+
+.via-primary {
+    --tw-gradient-via: #FDF2E9;
+}
+
+.to-secondary {
+    --tw-gradient-to: #EDE4DC;
+}

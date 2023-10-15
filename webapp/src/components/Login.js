@@ -3,7 +3,7 @@ import { useAppContext } from '../AppContext';
 import axios from 'axios';
 import '../axiosConfig';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+
 
 const Login = () => {
     const { setIsLoggedIn, setEmail: setGlobalEmail } = useAppContext();
@@ -40,7 +40,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-white via-blue-100 to-blue-200">
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-primary via-primary to-secondary">
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-4xl mb-4 font-semibold text-gray-800">Maintainability</h1>
                 <TextField
@@ -57,7 +57,7 @@ const Login = () => {
                 />
                 <button
                     onClick={handleLogin}
-                    className="p-3 w-full bg-red-200 text-black rounded-lg hover:bg-red-300 focus:outline-none focus:ring focus:ring-red-200">
+                    className="p-3 w-full bg-blue-200 text-black rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-red-200">
                     Login
                 </button>
                 <p className="mt-4">

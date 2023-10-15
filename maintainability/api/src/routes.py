@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List, Optional
 
 import jwt
 from fastapi import APIRouter, HTTPException, Request
@@ -49,6 +49,14 @@ async def extract_metrics(extract_metrics: models.ExtractMetrics, request: Reque
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get_metrics", response_model=List[models.Maintainability])
+async def get_metrics(user_email: str, project_name: str):
+    metrics = io_operations.get_metrics(user_email, project_name)
+    if not metrics.data:
+        return JSONResponse(status_code=404, content={"detail": "Metrics not found"})
+    return metrics.data
 
 
 @router.post("/register", response_model=models.User)

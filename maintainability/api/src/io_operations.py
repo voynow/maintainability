@@ -27,6 +27,16 @@ def write_metrics(metrics: models.Maintainability) -> Tuple:
     return table.insert(metrics).execute()
 
 
+def get_metrics(user_email: str, project_name: str):
+    table = connect_to_supabase_table("maintainability")
+    return (
+        table.select("*")
+        .eq("user_email", user_email)
+        .eq("project_name", project_name)
+        .execute()
+    )
+
+
 def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:
     user_data = {"email": email, "password": hashed_password, "role": role}
     table = connect_to_supabase_table("users")

@@ -24,7 +24,7 @@ const Register = () => {
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-white via-blue-100 to-blue-200">
+        <div className="flex flex-col items-center justify-center h-screen" style={{ background: 'linear-gradient(to top, #FDF2E9, #EDE4DC)' }}>
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-3xl mb-4">Welcome to Maintainability!</h1>
                 <TextField
@@ -41,11 +41,16 @@ const Register = () => {
                 />
                 <button
                     onClick={handleRegister}
-                    className="p-3 w-full bg-red-200 text-black rounded-lg hover:bg-red-300 focus:outline-none focus:ring focus:ring-red-200">
+                    className="p-3 w-full text-white border rounded border-2"
+                    style={{
+                        backgroundColor: 'var(--custom-red)',
+                        borderColor: 'var(--custom-red)',
+                    }}
+                >
                     Register
                 </button>
                 <p className="mt-4">
-                    Already have an account? <a href="/login" className="text-red-400 underline hover:text-red-500">Log In</a>
+                    Already have an account? <a href="/login" className="text-blue-400 underline hover:text-blue-500">Log In</a>
                 </p>
             </div>
         </div>

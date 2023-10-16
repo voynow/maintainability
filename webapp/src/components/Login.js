@@ -40,7 +40,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-primary via-primary to-secondary">
+        <div className="flex flex-col items-center justify-center h-screen" style={{ background: 'linear-gradient(to top, #FDF2E9, #EDE4DC)' }}>
             <div className="p-8 bg-white rounded-lg shadow-md w-1/3 text-center">
                 <h1 className="text-4xl mb-4 font-semibold text-gray-800">Maintainability</h1>
                 <TextField
@@ -57,16 +57,21 @@ const Login = () => {
                 />
                 <button
                     onClick={handleLogin}
-                    className="p-3 w-full bg-blue-200 text-black rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-red-200">
+                    className="p-3 w-full text-white border rounded border-2"
+                    style={{
+                        backgroundColor: 'var(--custom-red)',
+                        borderColor: 'var(--custom-red)',
+                    }}
+                >
                     Login
                 </button>
                 <p className="mt-4">
                     New here?&nbsp;
-                    <a href="/register" className="text-red-400 underline hover:text-red-500">Register</a>
+                    <a href="/register" className="text-blue-400 underline hover:text-blue-500">Register</a>
                 </p>
                 {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
-        </div>
+        </div >
     );
 };
 

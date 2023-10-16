@@ -27,6 +27,12 @@ def write_metrics(metrics: models.Maintainability) -> Tuple:
     return table.insert(metrics).execute()
 
 
+def get_user_projects(user_email: str) -> List[Dict]:
+    table = connect_to_supabase_table("maintainability")
+    response = table.select("project_name").eq("user_email", user_email).execute()
+    return response.data if response.data else []
+
+
 def get_metrics(user_email: str, project_name: str):
     table = connect_to_supabase_table("maintainability")
     return (

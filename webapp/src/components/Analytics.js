@@ -5,14 +5,30 @@ import { useAppContext } from '../AppContext';
 const Analytics = () => {
     const { email } = useAppContext();
     const [metrics, setMetrics] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState("maintainability");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await axios.get("/get_user_projects", {
+                params: { user_email: email },
+                headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+            });
+            if (response.status === 200) {
+                setProjects(response.data);
+            }
+        } catch (err) {
+            // Handle error
+        }
+    };
 
     const fetchMetrics = async () => {
         try {
             setIsLoading(true);
             const response = await axios.get("/get_metrics", {
-                params: { user_email: email, project_name: "YourProjectName" },
+                params: { user_email: email, project_name: selectedProject },
                 headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
             });
 
@@ -32,12 +48,20 @@ const Analytics = () => {
 
     useEffect(() => {
         if (email) {
+            fetchProjects();
             fetchMetrics();
         }
-    }, [email]);
+    }, [email, selectedProject]);
 
     return (
         <div>
+            <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
+                {projects.map((project, index) => (
+                    <option key={index} value={project.project_name}>
+                        {project.project_name}
+                    </option>
+                ))}
+            </select>
             {isLoading ? (
                 <p>Loading...</p>
             ) : error ? (

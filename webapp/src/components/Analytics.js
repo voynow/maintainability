@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
 import { Bar } from 'react-chartjs-2';
-import { CategoryScale, LinearScale, BarElement, Chart } from 'chart.js';
+import { TimeScale, CategoryScale, LinearScale, BarElement, Chart } from 'chart.js';
+import 'chartjs-adapter-date-fns';  // or 'chartjs-adapter-moment'
 
-Chart.register(CategoryScale, LinearScale, BarElement);
+Chart.register(TimeScale, CategoryScale, LinearScale, BarElement);
+
 
 const Analytics = () => {
     const { email } = useAppContext();
@@ -57,12 +59,34 @@ const Analytics = () => {
         }
     }, [email, selectedProject]);
 
+    const aggregatedMetrics = metrics?.reduce((acc, metric) => {
+        const date = metric.timestamp.split('T')[0]; // Extract the date part from ISO string
+        const weight = metric.loc;
+
+        acc[date] = acc[date] ? acc[date] : { totalLOC: 0, totalReadability: 0 };
+
+        acc[date].totalLOC += weight;
+        acc[date].totalReadability += metric.readability * weight;
+
+        return acc;
+    }, {});
+
+    // Calculate weighted average
+    const dates = [];
+    const avgReadability = [];
+
+    for (const [date, data] of Object.entries(aggregatedMetrics || {})) {
+        dates.push(date);
+        avgReadability.push(data.totalReadability / data.totalLOC);
+    }
+
+
     const chartData = {
-        labels: metrics?.map((metric) => metric.file_path),
+        labels: dates,
         datasets: [
             {
-                label: 'Readability',
-                data: metrics?.map((metric) => metric.readability),
+                label: 'Weighted Avg Readability',
+                data: avgReadability,
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
             },
         ],
@@ -71,7 +95,10 @@ const Analytics = () => {
     const chartOptions = {
         scales: {
             x: {
-                type: 'category',
+                type: 'time',
+                time: {
+                    unit: 'day'
+                },
             },
             y: {
                 type: 'linear',

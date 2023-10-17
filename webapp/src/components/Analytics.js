@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
+import { Bar } from 'react-chartjs-2';
+import { CategoryScale, LinearScale, BarElement, Chart } from 'chart.js';
+
+Chart.register(CategoryScale, LinearScale, BarElement);
 
 const Analytics = () => {
     const { email } = useAppContext();
@@ -20,7 +24,7 @@ const Analytics = () => {
                 setProjects(response.data);
             }
         } catch (err) {
-            // Handle error
+            setError("An error occurred");
         }
     };
 
@@ -53,6 +57,29 @@ const Analytics = () => {
         }
     }, [email, selectedProject]);
 
+    const chartData = {
+        labels: metrics?.map((metric) => metric.file_path),
+        datasets: [
+            {
+                label: 'Readability',
+                data: metrics?.map((metric) => metric.readability),
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            },
+        ],
+    };
+
+    const chartOptions = {
+        scales: {
+            x: {
+                type: 'category',
+            },
+            y: {
+                type: 'linear',
+                beginAtZero: true,
+            },
+        },
+    };
+
     return (
         <div>
             <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
@@ -67,35 +94,11 @@ const Analytics = () => {
             ) : error ? (
                 <p>{error}</p>
             ) : (
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr>
-                            <th>File Path</th>
-                            <th>timestamp</th>
-                            <th>Readability</th>
-                            <th>Design Quality</th>
-                            <th>Testability</th>
-                            <th>Consistency</th>
-                            <th>Error Handling</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {metrics.map((metric, index) => (
-                            <tr key={index}>
-                                <td>{metric.file_path}</td>
-                                <td>{metric.timestamp}</td>
-                                <td>{metric.readability}</td>
-                                <td>{metric.design_quality}</td>
-                                <td>{metric.testability}</td>
-                                <td>{metric.consistency}</td>
-                                <td>{metric.debug_error_handling}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <Bar data={chartData} options={chartOptions} />
             )}
         </div>
     );
 };
+
 
 export default Analytics;

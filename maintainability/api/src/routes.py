@@ -6,6 +6,7 @@ import jwt
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from jose import jwt
+from collections import defaultdict
 
 from . import io_operations, models, routes_helper, logger
 
@@ -51,12 +52,21 @@ async def extract_metrics(extract_metrics: models.ExtractMetrics, request: Reque
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/get_user_projects")
+async def get_user_projects(user_email: str):
+    projects = io_operations.get_user_projects(user_email)
+    if not projects:
+        return JSONResponse(status_code=404, content={"detail": "Projects not found"})
+    return projects
+
+
 @router.get("/get_metrics", response_model=List[models.Maintainability])
 async def get_metrics(user_email: str, project_name: str):
     metrics = io_operations.get_metrics(user_email, project_name)
     if not metrics.data:
         return JSONResponse(status_code=404, content={"detail": "Metrics not found"})
-    return metrics.data
+    weighted_metrics = routes_helper.calculate_weighted_metrics(metrics.data)
+    return weighted_metrics
 
 
 @router.post("/register", response_model=models.User)

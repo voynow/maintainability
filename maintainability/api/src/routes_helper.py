@@ -1,9 +1,11 @@
 import base64
 import json
 import secrets
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 
+from dateutil.parser import parse
 from fastapi import HTTPException
 from llm_blocks import block_factory
 from passlib.context import CryptContext
@@ -29,7 +31,7 @@ def validate_response(response: str) -> Dict:
         models.ValidModelResponse(**data)
         return data
     except (json.JSONDecodeError, ValidationError) as e:
-        logger.logger(f"Invalid LLM response: {e}")
+        logger.logger(f"Invalid LLM response! response={response}, error={str(e)}")
         return None
 
 
@@ -41,7 +43,7 @@ def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelR
         if validated_response:
             return validated_response
     # else return default values
-    return config.ValidModelResponse()
+    return models.ValidModelResponse().model_dump()
 
 
 def extract_metrics(
@@ -75,3 +77,33 @@ def validate_user(email: str, password: str) -> None:
 def generate_new_api_key():
     random_bytes = secrets.token_bytes(32)
     return base64.urlsafe_b64encode(random_bytes).decode("utf-8").rstrip("=")
+
+
+def calculate_weighted_metrics(response_data):
+    metric_cols = [
+        "readability",
+        "design_quality",
+        "testability",
+        "consistency",
+        "debug_error_handling",
+    ]
+
+    def aggregate_scores(objs):
+        total_loc = sum(obj["loc"] for obj in objs)
+        scores = {col: 0 for col in metric_cols}
+        for obj in objs:
+            weight = obj["loc"] / total_loc
+            for key in scores:
+                scores[key] += obj[key] * weight
+        return scores
+
+    dates = defaultdict(list)
+    for obj in response_data:
+        date_str = parse(obj["timestamp"]).strftime("%Y-%m-%d")
+        dates[date_str].append(obj)
+
+    date_scores = {}
+    for date, objs in dates.items():
+        date_scores[date] = aggregate_scores(objs)
+
+    return date_scores

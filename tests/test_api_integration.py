@@ -120,3 +120,15 @@ def test_get_metrics_with_valid_project(test_client):
         assert "user_email" in metric
         assert "readability" in metric
         # ommitting other fields for brevity
+
+
+def test_get_user_projects_with_valid_email(test_client):
+    """Test /get_user_projects route with a valid email"""
+    user_email = "test"
+    params = {"user_email": user_email}
+    response = test_client.get("/get_user_projects", params=params)
+
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    for project in response.json():
+        assert "project_name" in project

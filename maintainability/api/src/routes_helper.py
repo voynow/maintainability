@@ -43,7 +43,7 @@ def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelR
         if validated_response:
             return validated_response
     # else return default values
-    return models.ValidModelResponse()
+    return models.ValidModelResponse().model_dump()
 
 
 def extract_metrics(

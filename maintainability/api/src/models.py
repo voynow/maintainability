@@ -33,11 +33,11 @@ class Maintainability(BaseModel):
     extension: str
     content: str
     session_id: str
-    readability: int = 0
-    design_quality: int = 0
-    testability: int = 0
-    consistency: int = 0
-    debug_error_handling: int = 0
+    readability: int = -1
+    design_quality: int = -1
+    testability: int = -1
+    consistency: int = -1
+    debug_error_handling: int = -1
     timestamp: str = datetime.now(pytz.utc).isoformat()
 
 

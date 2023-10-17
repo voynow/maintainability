@@ -71,6 +71,7 @@ const Analytics = () => {
                     <thead>
                         <tr>
                             <th>File Path</th>
+                            <th>timestamp</th>
                             <th>Readability</th>
                             <th>Design Quality</th>
                             <th>Testability</th>
@@ -82,6 +83,7 @@ const Analytics = () => {
                         {metrics.map((metric, index) => (
                             <tr key={index}>
                                 <td>{metric.file_path}</td>
+                                <td>{metric.timestamp}</td>
                                 <td>{metric.readability}</td>
                                 <td>{metric.design_quality}</td>
                                 <td>{metric.testability}</td>

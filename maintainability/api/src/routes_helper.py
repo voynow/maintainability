@@ -31,7 +31,7 @@ def validate_response(response: str) -> Dict:
         models.ValidModelResponse(**data)
         return data
     except (json.JSONDecodeError, ValidationError) as e:
-        logger.logger(f"Invalid LLM response: {e}")
+        logger.logger(f"Invalid LLM response! response={response}, error={str(e)}")
         return None
 
 
@@ -43,7 +43,7 @@ def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelR
         if validated_response:
             return validated_response
     # else return default values
-    return config.ValidModelResponse()
+    return models.ValidModelResponse()
 
 
 def extract_metrics(

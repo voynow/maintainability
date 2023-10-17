@@ -5,6 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 
+from dateutil.parser import parse
 from fastapi import HTTPException
 from llm_blocks import block_factory
 from passlib.context import CryptContext
@@ -96,12 +97,13 @@ def calculate_weighted_metrics(response_data):
                 scores[key] += obj[key] * weight
         return scores
 
-    sessions = defaultdict(list)
+    dates = defaultdict(list)
     for obj in response_data:
-        sessions[obj["session_id"]].append(obj)
+        date_str = parse(obj["timestamp"]).strftime("%Y-%m-%d")
+        dates[date_str].append(obj)
 
-    session_scores = {}
-    for session, objs in sessions.items():
-        session_scores[session] = aggregate_scores(objs)
+    date_scores = {}
+    for date, objs in dates.items():
+        date_scores[date] = aggregate_scores(objs)
 
-    return session_scores
+    return date_scores

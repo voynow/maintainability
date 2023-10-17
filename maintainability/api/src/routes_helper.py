@@ -1,6 +1,7 @@
 import base64
 import json
 import secrets
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 
@@ -75,3 +76,32 @@ def validate_user(email: str, password: str) -> None:
 def generate_new_api_key():
     random_bytes = secrets.token_bytes(32)
     return base64.urlsafe_b64encode(random_bytes).decode("utf-8").rstrip("=")
+
+
+def calculate_weighted_metrics(response_data):
+    metric_cols = [
+        "readability",
+        "design_quality",
+        "testability",
+        "consistency",
+        "debug_error_handling",
+    ]
+
+    def aggregate_scores(objs):
+        total_loc = sum(obj["loc"] for obj in objs)
+        scores = {col: 0 for col in metric_cols}
+        for obj in objs:
+            weight = obj["loc"] / total_loc
+            for key in scores:
+                scores[key] += obj[key] * weight
+        return scores
+
+    sessions = defaultdict(list)
+    for obj in response_data:
+        sessions[obj["session_id"]].append(obj)
+
+    session_scores = {}
+    for session, objs in sessions.items():
+        session_scores[session] = aggregate_scores(objs)
+
+    return session_scores

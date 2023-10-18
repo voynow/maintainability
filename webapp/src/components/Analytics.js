@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
 import { Bar } from 'react-chartjs-2';
 import { TimeScale, CategoryScale, LinearScale, BarElement, Chart } from 'chart.js';
-import 'chartjs-adapter-date-fns';  // or 'chartjs-adapter-moment'
+import 'chartjs-adapter-date-fns';
 
 Chart.register(TimeScale, CategoryScale, LinearScale, BarElement);
 
-
 const Analytics = () => {
     const { email } = useAppContext();
-    const [metrics, setMetrics] = useState(null);
+    const [metrics, setMetrics] = useState({});
     const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState("maintainability");
+    const [selectedProject, setSelectedProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -24,74 +23,56 @@ const Analytics = () => {
             });
             if (response.status === 200) {
                 setProjects(response.data);
+                if (selectedProject === null && response.data.length > 0) {
+                    setSelectedProject(response.data[0].project_name);
+                }
             }
         } catch (err) {
-            setError("An error occurred");
+            setError("An error occurred while fetching projects.");
         }
     };
 
-    const fetchMetrics = async () => {
+    const projectOptions = projects.map((project) => ({
+        value: project.project_name,
+        label: project.project_name,
+    }));
+
+
+    const fetchMetrics = useCallback(async () => {
+        if (!selectedProject) return;
         try {
             setIsLoading(true);
+            console.log("API URL: /get_metrics");
+            console.log(`Params: user_email=${email}, project_name=${selectedProject}`);
             const response = await axios.get("/get_metrics", {
                 params: { user_email: email, project_name: selectedProject },
                 headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
             });
-
             if (response.status === 200) {
+                console.log("API Response:", response.data);
                 setMetrics(response.data);
+                setError(null);
             }
         } catch (err) {
-            if (err.response?.status === 404) {
-                setError("Metrics not found");
-            } else {
-                setError("An error occurred");
-            }
+            setError(err.response?.status === 404 ? "Metrics not found" : "An error occurred while fetching metrics.");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [email, selectedProject]);
 
     useEffect(() => {
         if (email) {
             fetchProjects();
             fetchMetrics();
         }
-    }, [email, selectedProject]);
+    }, [email, selectedProject, fetchMetrics]);
 
-    const aggregatedMetrics = metrics?.reduce((acc, metric) => {
-        const date = metric.timestamp.split('T')[0]; // Extract the date part from ISO string
-        const weight = metric.loc;
-
-        acc[date] = acc[date] ? acc[date] : { totalLOC: 0, totalReadability: 0 };
-
-        acc[date].totalLOC += weight;
-        acc[date].totalReadability += metric.readability * weight;
-
+    const aggregatedMetrics = Object.entries(metrics).reduce((acc, [date, metricObj]) => {
+        acc[date] = metricObj;
         return acc;
     }, {});
 
-    // Calculate weighted average
-    const dates = [];
-    const avgReadability = [];
-
-    for (const [date, data] of Object.entries(aggregatedMetrics || {})) {
-        dates.push(date);
-        avgReadability.push(data.totalReadability / data.totalLOC);
-    }
-
-
-    const chartData = {
-        labels: dates,
-        datasets: [
-            {
-                label: 'Weighted Avg Readability',
-                data: avgReadability,
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-            },
-        ],
-    };
-
+    const dates = Object.keys(aggregatedMetrics);
     const chartOptions = {
         scales: {
             x: {
@@ -103,29 +84,81 @@ const Analytics = () => {
             y: {
                 type: 'linear',
                 beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Metric Value'
+                }
             },
+        },
+        maintainAspectRatio: false,
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutCubic',
         },
     };
 
+    const capitalizeFirstLetter = (str) => {
+        return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
+
     return (
         <div>
-            <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 {projects.map((project, index) => (
-                    <option key={index} value={project.project_name}>
+                    <div
+                        key={index}
+                        style={{
+                            padding: '10px',
+                            margin: '5px',
+                            border: selectedProject === project.project_name ? '2px solid #CD5C5C' : '2px solid #cccccc',
+                            borderRadius: '5px',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => setSelectedProject(project.project_name)}
+                    >
                         {project.project_name}
-                    </option>
+                    </div>
                 ))}
-            </select>
-            {isLoading ? (
-                <p>Loading...</p>
-            ) : error ? (
-                <p>{error}</p>
-            ) : (
-                <Bar data={chartData} options={chartOptions} />
-            )}
-        </div>
+            </div>
+            {
+                isLoading ? (
+                    <p>Loading...</p>
+                ) : error ? (
+                    <p>{error}</p>
+                ) : (
+                    <div>
+                        {['readability', 'design_quality', 'testability', 'consistency', 'debug_error_handling'].map((metric, index) => (
+                            <div key={index} style={{ overflow: 'hidden', width: '100%', height: '200px', marginBottom: '30px' }}>
+                                <h3 style={{
+                                    textAlign: 'center',
+                                    fontFamily: 'Arial, Helvetica, sans-serif',
+                                    fontSize: '1.8em',
+                                    color: '#333333'
+                                }}>
+                                    {capitalizeFirstLetter(metric)}
+                                </h3>
+
+                                <Bar
+                                    data={{
+                                        labels: dates,
+                                        datasets: [{
+                                            label: metric,
+                                            data: dates.map(date => aggregatedMetrics[date][metric]),
+                                            backgroundColor: index % 2 === 0 ? '#CD8C8C' : '#CD5C5C',
+                                        }],
+                                    }}
+                                    options={chartOptions}
+                                    height={100}
+                                    width={400}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )
+            }
+        </div >
     );
 };
-
 
 export default Analytics;

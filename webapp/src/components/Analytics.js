@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
 import { Bar } from 'react-chartjs-2';
 import { TimeScale, CategoryScale, LinearScale, BarElement, Chart } from 'chart.js';
-import 'chartjs-adapter-date-fns';  // or 'chartjs-adapter-moment'
+import 'chartjs-adapter-date-fns';
 
 Chart.register(TimeScale, CategoryScale, LinearScale, BarElement);
 
-
 const Analytics = () => {
     const { email } = useAppContext();
-    const [metrics, setMetrics] = useState(null);
+    const [metrics, setMetrics] = useState({});
     const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState("maintainability");
+    const [selectedProject, setSelectedProject] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -24,71 +23,66 @@ const Analytics = () => {
             });
             if (response.status === 200) {
                 setProjects(response.data);
+                if (selectedProject === null && response.data.length > 0) {
+                    setSelectedProject(response.data[0].project_name);
+                }
             }
         } catch (err) {
-            setError("An error occurred");
+            setError("An error occurred while fetching projects.");
         }
     };
 
-    const fetchMetrics = async () => {
+
+    const fetchMetrics = useCallback(async () => {
         try {
             setIsLoading(true);
+            console.log("API URL: /get_metrics");
+            console.log(`Params: user_email=${email}, project_name=${selectedProject}`);
             const response = await axios.get("/get_metrics", {
                 params: { user_email: email, project_name: selectedProject },
                 headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
             });
-
             if (response.status === 200) {
+                console.log("API Response:", response.data);
                 setMetrics(response.data);
+                setError(null);
             }
         } catch (err) {
-            if (err.response?.status === 404) {
-                setError("Metrics not found");
-            } else {
-                setError("An error occurred");
-            }
+            setError(err.response?.status === 404 ? "Metrics not found" : "An error occurred while fetching metrics.");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [email, selectedProject]);
 
     useEffect(() => {
         if (email) {
             fetchProjects();
             fetchMetrics();
         }
-    }, [email, selectedProject]);
+    }, [email, selectedProject, fetchMetrics]);
 
-    const aggregatedMetrics = metrics?.reduce((acc, metric) => {
-        const date = metric.timestamp.split('T')[0]; // Extract the date part from ISO string
-        const weight = metric.loc;
-
-        acc[date] = acc[date] ? acc[date] : { totalLOC: 0, totalReadability: 0 };
-
-        acc[date].totalLOC += weight;
-        acc[date].totalReadability += metric.readability * weight;
-
+    const aggregatedMetrics = Object.entries(metrics).reduce((acc, [date, metricObj]) => {
+        acc[date] = metricObj;
         return acc;
     }, {});
 
-    // Calculate weighted average
-    const dates = [];
-    const avgReadability = [];
-
-    for (const [date, data] of Object.entries(aggregatedMetrics || {})) {
-        dates.push(date);
-        avgReadability.push(data.totalReadability / data.totalLOC);
-    }
-
+    const dates = Object.keys(aggregatedMetrics);
+    const readabilityData = dates.map(date => aggregatedMetrics[date].readability);
+    const designQualityData = dates.map(date => aggregatedMetrics[date].design_quality);
 
     const chartData = {
         labels: dates,
         datasets: [
             {
-                label: 'Weighted Avg Readability',
-                data: avgReadability,
+                label: 'Readability',
+                data: readabilityData,
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
             },
+            {
+                label: 'Design Quality',
+                data: designQualityData,
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+            }
         ],
     };
 
@@ -126,6 +120,5 @@ const Analytics = () => {
         </div>
     );
 };
-
 
 export default Analytics;

@@ -21,9 +21,7 @@ class ValidModelResponse(BaseModel):
 
 
 class Maintainability(BaseModel):
-    """
-    Composiiton of maintainability, file metrics, and user information
-    """
+    """Composiiton of maintainability, file metrics, and user information"""
 
     user_email: str
     project_name: str

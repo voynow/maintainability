@@ -80,30 +80,24 @@ def generate_new_api_key():
 
 
 def calculate_weighted_metrics(response_data):
-    metric_cols = [
-        "readability",
-        "design_quality",
-        "testability",
-        "consistency",
-        "debug_error_handling",
-    ]
-
     def aggregate_scores(objs):
-        total_loc = sum(obj["loc"] for obj in objs)
-        scores = {col: 0 for col in metric_cols}
-        for obj in objs:
-            weight = obj["loc"] / total_loc
-            for key in scores:
-                scores[key] += obj[key] * weight
-        return scores
+        filtered_objs = list(
+            filter(lambda obj: all(obj[col] != -1 for col in config.METRIC_COLS), objs)
+        )
+        total_loc = sum(obj["loc"] for obj in filtered_objs)
+
+        if total_loc == 0:
+            return {col: -1 for col in config.METRIC_COLS}
+
+        return {
+            col: sum(obj[col] * (obj["loc"] / total_loc) for obj in filtered_objs)
+            for col in config.METRIC_COLS
+        }
 
     dates = defaultdict(list)
+
     for obj in response_data:
         date_str = parse(obj["timestamp"]).strftime("%Y-%m-%d")
         dates[date_str].append(obj)
 
-    date_scores = {}
-    for date, objs in dates.items():
-        date_scores[date] = aggregate_scores(objs)
-
-    return date_scores
+    return {date: aggregate_scores(objs) for date, objs in dates.items()}

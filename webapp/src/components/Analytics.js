@@ -11,7 +11,7 @@ const Analytics = () => {
     const { email } = useAppContext();
     const [metrics, setMetrics] = useState({});
     const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState("");
+    const [selectedProject, setSelectedProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -34,6 +34,7 @@ const Analytics = () => {
 
 
     const fetchMetrics = useCallback(async () => {
+        if (!selectedProject) return;
         try {
             setIsLoading(true);
             console.log("API URL: /get_metrics");
@@ -76,12 +77,12 @@ const Analytics = () => {
             {
                 label: 'Readability',
                 data: readabilityData,
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                backgroundColor: '#CD8C8C',
             },
             {
                 label: 'Design Quality',
                 data: designQualityData,
-                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                backgroundColor: '#CD5C5C',
             }
         ],
     };

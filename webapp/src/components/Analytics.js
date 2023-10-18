@@ -68,38 +68,18 @@ const Analytics = () => {
     }, {});
 
     const dates = Object.keys(aggregatedMetrics);
-    const readabilityData = dates.map(date => aggregatedMetrics[date].readability);
-    const designQualityData = dates.map(date => aggregatedMetrics[date].design_quality);
-
-    const chartData = {
-        labels: dates,
-        datasets: [
-            {
-                label: 'Readability',
-                data: readabilityData,
-                backgroundColor: '#CD8C8C',
-            },
-            {
-                label: 'Design Quality',
-                data: designQualityData,
-                backgroundColor: '#CD5C5C',
-            }
-        ],
-    };
-
     const chartOptions = {
         scales: {
             x: {
                 type: 'time',
-                time: {
-                    unit: 'day'
-                },
+                time: { unit: 'day' },
             },
             y: {
                 type: 'linear',
                 beginAtZero: true,
             },
         },
+        maintainAspectRatio: false,
     };
 
     return (
@@ -116,7 +96,25 @@ const Analytics = () => {
             ) : error ? (
                 <p>{error}</p>
             ) : (
-                <Bar data={chartData} options={chartOptions} />
+                <div>
+                    {['readability', 'design_quality', 'testability', 'consistency', 'debug_error_handling'].map((metric, index) => (
+                        <div key={index} style={{ width: '100%', height: '200px' }}>
+                            <Bar
+                                data={{
+                                    labels: dates,
+                                    datasets: [{
+                                        label: metric,
+                                        data: dates.map(date => aggregatedMetrics[date][metric]),
+                                        backgroundColor: index % 2 === 0 ? '#CD8C8C' : '#CD5C5C',
+                                    }],
+                                }}
+                                options={chartOptions}
+                                height={100}
+                                width={400}
+                            />
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );

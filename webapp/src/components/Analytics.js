@@ -32,6 +32,11 @@ const Analytics = () => {
         }
     };
 
+    const projectOptions = projects.map((project) => ({
+        value: project.project_name,
+        label: project.project_name,
+    }));
+
 
     const fetchMetrics = useCallback(async () => {
         if (!selectedProject) return;
@@ -99,13 +104,23 @@ const Analytics = () => {
 
     return (
         <div>
-            <select value={selectedProject || ''} onChange={(e) => setSelectedProject(e.target.value)}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 {projects.map((project, index) => (
-                    <option key={index} value={project.project_name}>
+                    <div
+                        key={index}
+                        style={{
+                            padding: '10px',
+                            margin: '5px',
+                            border: selectedProject === project.project_name ? '2px solid #CD5C5C' : '2px solid #cccccc',
+                            borderRadius: '5px',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => setSelectedProject(project.project_name)}
+                    >
                         {project.project_name}
-                    </option>
+                    </div>
                 ))}
-            </select>
+            </div>
             {
                 isLoading ? (
                     <p>Loading...</p>

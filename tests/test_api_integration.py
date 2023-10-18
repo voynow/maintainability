@@ -109,16 +109,14 @@ def test_invalidate_api_key(test_client, generated_api_key):
 
 def test_get_metrics_with_valid_project(test_client):
     user_email = "test"
-    project_name = "maintainability"
+    project_name = "test_project"
     params = {"user_email": user_email, "project_name": project_name}
     response = test_client.get("/get_metrics", params=params)
 
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    for metric in response.json():
-        assert "project_name" in metric
-        assert "user_email" in metric
-        assert "readability" in metric
+    assert isinstance(response.json(), dict)
+    for _, obj in response.json().items():
+        assert "readability" in obj
         # ommitting other fields for brevity
 
 

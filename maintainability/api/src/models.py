@@ -39,6 +39,16 @@ class Maintainability(BaseModel):
     timestamp: str = datetime.now(pytz.utc).isoformat()
 
 
+class GetMetricsResponseObject(BaseModel):
+    """Response object for get_metrics route"""
+
+    readability: float
+    design_quality: float
+    testability: float
+    consistency: float
+    debug_error_handling: float
+
+
 class User(BaseModel):
     """user information"""
 

@@ -72,51 +72,77 @@ const Analytics = () => {
         scales: {
             x: {
                 type: 'time',
-                time: { unit: 'day' },
+                time: {
+                    unit: 'day'
+                },
             },
             y: {
                 type: 'linear',
                 beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Metric Value'
+                }
             },
         },
         maintainAspectRatio: false,
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutCubic',
+        },
     };
+
+    const capitalizeFirstLetter = (str) => {
+        return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
 
     return (
         <div>
-            <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
+            <select value={selectedProject || ''} onChange={(e) => setSelectedProject(e.target.value)}>
                 {projects.map((project, index) => (
                     <option key={index} value={project.project_name}>
                         {project.project_name}
                     </option>
                 ))}
             </select>
-            {isLoading ? (
-                <p>Loading...</p>
-            ) : error ? (
-                <p>{error}</p>
-            ) : (
-                <div>
-                    {['readability', 'design_quality', 'testability', 'consistency', 'debug_error_handling'].map((metric, index) => (
-                        <div key={index} style={{ width: '100%', height: '200px' }}>
-                            <Bar
-                                data={{
-                                    labels: dates,
-                                    datasets: [{
-                                        label: metric,
-                                        data: dates.map(date => aggregatedMetrics[date][metric]),
-                                        backgroundColor: index % 2 === 0 ? '#CD8C8C' : '#CD5C5C',
-                                    }],
-                                }}
-                                options={chartOptions}
-                                height={100}
-                                width={400}
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+            {
+                isLoading ? (
+                    <p>Loading...</p>
+                ) : error ? (
+                    <p>{error}</p>
+                ) : (
+                    <div>
+                        {['readability', 'design_quality', 'testability', 'consistency', 'debug_error_handling'].map((metric, index) => (
+                            <div key={index} style={{ overflow: 'hidden', width: '100%', height: '200px', marginBottom: '30px' }}>
+                                <h3 style={{
+                                    textAlign: 'center',
+                                    fontFamily: 'Arial, Helvetica, sans-serif',
+                                    fontSize: '1.8em',
+                                    color: '#333333'
+                                }}>
+                                    {capitalizeFirstLetter(metric)}
+                                </h3>
+
+                                <Bar
+                                    data={{
+                                        labels: dates,
+                                        datasets: [{
+                                            label: metric,
+                                            data: dates.map(date => aggregatedMetrics[date][metric]),
+                                            backgroundColor: index % 2 === 0 ? '#CD8C8C' : '#CD5C5C',
+                                        }],
+                                    }}
+                                    options={chartOptions}
+                                    height={100}
+                                    width={400}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )
+            }
+        </div >
     );
 };
 

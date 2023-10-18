@@ -60,7 +60,7 @@ async def get_user_projects(user_email: str):
     return projects
 
 
-@router.get("/get_metrics", response_model=Dict[str, models.Maintainability])
+@router.get("/get_metrics", response_model=Dict[str, models.GetMetricsResponseObject])
 async def get_metrics(user_email: str, project_name: str):
     metrics = io_operations.get_metrics(user_email, project_name)
     if not metrics.data:

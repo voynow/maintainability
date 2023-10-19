@@ -25,25 +25,15 @@ def get_llm() -> callable:
     )
 
 
-def validate_response(response: str) -> Dict:
-    try:
-        data = json.loads(response)
-        models.ValidModelResponse(**data)
-        return data
-    except (json.JSONDecodeError, ValidationError) as e:
-        logger.logger(f"Invalid LLM response! response={response}, error={str(e)}")
-        return None
-
-
 def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelResponse:
-    llm = get_llm()
-    for _ in range(config.LLM_MAX_RETRIES):
-        response = llm(filepath=filepath, code=code)
-        validated_response = validate_response(response)
-        if validated_response:
-            return validated_response
-    # else return default values
-    return models.ValidModelResponse().model_dump()
+    metric_collection = {}
+    gpt_3_5_turbo = get_llm()
+    for metric, description in config.METRIC_DESCRIPTIONS.items():
+        metric_collection[metric] = gpt_3_5_turbo(
+            filepath=filepath, code=code, metric_description=description
+        )
+        print(metric_collection[metric])
+    return metric_collection
 
 
 def extract_metrics(

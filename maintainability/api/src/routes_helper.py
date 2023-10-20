@@ -7,7 +7,6 @@ from dateutil.parser import parse
 from fastapi import HTTPException
 from llm_blocks import block_factory
 from passlib.context import CryptContext
-from pydantic import ValidationError
 
 from . import config, io_operations, logger, models
 
@@ -24,10 +23,13 @@ def get_llm() -> callable:
 
 
 def parse_response(text: str) -> float:
-    match = re.search(r"(\d{1,2})/10", text)
-    if match:
-        return int(match.group(1))
-    return None
+    try:
+        match = re.search(r"(\d{1,2})/10", text)
+        response = int(match.group(1))
+    except AttributeError as e:
+        logger.logger(f"Error parsing LLM response={text} with error={e}")
+        response = -1
+    return response
 
 
 def get_maintainability_metrics(filepath: str, code: str) -> models.ValidModelResponse:

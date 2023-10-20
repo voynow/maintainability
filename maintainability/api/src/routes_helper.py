@@ -1,9 +1,7 @@
 import base64
-import json
 import secrets
 from collections import defaultdict
-from pathlib import Path
-from typing import Dict
+import re
 
 from dateutil.parser import parse
 from fastapi import HTTPException
@@ -25,14 +23,21 @@ def get_llm() -> callable:
     )
 
 
-def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelResponse:
+def parse_response(text: str) -> float:
+    match = re.search(r"(\d{1,2})/10", text)
+    if match:
+        return int(match.group(1))
+    return None
+
+
+def get_maintainability_metrics(filepath: str, code: str) -> models.ValidModelResponse:
     metric_collection = {}
-    gpt_3_5_turbo = get_llm()
+    gpt_interface = get_llm()
     for metric, description in config.METRIC_DESCRIPTIONS.items():
-        metric_collection[metric] = gpt_3_5_turbo(
+        response = gpt_interface(
             filepath=filepath, code=code, metric_description=description
         )
-        print(metric_collection[metric])
+        metric_collection[metric] = parse_response(response)
     return metric_collection
 
 

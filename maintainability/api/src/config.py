@@ -8,7 +8,7 @@ Write two-three bullet points on your initial thoughts. When you are done, concl
 """
 
 METRIC_DESCRIPTIONS = {
-    "intuitive design": """Variable and Function Naming: Clear names indicating purpose and type.
+    "intuitive_design": """Variable and Function Naming: Clear names indicating purpose and type.
         Good: total_amount, calculate_tax(income)
         Bad: ta, calc()
         Comment Quality: Comments clarify the 'why,' not just the 'what.'
@@ -23,7 +23,7 @@ METRIC_DESCRIPTIONS = {
         Code Simplicity: Aim for straightforward code without sacrificing functionality.
         Good: Using list comprehensions instead of simple for-loops.
         Bad: Nested loops and if-statements that could be simplified.""",
-    "functional cohesion": """Single Responsibility Principle: Each function or module should have one, and only one, reason to change. This means it should perform one logical task.
+    "functional_cohesion": """Single Responsibility Principle: Each function or module should have one, and only one, reason to change. This means it should perform one logical task.
         Good: A function named calculate_tax(income) that only calculates tax.
         Bad: A function named process_user_data() that validates input, updates a database, and sends email.
         Separation of Concerns: Different aspects of the program should be separated into distinct sections of the codebase. This involves following established architectural patterns.
@@ -35,7 +35,7 @@ METRIC_DESCRIPTIONS = {
         Module Cohesion: Functions within a module should be strongly related in functionality. Avoid "god" modules that do everything.
         Good: A PaymentProcessing module that only contains functions related to payment.
         Bad: A Utilities module that contains everything from string manipulation to network requests.""",
-    "adaptive resilience": """Error-Handling: Employ comprehensive error-handling mechanisms, not just for external calls but also for internal logic that is prone to failure.
+    "adaptive_resilience": """Error-Handling: Employ comprehensive error-handling mechanisms, not just for external calls but also for internal logic that is prone to failure.
         Good: Using try-except blocks around not just HTTP requests but also file operations, database calls, and any segments where exceptions might occur.
         Bad: Only using error-handling for network requests but ignoring it for file I/O or other risky operations.
         Graceful Degradation: Code should still function, albeit at a reduced level, even when some subsystems or services fail.
@@ -47,7 +47,7 @@ METRIC_DESCRIPTIONS = {
         Adaptability: Ensure the code can adapt to different conditions, including load and data variability.
         Good: Implementing auto-scaling, rate-limiting, and data partitioning to handle different operational scenarios.
         Bad: Writing code that can't handle varying loads or data sizes.""",
-    "code efficiency": """Algorithmic Complexity: Use efficient algorithms and data structures. Complexity worse than O(n logn) should be justified.
+    "code_efficiency": """Algorithmic Complexity: Use efficient algorithms and data structures. Complexity worse than O(n logn) should be justified.
         Good: Using quicksort or mergesort for sorting tasks.
         Bad: Using bubble sort for a large dataset without justification.
         Resource Utilization: Monitor CPU and memory usage and minimize their footprint.
@@ -62,7 +62,7 @@ METRIC_DESCRIPTIONS = {
         Data Fetching and Caching: Optimize how data is retrieved and stored.
         Good: Implementing caching mechanisms or using batch retrieval for database calls.
         Bad: Making frequent, repetitive calls to a database for the same data.""",
-    "data security and integrity": """Data Validation: Validate all user inputs at both client and server sides. This is not just about format but also about acceptable ranges or values.
+    "data_security_and_integrity": """Data Validation: Validate all user inputs at both client and server sides. This is not just about format but also about acceptable ranges or values.
         Good: Using regex to validate usernames and also checking for banned or reserved names.
         Bad: Only using front-end validation, which can be bypassed.
         Data Sanitation: Ensure that all data is sanitized to prevent injection attacks, and not just SQL injections.
@@ -81,14 +81,6 @@ METRIC_DESCRIPTIONS = {
         Good: Logging failed login attempts and setting up alerts for multiple failures from the same IP.
         Bad: No logging or monitoring in place for security-relevant activities.""",
 }
-
-METRIC_COLS = [
-    "intuitive design",
-    "functional cohesion",
-    "adaptive resilience",
-    "code efficiency",
-    "data security and integrity",
-]
 
 MODEL_NAME = "gpt-3.5-turbo-16k"
 TEMPERATURE = 0.0

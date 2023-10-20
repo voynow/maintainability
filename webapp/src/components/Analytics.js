@@ -128,7 +128,7 @@ const Analytics = () => {
                     <p>{error}</p>
                 ) : (
                     <div>
-                        {['readability', 'design_quality', 'testability', 'consistency', 'debug_error_handling'].map((metric, index) => (
+                        {['intuitive_design', 'functional_cohesion', 'adaptive_resilience', 'code_efficiency', 'data_security_and_integrity'].map((metric, index) => (
                             <div key={index} style={{ overflow: 'hidden', width: '100%', height: '200px', marginBottom: '30px' }}>
                                 <h3 style={{
                                     textAlign: 'center',

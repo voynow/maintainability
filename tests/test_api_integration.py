@@ -117,7 +117,7 @@ def test_get_metrics_with_valid_project(test_client):
     assert response.status_code == 200
     assert isinstance(response.json(), dict)
     for _, obj in response.json().items():
-        assert "readability" in obj
+        assert "intuitive_design" in obj
         # ommitting other fields for brevity
 
 
@@ -136,9 +136,9 @@ def test_get_user_projects_with_valid_email(test_client):
 def test_extract_metrics_with_default_response(test_client):
     """Test /extract_metrics route when get_maintainability_metrics fails"""
 
-    mock_valid_model_response = models.ValidModelResponse().model_dump()
+    mock_valid_model_response = models.MaintainabilityMetrics().model_dump()
     patch_path = "maintainability.api.src.routes_helper.get_maintainability_metrics"
-    
+
     with patch(patch_path) as mock_get_metrics:
         mock_get_metrics.return_value = mock_valid_model_response
         headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}

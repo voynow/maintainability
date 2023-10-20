@@ -1,15 +1,12 @@
 import base64
-import json
 import secrets
 from collections import defaultdict
-from pathlib import Path
-from typing import Dict
+import re
 
 from dateutil.parser import parse
 from fastapi import HTTPException
 from llm_blocks import block_factory
 from passlib.context import CryptContext
-from pydantic import ValidationError
 
 from . import config, io_operations, logger, models
 
@@ -25,30 +22,36 @@ def get_llm() -> callable:
     )
 
 
-def validate_response(response: str) -> Dict:
+def parse_response(text: str) -> float:
     try:
-        data = json.loads(response)
-        models.ValidModelResponse(**data)
-        return data
-    except (json.JSONDecodeError, ValidationError) as e:
-        logger.logger(f"Invalid LLM response! response={response}, error={str(e)}")
-        return None
+        match = re.search(r"(\d{1,2})/10", text)
+        response = int(match.group(1))
+    except AttributeError as e:
+        logger.logger(f"Error parsing LLM response={text} with error={e}")
+        response = -1
+    return response
 
 
-def get_maintainability_metrics(filepath: Path, code: str) -> models.ValidModelResponse:
-    llm = get_llm()
-    for _ in range(config.LLM_MAX_RETRIES):
-        response = llm(filepath=filepath, code=code)
-        validated_response = validate_response(response)
-        if validated_response:
-            return validated_response
-    # else return default values
-    return models.ValidModelResponse().model_dump()
+def get_maintainability_metrics(
+    filepath: str, code: str
+) -> models.MaintainabilityMetrics:
+    metric_collection = {}
+    gpt_interface = get_llm()
+    for metric, description in config.METRIC_DESCRIPTIONS.items():
+        metric_name_formatted = metric.replace("_", " ")
+        response = gpt_interface(
+            filepath=filepath,
+            code=code,
+            metric=metric_name_formatted,
+            description=description,
+        )
+        metric_collection[metric] = parse_response(response)
+    return metric_collection
 
 
 def extract_metrics(
     user_email: str, project_name: str, session_id: str, filepath: str, content: str
-) -> models.Maintainability:
+) -> models.ExtractMetricsTransaction:
     maintainability_metrics = get_maintainability_metrics(filepath, content)
     io_operations.write_metrics(
         {
@@ -82,16 +85,19 @@ def generate_new_api_key():
 def calculate_weighted_metrics(response_data):
     def aggregate_scores(objs):
         filtered_objs = list(
-            filter(lambda obj: all(obj[col] != -1 for col in config.METRIC_COLS), objs)
+            filter(
+                lambda obj: all(obj[col] != -1 for col in config.METRIC_DESCRIPTIONS),
+                objs,
+            )
         )
         total_loc = sum(obj["loc"] for obj in filtered_objs)
 
         if total_loc == 0:
-            return {col: -1 for col in config.METRIC_COLS}
+            return {col: -1 for col in config.METRIC_DESCRIPTIONS}
 
         return {
             col: sum(obj[col] * (obj["loc"] / total_loc) for obj in filtered_objs)
-            for col in config.METRIC_COLS
+            for col in config.METRIC_DESCRIPTIONS
         }
 
     dates = defaultdict(list)

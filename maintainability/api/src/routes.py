@@ -1,14 +1,13 @@
 import os
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict
 
 import jwt
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from jose import jwt
-from collections import defaultdict
 
-from . import io_operations, models, routes_helper, logger
+from . import io_operations, logger, models, routes_helper
 
 router = APIRouter()
 
@@ -34,7 +33,7 @@ def read_root():
     return {"status": "ok"}
 
 
-@router.post("/extract_metrics", response_model=models.ValidModelResponse)
+@router.post("/extract_metrics", response_model=models.MaintainabilityMetrics)
 async def extract_metrics(extract_metrics: models.ExtractMetrics, request: Request):
     try:
         user_email = io_operations.get_email_via_api_key(
@@ -60,7 +59,7 @@ async def get_user_projects(user_email: str):
     return projects
 
 
-@router.get("/get_metrics", response_model=Dict[str, models.GetMetricsResponseObject])
+@router.get("/get_metrics", response_model=Dict[str, models.GetMetricsResponse])
 async def get_metrics(user_email: str, project_name: str):
     metrics = io_operations.get_metrics(user_email, project_name)
     if not metrics.data:

@@ -10,16 +10,6 @@ class ExtractMetrics(BaseModel):
     file_content: str
 
 
-class ValidModelResponse(BaseModel):
-    """LLM response validation model"""
-
-    readability: int = -1
-    design_quality: int = -1
-    testability: int = -1
-    consistency: int = -1
-    debug_error_handling: int = -1
-
-
 class Maintainability(BaseModel):
     """Composiiton of maintainability, file metrics, and user information"""
 
@@ -31,22 +21,22 @@ class Maintainability(BaseModel):
     extension: str
     content: str
     session_id: str
-    readability: int
-    design_quality: int
-    testability: int
-    consistency: int
-    debug_error_handling: int
+    intuitive_design: int
+    functional_cohesion: int
+    adaptive_resilience: int
+    code_efficiency: int
+    data_security_and_integrity: int
     timestamp: str = datetime.now(pytz.utc).isoformat()
 
 
-class GetMetricsResponseObject(BaseModel):
+class GetMetricsResponse(BaseModel):
     """Response object for get_metrics route"""
 
-    readability: float
-    design_quality: float
-    testability: float
-    consistency: float
-    debug_error_handling: float
+    intuitive_design: float
+    functional_cohesion: float
+    adaptive_resilience: float
+    code_efficiency: float
+    data_security_and_integrity: float
 
 
 class User(BaseModel):

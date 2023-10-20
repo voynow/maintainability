@@ -13,14 +13,14 @@ class ExtractMetrics(BaseModel):
 class MaintainabilityMetrics(BaseModel):
     """maintainability_metrics transaction model"""
 
-    intuitive_design: int
-    functional_cohesion: int
-    adaptive_resilience: int
-    code_efficiency: int
-    data_security_and_integrity: int
+    intuitive_design: int = -1
+    functional_cohesion: int = -1
+    adaptive_resilience: int = -1
+    code_efficiency: int = -1
+    data_security_and_integrity: int = -1
 
 
-class Maintainability(BaseModel):
+class ExtractMetricsTransaction(BaseModel):
     """extract_metrics transaction model"""
 
     user_email: str

@@ -47,7 +47,7 @@ def get_maintainability_metrics(
 
 def extract_metrics(
     user_email: str, project_name: str, session_id: str, filepath: str, content: str
-) -> models.Maintainability:
+) -> models.ExtractMetricsTransaction:
     maintainability_metrics = get_maintainability_metrics(filepath, content)
     io_operations.write_metrics(
         {
@@ -81,16 +81,19 @@ def generate_new_api_key():
 def calculate_weighted_metrics(response_data):
     def aggregate_scores(objs):
         filtered_objs = list(
-            filter(lambda obj: all(obj[col] != -1 for col in config.METRIC_COLS), objs)
+            filter(
+                lambda obj: all(obj[col] != -1 for col in config.METRIC_DESCRIPTIONS),
+                objs,
+            )
         )
         total_loc = sum(obj["loc"] for obj in filtered_objs)
 
         if total_loc == 0:
-            return {col: -1 for col in config.METRIC_COLS}
+            return {col: -1 for col in config.METRIC_DESCRIPTIONS}
 
         return {
             col: sum(obj[col] * (obj["loc"] / total_loc) for obj in filtered_objs)
-            for col in config.METRIC_COLS
+            for col in config.METRIC_DESCRIPTIONS
         }
 
     dates = defaultdict(list)

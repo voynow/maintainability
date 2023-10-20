@@ -1,10 +1,12 @@
-PROMPT = """You are a highly respected tech lead participating in a code review of {filepath}:
+PROMPT = """You are a highly respected tech lead at a leading technology company, participating in a code review of {filepath}:
 {code}
 
-Evaluate the code for the following:
-{metric_description}
+Evaluate the code on {metric}:
+{description}
 
-Write two-three bullet points on your initial thoughts. When you are done, conclude with a numerical response (X/10, where 10 is the best and 0 is bad) and nothing else.
+Approach this review with big tech, production-ready expectations. Be uncompromising and severe in your critique. Use a zero-tolerance policy for lapses in quality, and make sure to distribute your scores rigorously and evenly across the 0-10 range. Reserve scores of 9 or 10 for exceptional code that could be considered a best-in-class example.
+
+Write two-three bullet points on your initial thoughts. When you are done, conclude with a numerical response (X/10, where 10 is exceptional and 0 is unacceptable) and nothing else.
 """
 
 METRIC_DESCRIPTIONS = {

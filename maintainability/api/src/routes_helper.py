@@ -38,8 +38,12 @@ def get_maintainability_metrics(
     metric_collection = {}
     gpt_interface = get_llm()
     for metric, description in config.METRIC_DESCRIPTIONS.items():
+        metric_name_formatted = metric.replace("_", " ")
         response = gpt_interface(
-            filepath=filepath, code=code, metric_description=description
+            filepath=filepath,
+            code=code,
+            metric=metric_name_formatted,
+            description=description,
         )
         metric_collection[metric] = parse_response(response)
     return metric_collection

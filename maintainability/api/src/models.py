@@ -10,8 +10,18 @@ class ExtractMetrics(BaseModel):
     file_content: str
 
 
+class MaintainabilityMetrics(BaseModel):
+    """maintainability_metrics transaction model"""
+
+    intuitive_design: int
+    functional_cohesion: int
+    adaptive_resilience: int
+    code_efficiency: int
+    data_security_and_integrity: int
+
+
 class Maintainability(BaseModel):
-    """Composiiton of maintainability, file metrics, and user information"""
+    """extract_metrics transaction model"""
 
     user_email: str
     project_name: str

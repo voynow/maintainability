@@ -32,7 +32,9 @@ def parse_response(text: str) -> float:
     return response
 
 
-def get_maintainability_metrics(filepath: str, code: str) -> models.ValidModelResponse:
+def get_maintainability_metrics(
+    filepath: str, code: str
+) -> models.MaintainabilityMetrics:
     metric_collection = {}
     gpt_interface = get_llm()
     for metric, description in config.METRIC_DESCRIPTIONS.items():

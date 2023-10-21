@@ -33,19 +33,32 @@ def read_root():
     return {"status": "ok"}
 
 
-@router.post("/extract_metrics", response_model=models.MaintainabilityMetrics)
-async def extract_metrics(extract_metrics: models.ExtractMetrics, request: Request):
+@router.post("/extract_metrics")
+async def extract_metrics(extract_metrics: models.ExtractMetrics):
     try:
-        user_email = io_operations.get_email_via_api_key(
-            request.headers.get("X-API-KEY", None)
-        )
-        return routes_helper.extract_metrics(
-            user_email,
-            extract_metrics.project_name,
-            extract_metrics.session_id,
+        return routes_helper.get_maintainability_metrics(
             extract_metrics.filepath,
             extract_metrics.file_content,
+            extract_metrics.metric,
         )
+    except Exception as e:
+        logger.logger(f"Error 500: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/insert_metrics")
+async def insert_metrics(metrics: models.ExtractMetricsTransaction):
+    try:
+        return io_operations.write_metrics(metrics)
+    except Exception as e:
+        logger.logger(f"Error 500: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get_user_email")
+async def get_user_email(api_key: str):
+    try:
+        return io_operations.get_user_email(api_key)
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -4,20 +4,9 @@ import pytz
 
 
 class ExtractMetrics(BaseModel):
-    project_name: str
-    session_id: str
     filepath: str
     file_content: str
-
-
-class MaintainabilityMetrics(BaseModel):
-    """maintainability_metrics transaction model"""
-
-    intuitive_design: int = -1
-    functional_cohesion: int = -1
-    adaptive_resilience: int = -1
-    code_efficiency: int = -1
-    data_security_and_integrity: int = -1
+    metric: str
 
 
 class ExtractMetricsTransaction(BaseModel):

@@ -22,3 +22,10 @@ EXTENSIONS = [
 ]
 
 MIN_NUM_LINES = 20
+METRICS = [
+    "intuitive_design",
+    "functional_cohesion",
+    "adaptive_resilience",
+    "code_efficiency",
+    "data_security_and_integrity",
+]

@@ -32,41 +32,16 @@ def parse_response(text: str) -> float:
     return response
 
 
-def get_maintainability_metrics(
-    filepath: str, code: str
-) -> models.MaintainabilityMetrics:
-    metric_collection = {}
+def get_maintainability_metrics(filepath: str, code: str, metric: str) -> int:
     gpt_interface = get_llm()
-    for metric, description in config.METRIC_DESCRIPTIONS.items():
-        metric_name_formatted = metric.replace("_", " ")
-        response = gpt_interface(
-            filepath=filepath,
-            code=code,
-            metric=metric_name_formatted,
-            description=description,
-        )
-        metric_collection[metric] = parse_response(response)
-    return metric_collection
-
-
-def extract_metrics(
-    user_email: str, project_name: str, session_id: str, filepath: str, content: str
-) -> models.ExtractMetricsTransaction:
-    maintainability_metrics = get_maintainability_metrics(filepath, content)
-    io_operations.write_metrics(
-        {
-            "user_email": user_email,
-            "project_name": project_name,
-            "session_id": session_id,
-            "file_path": filepath,
-            "file_size": len(content.encode("utf-8")),
-            "loc": len(content.splitlines()),
-            "extension": filepath.split(".")[-1] if "." in filepath else "",
-            "content": content,
-            **maintainability_metrics,
-        }
+    description = config.METRIC_DESCRIPTIONS[metric]
+    response = gpt_interface(
+        filepath=filepath,
+        code=code,
+        metric=metric.replace("_", " "),
+        description=description,
     )
-    return maintainability_metrics
+    return int(parse_response(response))
 
 
 def validate_user(email: str, password: str) -> None:

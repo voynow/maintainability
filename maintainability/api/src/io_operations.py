@@ -102,7 +102,7 @@ def write_log(loc: str, text: str) -> Tuple:
     return table.insert(log_data).execute()
 
 
-def get_email_via_api_key(api_key: str) -> str:
+def get_user_email(api_key: str) -> str:
     table = connect_to_supabase_table("api_keys")
     response = table.select("user").eq('"api_key"', api_key).execute()
     if response.data:

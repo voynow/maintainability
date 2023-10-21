@@ -8,7 +8,7 @@ import uuid
 import click
 import requests
 
-from . import file_operations
+from . import file_operations, config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -78,29 +78,6 @@ def call_api_wrapper(
     return response.json()
 
 
-def extract_metrics(
-    project_name: str,
-    session_id: str,
-    filepath: str,
-    content: str,
-    base_url: str,
-    api_key: str,
-) -> None:
-    logger.info(f"{session_id} sending {filepath} to extract_metrics")
-    response = call_api_wrapper(
-        base_url=base_url,
-        endpoint="extract_metrics",
-        payload={
-            "project_name": project_name,
-            "session_id": session_id,
-            "filepath": filepath,
-            "file_content": content,
-        },
-        api_key=api_key,
-    )
-    logger.info(f"{session_id} extract_metrics response: {response}")
-
-
 @click.command()
 @click.option("--paths", **options["paths"])
 @click.option("--base_url", **options["base_url"])
@@ -113,9 +90,28 @@ def cli_runner(paths, base_url, api_key):
     filtered_repo = file_operations.filter_repo(repo, target_paths)
     project_name = os.path.basename(os.getcwd())
 
+    # TODO needs to be implemented
+    # user_email = io_operations.get_email_via_api_key(
+    #     request.headers.get("X-API-KEY", None)
+    # )
+
     logger.info(f"{session_id} starting extraction for {project_name}")
     for filepath, content in filtered_repo.items():
-        extract_metrics(project_name, session_id, filepath, content, base_url, api_key)
+        for metric in config.METRICS:
+            response = call_api_wrapper(
+                base_url=base_url,
+                endpoint="extract_metrics",
+                payload={
+                    "filepath": filepath,
+                    "file_content": content,
+                    "metric": metric,
+                },
+                api_key=api_key,
+            )
+
+    # TODO
+    # collect responses/aggregate scores
+    # send to write_metrics endpoint
 
 
 if __name__ == "__main__":

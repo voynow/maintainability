@@ -33,26 +33,23 @@ def parse_response(text: str) -> float:
 
 
 def get_maintainability_metrics(
-    filepath: str, code: str
+    filepath: str, code: str, metric: str
 ) -> models.MaintainabilityMetrics:
-    metric_collection = {}
     gpt_interface = get_llm()
-    for metric, description in config.METRIC_DESCRIPTIONS.items():
-        metric_name_formatted = metric.replace("_", " ")
-        response = gpt_interface(
-            filepath=filepath,
-            code=code,
-            metric=metric_name_formatted,
-            description=description,
-        )
-        metric_collection[metric] = parse_response(response)
-    return metric_collection
+    description = config.METRIC_DESCRIPTIONS[metric]
+    response = gpt_interface(
+        filepath=filepath,
+        code=code,
+        metric=metric.replace("_", " "),
+        description=description,
+    )
+    return parse_response(response)
 
 
 def extract_metrics(
     user_email: str, project_name: str, session_id: str, filepath: str, content: str
 ) -> models.ExtractMetricsTransaction:
-    maintainability_metrics = get_maintainability_metrics(filepath, content)
+    maintainability_metrics = get_maintainability_metrics(filepath, content, metric)
     io_operations.write_metrics(
         {
             "user_email": user_email,

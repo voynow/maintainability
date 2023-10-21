@@ -88,6 +88,7 @@ def extract_metrics_wrapper(
 ) -> Dict:
     maintainability_metrics = {}
     for metric in config.METRICS:
+        logger.info(f"Extracting {filepath}:{metric}")
         response = call_api_wrapper(
             base_url=base_url,
             endpoint="extract_metrics",

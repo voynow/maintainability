@@ -21,7 +21,7 @@ EXTENSIONS = [
     ".css",
 ]
 
-MIN_NUM_LINES = 20
+MIN_NUM_LINES = 50
 METRICS = [
     "intuitive_design",
     "functional_cohesion",

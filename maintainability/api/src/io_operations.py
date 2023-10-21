@@ -23,7 +23,6 @@ def connect_to_supabase_table(table_name: str) -> Client:
 
 
 def write_metrics(metrics: models.ExtractMetricsTransaction) -> Tuple:
-    logger.logger(f"{metrics} {type(metrics)}")
     table = connect_to_supabase_table("maintainability")
     return table.insert(metrics.model_dump()).execute()
 

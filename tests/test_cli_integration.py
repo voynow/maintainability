@@ -17,4 +17,8 @@ def test_cli_command():
             f.write("test content")
 
         result = runner.invoke(main.cli_runner, args)
+    # for debugging
+    print(result.output)
+    print(result.exception)
+    print(result.exit_code)
     assert result.exit_code == 0

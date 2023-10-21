@@ -24,17 +24,17 @@ def unique_email():
 
 def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
+    # TODO fix
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     payload = {
-        "project_name": "test_project",
         "filepath": "/test/path/testfile.py",
         "file_content": "print('hello world')\n" * 100,
-        "session_id": "88888888-8888-8888-8888-888888888888",
+        "metric": "adaptive_resilience",
     }
     response = test_client.post("/extract_metrics", headers=headers, json=payload)
-    print(response.json())
     assert response.status_code == 200
-    assert isinstance(response.json(), dict)
+    assert isinstance(response.json(), int)
+    assert response.json() >= 0 and response.json() <= 10
 
 
 def test_extract_metrics_with_invalid_data(test_client):
@@ -133,25 +133,14 @@ def test_get_user_projects_with_valid_email(test_client):
         assert "project_name" in project
 
 
-def test_extract_metrics_with_default_response(test_client):
-    """Test /extract_metrics route when get_maintainability_metrics fails"""
+def test_get_user_email(test_client):
+    """Test /get_user_email route with valid data"""
+    user_email = "test"
+    params = {"email": user_email}
+    response = test_client.get("/api_keys", params=params)
+    key = response.json()["api_keys"][0]["api_key"]
 
-    mock_valid_model_response = models.MaintainabilityMetrics().model_dump()
-    patch_path = "maintainability.api.src.routes_helper.get_maintainability_metrics"
-
-    with patch(patch_path) as mock_get_metrics:
-        mock_get_metrics.return_value = mock_valid_model_response
-        headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
-        payload = {
-            "project_name": "test_project",
-            "filepath": "/test/path/testfile.py",
-            "file_content": "print('hello world')\n" * 100,
-            "session_id": "88888888-8888-8888-8888-888888888888",
-        }
-        response = test_client.post("/extract_metrics", headers=headers, json=payload)
-
-        assert response.status_code == 200
-        assert isinstance(response.json(), dict)
-        for metric, value in mock_valid_model_response.items():
-            assert metric in response.json()
-            assert response.json()[metric] == value
+    params = {"api_key": key}
+    response = test_client.get(f"/get_user_email", params=params)
+    assert response.status_code == 200
+    assert response.json() == user_email

@@ -55,7 +55,7 @@ async def insert_metrics(metrics: models.ExtractMetricsTransaction):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/get_user_email")
+@router.get("/get_user_email")
 async def get_user_email(api_key: str):
     try:
         return io_operations.get_user_email(api_key)

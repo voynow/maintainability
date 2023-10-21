@@ -4,10 +4,9 @@ import pytz
 
 
 class ExtractMetrics(BaseModel):
-    project_name: str
-    session_id: str
     filepath: str
     file_content: str
+    metric: str
 
 
 class MaintainabilityMetrics(BaseModel):

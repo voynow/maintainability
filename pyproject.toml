@@ -48,8 +48,8 @@ ignore = [
     ".pytest_cache",
     ".vercel",
     ".github",
-    "maintainability/cli/",
-    "webapp",
+    "maintainability",
+    # "webapp",
     "tests",
     "integration_tests.sh",
     "pyproject.toml",
@@ -60,4 +60,5 @@ ignore = [
     # "axiosConfig.js",
     # "ErrorBoundary.js",
     # "theme.js",
+    "docs",
 ]

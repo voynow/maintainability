@@ -36,6 +36,9 @@ def read_root():
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics: models.ExtractMetrics):
     try:
+        logger.logger(
+            f"Extracting {extract_metrics.metric} from {extract_metrics.filepath}"
+        )
         return routes_helper.get_maintainability_metrics(
             extract_metrics.filepath,
             extract_metrics.file_content,

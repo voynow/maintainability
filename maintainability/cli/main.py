@@ -113,6 +113,18 @@ def cli_runner(paths, base_url, api_key):
     # collect responses/aggregate scores
     # send to write_metrics endpoint
 
+    # {
+    #     "user_email": user_email,
+    #     "project_name": project_name,
+    #     "session_id": session_id,
+    #     "file_path": filepath,
+    #     "file_size": len(content.encode("utf-8")),
+    #     "loc": len(content.splitlines()),
+    #     "extension": filepath.split(".")[-1] if "." in filepath else "",
+    #     "content": content,
+    #     **maintainability_metrics,
+    # }
+
 
 if __name__ == "__main__":
     cli_runner()

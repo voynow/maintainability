@@ -33,14 +33,23 @@ def read_root():
     return {"status": "ok"}
 
 
-@router.post("/extract_metrics", response_model=models.MaintainabilityMetrics)
-async def extract_metrics(extract_metrics: models.ExtractMetrics, request: Request):
+@router.post("/extract_metrics")
+async def extract_metrics(extract_metrics: models.ExtractMetrics):
     try:
         return routes_helper.get_maintainability_metrics(
             extract_metrics.filepath,
             extract_metrics.file_content,
             extract_metrics.metric,
         )
+    except Exception as e:
+        logger.logger(f"Error 500: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/insert_metrics")
+async def insert_metrics(metrics: models.ExtractMetricsTransaction):
+    try:
+        return io_operations.write_metrics(metrics)
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

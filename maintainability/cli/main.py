@@ -78,6 +78,23 @@ def call_api_wrapper(
     return response.json()
 
 
+def extract_metrics_wrapper(base_url: str, filepath: str, content: str, api_key: str):
+    maintainability_metrics = {}
+    for metric in config.METRICS:
+        response = call_api_wrapper(
+            base_url=base_url,
+            endpoint="extract_metrics",
+            payload={
+                "filepath": filepath,
+                "file_content": content,
+                "metric": metric,
+            },
+            api_key=api_key,
+        )
+        maintainability_metrics[metric] = response
+    return maintainability_metrics
+
+
 @click.command()
 @click.option("--paths", **options["paths"])
 @click.option("--base_url", **options["base_url"])
@@ -90,40 +107,34 @@ def cli_runner(paths, base_url, api_key):
     filtered_repo = file_operations.filter_repo(repo, target_paths)
     project_name = os.path.basename(os.getcwd())
 
-    # TODO needs to be implemented
-    # user_email = io_operations.get_email_via_api_key(
-    #     request.headers.get("X-API-KEY", None)
-    # )
+    user_email = call_api_wrapper(
+        base_url=base_url,
+        endpoint="get_user_email",
+        payload={"api_key": api_key},
+        api_key=api_key,
+    )
 
-    logger.info(f"{session_id} starting extraction for {project_name}")
+    logger.info(f"Starting extraction for {user_email}:{project_name}")
     for filepath, content in filtered_repo.items():
-        for metric in config.METRICS:
-            response = call_api_wrapper(
-                base_url=base_url,
-                endpoint="extract_metrics",
-                payload={
-                    "filepath": filepath,
-                    "file_content": content,
-                    "metric": metric,
-                },
-                api_key=api_key,
-            )
-
-    # TODO
-    # collect responses/aggregate scores
-    # send to write_metrics endpoint
-
-    # {
-    #     "user_email": user_email,
-    #     "project_name": project_name,
-    #     "session_id": session_id,
-    #     "file_path": filepath,
-    #     "file_size": len(content.encode("utf-8")),
-    #     "loc": len(content.splitlines()),
-    #     "extension": filepath.split(".")[-1] if "." in filepath else "",
-    #     "content": content,
-    #     **maintainability_metrics,
-    # }
+        maintainability_metrics = extract_metrics_wrapper(
+            base_url=base_url, filepath=filepath, content=content, api_key=api_key
+        )
+        call_api_wrapper(
+            base_url=base_url,
+            endpoint="insert_metrics",
+            payload={
+                "user_email": user_email,
+                "project_name": project_name,
+                "session_id": session_id,
+                "file_path": filepath,
+                "file_size": len(content.encode("utf-8")),
+                "loc": len(content.splitlines()),
+                "extension": filepath.split(".")[-1] if "." in filepath else "",
+                "content": content,
+                **maintainability_metrics,
+            },
+            api_key=api_key,
+        )
 
 
 if __name__ == "__main__":

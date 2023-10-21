@@ -35,37 +35,42 @@ options = {
 def call_api_wrapper(
     base_url: str,
     endpoint: str,
+    method: str = "POST",
     payload: Optional[Dict] = None,
     api_key: Optional[str] = None,
 ):
     """
-    Wrapper for calling the API. Handles errors and logging
+    Wrapper for calling the API. Handles errors and logging.
 
-    :param endpoint: API endpoint to call
-    :param payload: Payload to send to the API
-    :return: Response from the API
+    :param base_url: The base URL for the API
+    :param endpoint: The API endpoint to call
+    :param method: The HTTP method to use (GET or POST)
+    :param payload: The payload sent to the API
+    :param api_key: The API key for authentication
+    :return: The response from the API
     """
     url = f"{base_url}/{endpoint}"
     headers = {"Content-Type": "application/json"}
     if api_key:
         headers["X-API-KEY"] = api_key
+
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-        )
+        if method == "POST":
+            response = requests.post(url, json=payload, headers=headers)
+        elif method == "GET":
+            response = requests.get(url, params=payload, headers=headers)
+        else:
+            raise ValueError(f"Unsupported method: {method}")
+
         response.raise_for_status()
 
     except requests.HTTPError as e:
         status_code = e.response.status_code
         response_content = e.response.content.decode("utf-8")
-
         try:
             detail = json.loads(response_content)["detail"]
         except json.JSONDecodeError:
             detail = response_content
-
         logger.error(
             f"HTTPError on {endpoint} with code={status_code}, Detail: {detail}"
         )
@@ -112,6 +117,7 @@ def cli_runner(paths, base_url, api_key):
         endpoint="get_user_email",
         payload={"api_key": api_key},
         api_key=api_key,
+        method="GET",
     )
 
     logger.info(f"Starting extraction for {user_email}:{project_name}")

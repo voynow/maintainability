@@ -18,6 +18,7 @@ class MetricTransaction(BaseModel):
 
 
 class FileTransaction(BaseModel):
+    file_id: str
     user_email: str
     project_name: str
     file_path: str
@@ -26,7 +27,6 @@ class FileTransaction(BaseModel):
     extension: str
     content: str
     session_id: str
-    file_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = datetime.now(pytz.utc).isoformat()
 
 

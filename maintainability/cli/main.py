@@ -84,7 +84,7 @@ def call_api_wrapper(
 
 
 def extract_metrics_wrapper(
-    base_url: str, filepath: str, content: str, api_key: str
+    base_url: str, file_id: str, filepath: str, content: str, api_key: str
 ) -> Dict:
     maintainability_metrics = {}
     for metric in config.METRICS:
@@ -93,6 +93,7 @@ def extract_metrics_wrapper(
             base_url=base_url,
             endpoint="extract_metrics",
             payload={
+                "file_id": file_id,
                 "filepath": filepath,
                 "file_content": content,
                 "metric": metric,
@@ -125,13 +126,19 @@ def cli_runner(paths, base_url, api_key):
 
     logger.info(f"Starting extraction for {user_email}:{project_name}")
     for filepath, content in filtered_repo.items():
+        file_id = str(uuid.uuid4())
         maintainability_metrics = extract_metrics_wrapper(
-            base_url=base_url, filepath=filepath, content=content, api_key=api_key
+            base_url=base_url,
+            file_id=file_id,
+            filepath=filepath,
+            content=content,
+            api_key=api_key,
         )
         call_api_wrapper(
             base_url=base_url,
-            endpoint="insert_metrics",
+            endpoint="insert_file",
             payload={
+                "file_id": file_id,
                 "user_email": user_email,
                 "project_name": project_name,
                 "session_id": session_id,
@@ -140,10 +147,10 @@ def cli_runner(paths, base_url, api_key):
                 "loc": len(content.splitlines()),
                 "extension": filepath.split(".")[-1] if "." in filepath else "",
                 "content": content,
-                **maintainability_metrics,
             },
             api_key=api_key,
         )
+        logger.info(f"Inserted {filepath}, metrics={maintainability_metrics}")
 
 
 if __name__ == "__main__":

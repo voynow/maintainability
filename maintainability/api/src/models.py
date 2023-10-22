@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 import pytz
+import uuid
 
 
 class ExtractMetrics(BaseModel):
@@ -9,9 +10,14 @@ class ExtractMetrics(BaseModel):
     metric: str
 
 
-class ExtractMetricsTransaction(BaseModel):
-    """extract_metrics transaction model"""
+class MetricTransaction(BaseModel):
+    metric: str
+    score: int
+    reasoning: str
+    file_id: str
 
+
+class FileTransaction(BaseModel):
     user_email: str
     project_name: str
     file_path: str
@@ -20,11 +26,7 @@ class ExtractMetricsTransaction(BaseModel):
     extension: str
     content: str
     session_id: str
-    intuitive_design: int
-    functional_cohesion: int
-    adaptive_resilience: int
-    code_efficiency: int
-    data_security_and_integrity: int
+    file_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = datetime.now(pytz.utc).isoformat()
 
 

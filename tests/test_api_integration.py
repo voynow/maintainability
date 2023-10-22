@@ -22,11 +22,19 @@ def unique_email():
     return f"test+{uuid4()}@example.com"
 
 
+def test_health_route(test_client):
+    """Test /health route"""
+    response = test_client.get("/health")
+    assert response.status_code == 200
+    assert "status" in response.json()
+    assert response.json()["status"] == "ok"
+
+
 def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
-    # TODO fix
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     payload = {
+        "file_id": "88888888-8888-8888-8888-888888888888",
         "filepath": "/test/path/testfile.py",
         "file_content": "print('hello world')\n" * 100,
         "metric": "adaptive_resilience",
@@ -46,12 +54,24 @@ def test_extract_metrics_with_invalid_data(test_client):
     assert response.status_code == 422
 
 
-def test_health_route(test_client):
-    """Test /health route"""
-    response = test_client.get("/health")
+def test_insert_file(test_client):
+    """Test /insert_file route with valid data"""
+    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
+    payload = {
+        "file_id": str(uuid4()),
+        "file_path": "/test/path/testfile.py",
+        "content": "print('hello world')\n" * 100,
+        "user_email": "test",
+        "project_name": "test_project",
+        "session_id": "88888888-8888-8888-8888-888888888888",
+        "file_size": 0,
+        "loc": 0,
+        "extension": "",
+    }
+    response = test_client.post("/insert_file", headers=headers, json=payload)
     assert response.status_code == 200
-    assert "status" in response.json()
-    assert response.json()["status"] == "ok"
+    assert isinstance(response.json(), dict)
+    assert response.json()["data"][0]["file_id"] == payload["file_id"]
 
 
 def test_successful_registration(test_client):

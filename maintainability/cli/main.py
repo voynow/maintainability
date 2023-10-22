@@ -127,13 +127,8 @@ def cli_runner(paths, base_url, api_key):
     logger.info(f"Starting extraction for {user_email}:{project_name}")
     for filepath, content in filtered_repo.items():
         file_id = str(uuid.uuid4())
-        maintainability_metrics = extract_metrics_wrapper(
-            base_url=base_url,
-            file_id=file_id,
-            filepath=filepath,
-            content=content,
-            api_key=api_key,
-        )
+
+        # insert file into file table
         call_api_wrapper(
             base_url=base_url,
             endpoint="insert_file",
@@ -150,6 +145,16 @@ def cli_runner(paths, base_url, api_key):
             },
             api_key=api_key,
         )
+
+        # extract metrics from file and insert into metrics table
+        maintainability_metrics = extract_metrics_wrapper(
+            base_url=base_url,
+            file_id=file_id,
+            filepath=filepath,
+            content=content,
+            api_key=api_key,
+        )
+
         logger.info(f"Inserted {filepath}, metrics={maintainability_metrics}")
 
 

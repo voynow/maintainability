@@ -34,15 +34,16 @@ def read_root():
 
 
 @router.post("/extract_metrics")
-async def extract_metrics(extract_metrics: models.ExtractMetrics):
+async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
     try:
         logger.logger(
             f"Extracting {extract_metrics.metric} from {extract_metrics.filepath}"
         )
-        return routes_helper.get_maintainability_metrics(
-            extract_metrics.filepath,
-            extract_metrics.file_content,
-            extract_metrics.metric,
+        return routes_helper.extract_metrics(
+            file_id=extract_metrics.file_id,
+            filepath=extract_metrics.filepath,
+            code=extract_metrics.file_content,
+            metric=extract_metrics.metric,
         )
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")

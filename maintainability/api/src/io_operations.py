@@ -22,9 +22,17 @@ def connect_to_supabase_table(table_name: str) -> Client:
     ).table(table_name)
 
 
-def write_metrics(metrics: models.ExtractMetricsTransaction) -> Tuple:
-    table = connect_to_supabase_table("maintainability")
-    return table.insert(metrics.model_dump()).execute()
+def write_metrics(
+    file_id: str, metric: str, reasoning: str, metric_quantity: int
+) -> Tuple:
+    insert_obj = {
+        "file_id": file_id,
+        "metric": metric,
+        "reasoning": reasoning,
+        "score": metric_quantity,
+    }
+    table = connect_to_supabase_table("metrics")
+    return table.insert(insert_obj).execute()
 
 
 def get_user_projects(user_email: str) -> List[Dict]:

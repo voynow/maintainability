@@ -5,6 +5,7 @@ import uuid
 
 
 class ExtractMetrics(BaseModel):
+    file_id: str
     filepath: str
     file_content: str
     metric: str

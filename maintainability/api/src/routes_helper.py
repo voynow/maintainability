@@ -43,7 +43,10 @@ def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
     )
     metric_quantity = int(parse_response(response))
     io_operations.write_metrics(
-        file_id=file_id, metric=metric, score=metric_quantity, reasoning=response
+        file_id=file_id,
+        metric=metric,
+        metric_quantity=metric_quantity,
+        reasoning=response,
     )
     return metric_quantity
 

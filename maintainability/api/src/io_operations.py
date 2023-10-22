@@ -23,7 +23,10 @@ def connect_to_supabase_table(table_name: str) -> Client:
 
 
 def write_metrics(
-    file_id: str, metric: str, reasoning: str, metric_quantity: int
+    file_id: str,
+    metric: str,
+    metric_quantity: int,
+    reasoning: str,
 ) -> Tuple:
     table = connect_to_supabase_table("metrics")
     return table.insert(

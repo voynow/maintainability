@@ -50,6 +50,10 @@ def should_include_file(
     if filepath.name.startswith("test") or filepath.stem.endswith("test"):
         return f"identified as test file."
 
+    # Check if it's a config file
+    if filepath.name.startswith("config."):
+        return f"identified as config file."
+
     return None
 
 

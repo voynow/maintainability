@@ -50,10 +50,10 @@ async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/insert_metrics")
-async def insert_metrics(metrics: models.ExtractMetricsTransaction):
+@router.post("/insert_file")
+async def insert_metrics(file: models.FileTransaction):
     try:
-        return io_operations.write_metrics(metrics)
+        return io_operations.write_file(file)
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

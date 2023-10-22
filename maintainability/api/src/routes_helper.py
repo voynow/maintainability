@@ -8,7 +8,7 @@ from fastapi import HTTPException
 from llm_blocks import block_factory
 from passlib.context import CryptContext
 
-from . import config, io_operations, logger, models
+from . import config, io_operations, logger
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -32,7 +32,7 @@ def parse_response(text: str) -> float:
     return response
 
 
-def get_maintainability_metrics(filepath: str, code: str, metric: str) -> int:
+def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
     gpt_interface = get_llm()
     description = config.METRIC_DESCRIPTIONS[metric]
     response = gpt_interface(
@@ -41,7 +41,14 @@ def get_maintainability_metrics(filepath: str, code: str, metric: str) -> int:
         metric=metric.replace("_", " "),
         description=description,
     )
-    return int(parse_response(response))
+    metric_quantity = int(parse_response(response))
+    io_operations.write_metrics(
+        file_id=file_id,
+        metric=metric,
+        metric_quantity=metric_quantity,
+        reasoning=response,
+    )
+    return metric_quantity
 
 
 def validate_user(email: str, password: str) -> None:

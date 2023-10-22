@@ -34,25 +34,26 @@ def read_root():
 
 
 @router.post("/extract_metrics")
-async def extract_metrics(extract_metrics: models.ExtractMetrics):
+async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
     try:
         logger.logger(
-            f"Extracting {extract_metrics.metric} from {extract_metrics.filepath}"
+            f"Extracting {extract_metrics_obj.metric} from {extract_metrics_obj.filepath}"
         )
-        return routes_helper.get_maintainability_metrics(
-            extract_metrics.filepath,
-            extract_metrics.file_content,
-            extract_metrics.metric,
+        return routes_helper.extract_metrics(
+            file_id=extract_metrics_obj.file_id,
+            filepath=extract_metrics_obj.filepath,
+            code=extract_metrics_obj.file_content,
+            metric=extract_metrics_obj.metric,
         )
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/insert_metrics")
-async def insert_metrics(metrics: models.ExtractMetricsTransaction):
+@router.post("/insert_file")
+async def insert_metrics(file: models.FileTransaction):
     try:
-        return io_operations.write_metrics(metrics)
+        return io_operations.write_file(file)
     except Exception as e:
         logger.logger(f"Error 500: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

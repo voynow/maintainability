@@ -118,4 +118,15 @@ def calculate_weighted_metrics(files_metrics: models.FileJoinedOnMetrics):
             dates[date].append(obj)
         groupby_metrics[metric_name] = dates
 
-    return groupby_metrics
+    # aggregate scores weighted by loc
+    weighted_metrics = {}
+    for metric, dates in groupby_metrics.items():
+        weighted_metrics[metric] = {}
+        for date, objs in dates.items():
+            total_loc = sum(obj["loc"] for obj in objs)
+            weighted_score = sum(
+                obj["score"] * (obj["loc"] / total_loc) for obj in objs
+            )
+            weighted_metrics[metric][date] = weighted_score
+
+    return weighted_metrics

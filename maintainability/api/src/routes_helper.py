@@ -1,14 +1,14 @@
 import base64
+from datetime import datetime
 import secrets
-from collections import defaultdict
 import re
 
-from dateutil.parser import parse
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 from llm_blocks import block_factory
 from passlib.context import CryptContext
 
-from . import config, io_operations, logger
+from . import config, io_operations, logger, models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -64,28 +64,58 @@ def generate_new_api_key():
     return base64.urlsafe_b64encode(random_bytes).decode("utf-8").rstrip("=")
 
 
-def calculate_weighted_metrics(response_data):
-    def aggregate_scores(objs):
-        filtered_objs = list(
-            filter(
-                lambda obj: all(obj[col] != -1 for col in config.METRIC_DESCRIPTIONS),
-                objs,
-            )
+def join_files_metrics(
+    user_email: str, project_name: str
+) -> models.FileJoinedOnMetrics:
+    # get all files from user="test", project="maintainability"
+    files = io_operations.get_files("test", "maintainability")
+    if not files.data:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "detail": f"user_email={user_email}, project_name={project_name} combination not found"
+            },
         )
-        total_loc = sum(obj["loc"] for obj in filtered_objs)
+    # get all metrics associated with files
+    file_dict = {file["file_id"]: file for file in files.data}
+    metrics = io_operations.get_metrics(list(file_dict))
+    if not metrics.data:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "detail": f"No metrics found for user_email={user_email}, project_name={project_name} combination"
+            },
+        )
+    # join tables
+    for metric in metrics.data:
+        if metric["file_id"] in file_dict:
+            metric.update(file_dict[metric["file_id"]])
 
-        if total_loc == 0:
-            return {col: -1 for col in config.METRIC_DESCRIPTIONS}
+    return metrics.data
 
-        return {
-            col: sum(obj[col] * (obj["loc"] / total_loc) for obj in filtered_objs)
-            for col in config.METRIC_DESCRIPTIONS
-        }
 
-    dates = defaultdict(list)
+def calculate_weighted_metrics(files_metrics: models.FileJoinedOnMetrics):
+    # group metrics by metric name
+    groupby_metrics = {}
+    for obj in files_metrics:
+        if obj["metric"] not in groupby_metrics:
+            groupby_metrics[obj["metric"]] = []
+        groupby_metrics[obj["metric"]].append(obj)
 
-    for obj in response_data:
-        date_str = parse(obj["timestamp"]).strftime("%Y-%m-%d")
-        dates[date_str].append(obj)
+    # convert timestamp to datetime object
+    strptime_fmt = "%Y-%m-%dT%H:%M:%S.%f%z"
+    for metric_name, objs in groupby_metrics.items():
+        for obj in objs:
+            obj["timestamp"] = datetime.strptime(obj["timestamp"], strptime_fmt)
 
-    return {date: aggregate_scores(objs) for date, objs in dates.items()}
+    # groupby date within each metric group
+    for metric_name, objs in groupby_metrics.items():
+        dates = {}
+        for obj in objs:
+            date = obj["timestamp"].date()
+            if date not in dates:
+                dates[date] = []
+            dates[date].append(obj)
+        groupby_metrics[metric_name] = dates
+
+    return groupby_metrics

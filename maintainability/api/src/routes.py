@@ -78,10 +78,8 @@ async def get_user_projects(user_email: str):
 
 @router.get("/get_metrics", response_model=Dict[str, models.GetMetricsResponse])
 async def get_metrics(user_email: str, project_name: str):
-    metrics = io_operations.get_metrics(user_email, project_name)
-    if not metrics.data:
-        return JSONResponse(status_code=404, content={"detail": "Metrics not found"})
-    weighted_metrics = routes_helper.calculate_weighted_metrics(metrics.data)
+    files_metrics = routes_helper.join_files_metrics(user_email, project_name)
+    weighted_metrics = routes_helper.calculate_weighted_metrics(files_metrics)
     return weighted_metrics
 
 

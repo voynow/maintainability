@@ -53,14 +53,19 @@ def get_user_projects(user_email: str) -> List[Dict]:
     return [{"project_name": name} for name in unique_projects]
 
 
-def get_metrics(user_email: str, project_name: str):
-    table = connect_to_supabase_table("maintainability")
+def get_files(user_email: str, project_name: str):
+    table = connect_to_supabase_table("files")
     return (
         table.select("*")
         .eq("user_email", user_email)
         .eq("project_name", project_name)
         .execute()
     )
+
+
+def get_metrics(file_ids: List[str]):
+    table = connect_to_supabase_table("metrics")
+    return table.select("*").in_("file_id", file_ids).execute()
 
 
 def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:

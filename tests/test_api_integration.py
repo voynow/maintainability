@@ -133,12 +133,12 @@ def test_get_metrics_with_valid_project(test_client):
     project_name = "test_project"
     params = {"user_email": user_email, "project_name": project_name}
     response = test_client.get("/get_metrics", params=params)
-
     assert response.status_code == 200
     assert isinstance(response.json(), dict)
-    for _, obj in response.json().items():
-        assert "intuitive_design" in obj
-        # ommitting other fields for brevity
+    assert "intuitive_design" in response.json()
+    assert "adaptive_resilience" in response.json()
+    # ommitting other fields for brevity
+    assert response.json()["intuitive_design"]["2023-10-22"] == 7.5341586428243925
 
 
 def test_get_user_projects_with_valid_email(test_client):

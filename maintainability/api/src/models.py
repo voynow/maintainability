@@ -31,6 +31,22 @@ class FileTransaction(BaseModel):
     timestamp: str = datetime.now(pytz.utc).isoformat()
 
 
+class FileJoinedOnMetrics(BaseModel):
+    file_id: str
+    user_email: str
+    project_name: str
+    file_path: str
+    file_size: int
+    loc: int
+    extension: str
+    content: str
+    session_id: str
+    timestamp: str
+    metric: str
+    score: int
+    reasoning: str
+
+
 class GetMetricsResponse(BaseModel):
     """Response object for get_metrics route"""
 

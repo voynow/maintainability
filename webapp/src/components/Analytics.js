@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
 import Plot from 'react-plotly.js';
+import { Container, CircularProgress, Paper, List, ListItem, Typography } from '@mui/material';
 
 const Analytics = () => {
     const { email } = useAppContext();
@@ -65,13 +66,13 @@ const Analytics = () => {
     }, [plotData, isLoading, error]);
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div style={{ flex: 3 }}>
+        <div style={{ display: 'flex', width: '100%', padding: '0 16px' }}>
+            <div style={{ flex: 3, padding: '16px' }}>
                 {
                     isLoading ? (
-                        <p>Loading...</p>
+                        <CircularProgress />
                     ) : error ? (
-                        <p>{error}</p>
+                        <Typography variant="h6" color="error">{error}</Typography>
                     ) : plotData ? (
                         <div style={{ width: '100%', height: '80vh' }}>
                             <Plot data={plotData.data} layout={plotData.layout} />
@@ -79,27 +80,40 @@ const Analytics = () => {
                     ) : null
                 }
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: '20px' }}>
-                {projects.map((project, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            padding: '10px',
-                            margin: '5px',
-                            width: '150px',
-                            textAlign: 'center',
-                            border: selectedProject === project.project_name ? '2px solid #CD5C5C' : '2px solid #cccccc',
-                            borderRadius: '5px',
-                            cursor: 'pointer'
-                        }}
-                        onClick={() => setSelectedProject(project.project_name)}
-                    >
-                        {project.project_name}
-                    </div>
-                ))}
+            <div style={{
+                flex: 1,
+                padding: '10px',
+                backgroundColor: '#f9f9f9',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                maxHeight: '600px',  // Max height
+                minHeight: '300px',  // Min height
+                overflow: 'hidden'   // Hide overflow'
+            }}>
+                <List>
+                    {projects.map((project, index) => (
+                        <ListItem
+                            button
+                            key={index}
+                            selected={selectedProject === project.project_name}
+                            onClick={() => setSelectedProject(project.project_name)}
+                            style={{
+                                padding: '10px 20px', // Additional padding
+                                borderRadius: '4px', // Slight rounding of corners
+                                margin: '4px 0', // Some margin between items
+                                backgroundColor: selectedProject === project.project_name ? '#e0e0e0' : 'transparent', // Background change on selection
+                                transition: 'background-color 0.2s' // Transition for smoother effect
+                            }}
+                        >
+                            {project.project_name}
+                        </ListItem>
+                    ))}
+                </List>
             </div>
-        </div>
+        </div >
     );
+
+
 };
 
 export default Analytics;

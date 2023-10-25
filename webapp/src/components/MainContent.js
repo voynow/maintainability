@@ -3,9 +3,9 @@ import Container from '@mui/material/Container';
 
 const MainContent = ({ children }) => {
     return (
-        <Container style={{ flex: 1, overflowY: 'auto', marginTop: '64px' }}>
+        <div style={{ flex: 1, padding: '0 16px', marginTop: '64px' }}>
             {children}
-        </Container>
+        </div>
     );
 };
 

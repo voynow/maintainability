@@ -1,15 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
-import { Bar } from 'react-chartjs-2';
-import { TimeScale, CategoryScale, LinearScale, BarElement, Chart } from 'chart.js';
-import 'chartjs-adapter-date-fns';
-
-Chart.register(TimeScale, CategoryScale, LinearScale, BarElement);
+import Plot from 'react-plotly.js';
 
 const Analytics = () => {
     const { email } = useAppContext();
-    const [metrics, setMetrics] = useState({});
+    const [plotData, setPlotData] = useState(null);
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -32,27 +28,19 @@ const Analytics = () => {
         }
     };
 
-    const projectOptions = projects.map((project) => ({
-        value: project.project_name,
-        label: project.project_name,
-    }));
-
-
     const fetchMetrics = useCallback(async () => {
         if (!selectedProject) return;
         try {
             setIsLoading(true);
-            console.log("API URL: /get_metrics");
-            console.log(`Params: user_email=${email}, project_name=${selectedProject}`);
             const response = await axios.get("/get_metrics", {
                 params: { user_email: email, project_name: selectedProject },
                 headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
             });
             if (response.status === 200) {
-                console.log("API Response:", response.data);
-                setMetrics(response.data);
+                setPlotData(JSON.parse(response.data));
                 setError(null);
             }
+
         } catch (err) {
             setError(err.response?.status === 404 ? "Metrics not found" : "An error occurred while fetching metrics.");
         } finally {
@@ -67,50 +55,39 @@ const Analytics = () => {
         }
     }, [email, selectedProject, fetchMetrics]);
 
-    const aggregatedMetrics = Object.entries(metrics).reduce((acc, [date, metricObj]) => {
-        acc[date] = metricObj;
-        return acc;
-    }, {});
-
-    const dates = Object.keys(aggregatedMetrics);
-    const chartOptions = {
-        scales: {
-            x: {
-                type: 'time',
-                time: {
-                    unit: 'day'
-                },
-            },
-            y: {
-                type: 'linear',
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Metric Value'
-                }
-            },
-        },
-        maintainAspectRatio: false,
-        animation: {
-            duration: 1000,
-            easing: 'easeInOutCubic',
-        },
-    };
-
-    const capitalizeFirstLetter = (str) => {
-        return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    };
-
+    useEffect(() => {
+        console.log("State Update: ", { plotData, isLoading, error });
+        if (plotData) {
+            console.log("Rendering Plot", plotData);
+            console.log("Plotly Layout:", plotData.layout);
+            console.log("Plotly Data:", plotData.data);
+        }
+    }, [plotData, isLoading, error]);
 
     return (
-        <div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ flex: 3 }}>
+                {
+                    isLoading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p>{error}</p>
+                    ) : plotData ? (
+                        <div style={{ width: '100%', height: '80vh' }}>
+                            <Plot data={plotData.data} layout={plotData.layout} />
+                        </div>
+                    ) : null
+                }
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: '20px' }}>
                 {projects.map((project, index) => (
                     <div
                         key={index}
                         style={{
                             padding: '10px',
                             margin: '5px',
+                            width: '150px',
+                            textAlign: 'center',
                             border: selectedProject === project.project_name ? '2px solid #CD5C5C' : '2px solid #cccccc',
                             borderRadius: '5px',
                             cursor: 'pointer'
@@ -121,43 +98,7 @@ const Analytics = () => {
                     </div>
                 ))}
             </div>
-            {
-                isLoading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p>{error}</p>
-                ) : (
-                    <div>
-                        {['intuitive_design', 'functional_cohesion', 'adaptive_resilience', 'code_efficiency', 'data_security_and_integrity'].map((metric, index) => (
-                            <div key={index} style={{ overflow: 'hidden', width: '100%', height: '200px', marginBottom: '30px' }}>
-                                <h3 style={{
-                                    textAlign: 'center',
-                                    fontFamily: 'Arial, Helvetica, sans-serif',
-                                    fontSize: '1.8em',
-                                    color: '#333333'
-                                }}>
-                                    {capitalizeFirstLetter(metric)}
-                                </h3>
-
-                                <Bar
-                                    data={{
-                                        labels: dates,
-                                        datasets: [{
-                                            label: metric,
-                                            data: dates.map(date => aggregatedMetrics[date][metric]),
-                                            backgroundColor: index % 2 === 0 ? '#CD8C8C' : '#CD5C5C',
-                                        }],
-                                    }}
-                                    options={chartOptions}
-                                    height={100}
-                                    width={400}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                )
-            }
-        </div >
+        </div>
     );
 };
 

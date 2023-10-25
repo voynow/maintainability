@@ -80,7 +80,8 @@ async def get_user_projects(user_email: str):
 async def get_metrics(user_email: str, project_name: str):
     files_metrics = routes_helper.join_files_metrics(user_email, project_name)
     weighted_metrics = routes_helper.calculate_weighted_metrics(files_metrics)
-    return weighted_metrics
+    plot_json = routes_helper.generate_plotly_fig(weighted_metrics)
+    return plot_json
 
 
 @router.post("/register", response_model=models.User)

@@ -207,4 +207,4 @@ def generate_plotly_fig(data):
         width=980,
         height=500,
     )
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return fig.to_dict()

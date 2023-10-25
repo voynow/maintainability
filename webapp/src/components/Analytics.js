@@ -37,7 +37,7 @@ const Analytics = () => {
                 headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
             });
             if (response.status === 200) {
-                setPlotData(JSON.parse(response.data));
+                setPlotData(response.data);
                 setError(null);
             }
 

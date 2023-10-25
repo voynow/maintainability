@@ -204,5 +204,7 @@ def generate_plotly_fig(data):
         plot_bgcolor="#2a2a2a",
         paper_bgcolor="#2a2a2a",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        width=980,
+        height=500,
     )
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)

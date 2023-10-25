@@ -65,14 +65,29 @@ const Analytics = () => {
     }, [plotData, isLoading, error]);
 
     return (
-        <div style={{ textAlign: 'center' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ flex: 3 }}>
+                {
+                    isLoading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p>{error}</p>
+                    ) : plotData ? (
+                        <div style={{ width: '100%', height: '80vh' }}>
+                            <Plot data={plotData.data} layout={plotData.layout} />
+                        </div>
+                    ) : null
+                }
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: '20px' }}>
                 {projects.map((project, index) => (
                     <div
                         key={index}
                         style={{
                             padding: '10px',
                             margin: '5px',
+                            width: '150px',
+                            textAlign: 'center',
                             border: selectedProject === project.project_name ? '2px solid #CD5C5C' : '2px solid #cccccc',
                             borderRadius: '5px',
                             cursor: 'pointer'
@@ -83,18 +98,6 @@ const Analytics = () => {
                     </div>
                 ))}
             </div>
-
-            {
-                isLoading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p>{error}</p>
-                ) : plotData ? (
-                    <div style={{ width: '100%', margin: 'auto' }}>
-                        <Plot data={plotData.data} layout={{ ...plotData.layout, width: 1000, height: 600 }} />
-                    </div>
-                ) : null
-            }
         </div>
     );
 };

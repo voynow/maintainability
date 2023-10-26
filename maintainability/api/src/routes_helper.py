@@ -146,6 +146,8 @@ def generate_plotly_figs(data):
 
     # Iterate through metrics in the data
     for idx, (metric_name, metric_data) in enumerate(data.items()):
+        title = metric_name.replace("_", " ").capitalize()
+
         # Create the figure
         fig = go.Figure()
 
@@ -158,7 +160,7 @@ def generate_plotly_figs(data):
                 x=x_values,
                 y=y_values,
                 mode="lines+markers",
-                name=metric_name.capitalize(),
+                name=title,
                 marker=dict(size=10, color=color_palette[idx % len(color_palette)]),
                 line=dict(width=3, color=color_palette[idx % len(color_palette)]),
             )
@@ -166,9 +168,9 @@ def generate_plotly_figs(data):
 
         # Repeating layout code. Consider centralizing if getting more complex.
         fig.update_layout(
-            template="plotly_dark",  # Dark theme
+            template="plotly_dark",
             title={
-                "text": f"{metric_name.capitalize()} Overview",
+                "text": title,
                 "y": 0.95,
                 "x": 0.5,
                 "xanchor": "center",

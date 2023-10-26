@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../AppContext';
 import Plot from 'react-plotly.js';
-import { Container, CircularProgress, Paper, List, ListItem, Typography } from '@mui/material';
+import { CircularProgress, List, ListItem, ListItemText, Typography } from '@mui/material';
 
 const Analytics = () => {
     const { email } = useAppContext();
@@ -86,18 +86,19 @@ const Analytics = () => {
                 <div style={{
                     flex: 1,
                     padding: '10px',
-                    backgroundColor: '#f9f9f9',
+                    backgroundColor: '#FEF7F1',
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                     height: '400px',
                     overflowY: 'auto'
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Typography variant="h6" style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                        <Typography variant="h5" style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                            <span className="material-icons" style={{ marginRight: '8px' }}>folder</span>
                             Projects
                         </Typography>
                     </div>
-                    <List>
+                    <List style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {projects.map((project, index) => (
                             <ListItem
                                 button
@@ -109,10 +110,14 @@ const Analytics = () => {
                                     borderRadius: '4px',
                                     margin: '4px 0',
                                     backgroundColor: selectedProject === project.project_name ? '#e0e0e0' : 'transparent',
-                                    transition: 'background-color 0.2s'
+                                    transition: 'background-color 0.2s, box-shadow 0.2s',
+                                    width: '100%',  // Full width to center text
                                 }}
                             >
-                                {project.project_name}
+                                <ListItemText
+                                    primary={project.project_name}
+                                    primaryTypographyProps={{ align: 'center', style: { fontSize: '1.1rem' } }}  // Center align & enlarge font
+                                />
                             </ListItem>
                         ))}
                     </List>

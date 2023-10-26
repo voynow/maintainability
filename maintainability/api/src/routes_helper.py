@@ -135,7 +135,7 @@ def calculate_weighted_metrics(files_metrics: models.FileJoinedOnMetrics):
     return weighted_metrics
 
 
-def generate_individual_plotly_figs(data):
+def generate_plotly_figs(data):
     """
     Generate a list of individual Plotly figures based on the given metrics data.
     """
@@ -212,6 +212,6 @@ def generate_individual_plotly_figs(data):
             height=500,
         )
 
-        figs_json.append(json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder))
+        figs_json.append(fig.to_dict())
 
     return figs_json

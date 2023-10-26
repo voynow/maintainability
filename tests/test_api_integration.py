@@ -136,11 +136,8 @@ def test_get_metrics_with_valid_project(test_client):
     assert response.status_code == 200
 
     response_data = response.json()
-    print(response_data)
-    print(type(response_data))
     assert "data" in response_data
     assert "layout" in response_data
-    print(type(response_data["data"]))
     assert isinstance(response_data["data"], list)
     assert isinstance(response_data["layout"], dict)
 

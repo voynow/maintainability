@@ -67,50 +67,56 @@ const Analytics = () => {
 
     return (
         <div style={{ display: 'flex', width: '100%', padding: '0 16px' }}>
-            <div style={{ flex: 3, padding: '16px' }}>
+            <div style={{ flex: 3, padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 {
                     isLoading ? (
                         <CircularProgress />
                     ) : error ? (
                         <Typography variant="h6" color="error">{error}</Typography>
-                    ) : plotData ? (
+                    ) : plotData && (
                         <div style={{ width: '100%', height: '80vh' }}>
                             <Plot data={plotData.data} layout={plotData.layout} />
                         </div>
-                    ) : null
+                    )
                 }
             </div>
-            <div style={{
-                flex: 1,
-                padding: '10px',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                maxHeight: '600px',  // Max height
-                minHeight: '300px',  // Min height
-                overflow: 'hidden'   // Hide overflow'
-            }}>
-                <List>
-                    {projects.map((project, index) => (
-                        <ListItem
-                            button
-                            key={index}
-                            selected={selectedProject === project.project_name}
-                            onClick={() => setSelectedProject(project.project_name)}
-                            style={{
-                                padding: '10px 20px', // Additional padding
-                                borderRadius: '4px', // Slight rounding of corners
-                                margin: '4px 0', // Some margin between items
-                                backgroundColor: selectedProject === project.project_name ? '#e0e0e0' : 'transparent', // Background change on selection
-                                transition: 'background-color 0.2s' // Transition for smoother effect
-                            }}
-                        >
-                            {project.project_name}
-                        </ListItem>
-                    ))}
-                </List>
-            </div>
-        </div >
+            {plotData && (
+                <div style={{
+                    flex: 1,
+                    padding: '10px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                    height: '400px',
+                    overflowY: 'auto'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Typography variant="h6" style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                            Projects
+                        </Typography>
+                    </div>
+                    <List>
+                        {projects.map((project, index) => (
+                            <ListItem
+                                button
+                                key={index}
+                                selected={selectedProject === project.project_name}
+                                onClick={() => setSelectedProject(project.project_name)}
+                                style={{
+                                    padding: '10px 20px',
+                                    borderRadius: '4px',
+                                    margin: '4px 0',
+                                    backgroundColor: selectedProject === project.project_name ? '#e0e0e0' : 'transparent',
+                                    transition: 'background-color 0.2s'
+                                }}
+                            >
+                                {project.project_name}
+                            </ListItem>
+                        ))}
+                    </List>
+                </div>
+            )}
+        </div>
     );
 
 

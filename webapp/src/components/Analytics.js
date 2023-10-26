@@ -67,16 +67,18 @@ const Analytics = () => {
 
     return (
         <div style={{ display: 'flex', width: '100%', padding: '0 16px' }}>
-            <div style={{ flex: 3, padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ flex: 3, padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {
                     isLoading ? (
                         <CircularProgress />
                     ) : error ? (
                         <Typography variant="h6" color="error">{error}</Typography>
-                    ) : plotData && (
-                        <div style={{ width: '100%', height: '80vh' }}>
-                            <Plot data={plotData.data} layout={plotData.layout} />
-                        </div>
+                    ) : plotData && plotData.length > 0 && (
+                        plotData.map((plot, index) => (
+                            <div key={index} style={{ width: '100%', height: '40vh', marginBottom: '256px' }}>
+                                <Plot data={plot.data} layout={plot.layout} />
+                            </div>
+                        ))
                     )
                 }
             </div>

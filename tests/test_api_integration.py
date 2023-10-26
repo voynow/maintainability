@@ -1,5 +1,5 @@
+import json
 import os
-from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -64,8 +64,8 @@ def test_insert_file(test_client):
         "user_email": "test",
         "project_name": "test_project",
         "session_id": "88888888-8888-8888-8888-888888888888",
-        "file_size": 0,
-        "loc": 0,
+        "file_size": 100,
+        "loc": 100,
         "extension": "",
     }
     response = test_client.post("/insert_file", headers=headers, json=payload)
@@ -134,11 +134,25 @@ def test_get_metrics_with_valid_project(test_client):
     params = {"user_email": user_email, "project_name": project_name}
     response = test_client.get("/get_metrics", params=params)
     assert response.status_code == 200
-    assert isinstance(response.json(), dict)
-    assert "intuitive_design" in response.json()
-    assert "adaptive_resilience" in response.json()
-    # ommitting other fields for brevity
-    assert response.json()["intuitive_design"]["2023-10-22"] == 7.5341586428243925
+
+    response_data = response.json()
+    print(response_data)
+    print(type(response_data))
+    assert "data" in response_data
+    assert "layout" in response_data
+    print(type(response_data["data"]))
+    assert isinstance(response_data["data"], list)
+    assert isinstance(response_data["layout"], dict)
+
+    if response_data["data"]:
+        first_data = response_data["data"][0]
+        assert "line" in first_data
+        assert "marker" in first_data
+        assert "mode" in first_data
+        assert "name" in first_data
+        assert "x" in first_data
+        assert "y" in first_data
+        assert "type" in first_data
 
 
 def test_get_user_projects_with_valid_email(test_client):

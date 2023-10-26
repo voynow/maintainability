@@ -136,23 +136,22 @@ def test_get_metrics_with_valid_project(test_client):
     assert response.status_code == 200
 
     response_data = response.json()
-    print(response_data)
-    print(type(response_data))
-    assert "data" in response_data
-    assert "layout" in response_data
-    print(type(response_data["data"]))
-    assert isinstance(response_data["data"], list)
-    assert isinstance(response_data["layout"], dict)
 
-    if response_data["data"]:
-        first_data = response_data["data"][0]
-        assert "line" in first_data
-        assert "marker" in first_data
-        assert "mode" in first_data
-        assert "name" in first_data
-        assert "x" in first_data
-        assert "y" in first_data
-        assert "type" in first_data
+    for metric in response_data:
+        assert "data" in metric
+        assert "layout" in metric
+        assert isinstance(metric["data"], list)
+        assert isinstance(metric["layout"], dict)
+
+        if metric["data"]:
+            first_data = metric["data"]
+            assert "line" in first_data
+            assert "marker" in first_data
+            assert "mode" in first_data
+            assert "name" in first_data
+            assert "x" in first_data
+            assert "y" in first_data
+            assert "type" in first_data
 
 
 def test_get_user_projects_with_valid_email(test_client):

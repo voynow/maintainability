@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentPage, setCurrentPage] = useState('Analytics');
     const [email, setEmail] = useState(null);
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const logout = () => {
         localStorage.removeItem('access_token');
@@ -24,6 +25,8 @@ export const AppProvider = ({ children }) => {
         email,
         setEmail,
         logout,
+        selectedProject,
+        setSelectedProject
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

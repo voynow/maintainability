@@ -210,8 +210,8 @@ def generate_plotly_figs(data):
             legend=dict(
                 orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
             ),
-            width=980,
-            height=500,
+            # width=980,
+            # height=500,
         )
 
         figs_json.append(fig.to_dict())

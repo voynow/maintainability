@@ -75,7 +75,7 @@ const APIKeys = () => {
         <div className="space-y-4">
             <Table className="min-w-full bg-white rounded-lg shadow-md">
                 <TableHead>
-                    <TableRow style={{ backgroundColor: '#EDE4DC' }}>
+                    <TableRow style={{ backgroundColor: '#eeeeee' }}>
                         <TableCell style={{ width: '5%' }}>#</TableCell>
                         <TableCell style={{ width: '25%' }}>Name</TableCell>
                         <TableCell style={{ width: '50%' }}>API Key</TableCell>
@@ -84,7 +84,7 @@ const APIKeys = () => {
                 </TableHead>
                 <TableBody>
                     {apiKeys.map((keyObj, index) => (
-                        <TableRow key={index} style={{ backgroundColor: '#FDF2E9' }}>
+                        <TableRow key={index} style={{ backgroundColor: '#fafafa' }}>
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{keyObj.name}</TableCell>
                             <TableCell>

@@ -19,19 +19,14 @@ const Header = ({ toggleSidebar }) => {
         <>
             <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#FDF2E9' }}>
                 <Toolbar>
-                    <Box display="flex" alignItems="center">
-                        <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleSidebar} sx={{ color: '#333333' }}>
-                            <MenuIcon />
-                        </IconButton>
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
                         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
                             Maintainability
                         </Link>
                     </Typography>
                     <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
-                        <AccountCircleIcon sx={{ marginRight: '4px', fontSize: '30px', color: '#CD5C5C' }} />
-                        <Typography variant="body1" sx={{ fontSize: '18px', color: '#333333' }}>
+                        <AccountCircleIcon sx={{ marginRight: '6px', fontSize: '35px', color: '#CD5C5C' }} />
+                        <Typography variant="body1" sx={{ fontSize: '24px', color: '#333333' }}>
                             {email}
                         </Typography>
                     </ButtonBase>

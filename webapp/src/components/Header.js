@@ -60,8 +60,8 @@ const Header = () => {
                     </FormControl>
 
                     <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
-                        <AccountCircleIcon sx={{ marginRight: '6px', fontSize: '35px', color: '#CD5C5C' }} />
-                        <Typography variant="body1" sx={{ fontSize: '24px', color: '#333333' }}>
+                        <AccountCircleIcon sx={{ marginRight: '6px', fontSize: '35x', color: '#CD5C5C' }} />
+                        <Typography variant="body1" sx={{ fontSize: '20px', color: '#333333' }}>
                             {email}
                         </Typography>
                     </ButtonBase>

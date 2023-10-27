@@ -144,7 +144,7 @@ def test_get_metrics_with_valid_project(test_client):
         assert isinstance(metric["layout"], dict)
 
         if metric["data"]:
-            first_data = metric["data"]
+            first_data = metric["data"][0]
             assert "line" in first_data
             assert "marker" in first_data
             assert "mode" in first_data

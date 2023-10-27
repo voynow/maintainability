@@ -19,12 +19,7 @@ const Header = ({ toggleSidebar }) => {
         <>
             <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#FDF2E9' }}>
                 <Toolbar>
-                    <Box display="flex" alignItems="center">
-                        <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleSidebar} sx={{ color: '#333333' }}>
-                            <MenuIcon />
-                        </IconButton>
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
                         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
                             Maintainability
                         </Link>

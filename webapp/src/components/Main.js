@@ -8,20 +8,15 @@ import MainContent from './MainContent';
 import Payments from './Payments';
 import Profile from './Profile';
 import Register from './Register';
-import Sidebar from './Sidebar';
 
 const Main = () => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+
 
   return (
     <div className='flex flex-col h-full'>
-      <Header toggleSidebar={toggleSidebar} />
+      <Header />
       <div className='flex flex-row flex-grow'>
-        <Sidebar isOpen={sidebarOpen} toggleDrawer={toggleSidebar} />
         <MainContent>
           <Routes>
             <Route index element={<Analytics />} />

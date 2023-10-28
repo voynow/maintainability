@@ -36,6 +36,7 @@ def read_root():
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
     try:
+        1 / 0
         import time
 
         time.sleep(10)

@@ -45,7 +45,7 @@ def write_file(file: models.FileTransaction) -> Tuple:
 
 
 def get_user_projects(user_email: str) -> List[Dict]:
-    table = connect_to_supabase_table("maintainability")
+    table = connect_to_supabase_table("files")
     response = table.select("project_name").eq("user_email", user_email).execute()
     if not response.data:
         return []

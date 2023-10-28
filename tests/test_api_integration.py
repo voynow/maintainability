@@ -177,3 +177,10 @@ def test_get_user_email(test_client):
     response = test_client.get(f"/get_user_email", params=params)
     assert response.status_code == 200
     assert response.json() == user_email
+
+
+def test_get_user_email_with_invalid_api_key(test_client):
+    """Test /get_user_email route with invalid data"""
+    params = {"api_key": "invalid"}
+    response = test_client.get(f"/get_user_email", params=params)
+    assert response.status_code == 404

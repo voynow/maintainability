@@ -27,6 +27,7 @@ bcrypt = "*"
 python-multipart = "*"
 passlib = "*"
 pyJWT = "*"
+plotly = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.main:cli_runner"

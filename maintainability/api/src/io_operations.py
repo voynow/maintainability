@@ -118,8 +118,8 @@ def delete_api_key(api_key: str) -> None:
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
 
 
-def write_log(loc: str, text: str) -> Tuple:
-    log_data = {"loc": loc, "text": text}
+def write_log(loc: str, text: str, session_id: str) -> Tuple:
+    log_data = {"loc": loc, "text": text, "session_id": session_id}
     table = connect_to_supabase_table("logs")
     return table.insert(log_data).execute()
 

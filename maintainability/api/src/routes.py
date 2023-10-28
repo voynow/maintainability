@@ -65,14 +65,13 @@ async def insert_metrics(file: models.FileTransaction):
 @router.get("/get_user_email")
 async def get_user_email(api_key: str):
     try:
+        logger.logger(f"api_key={api_key}")
         response = io_operations.get_user_email(api_key)
         if response is None:
             raise HTTPException(status_code=404, detail="User not found")
         return response
     except HTTPException as e:
-        logger.logger(
-            f"HTTPException during get_user_email: Status Code: {e.status_code}, Detail: {e.detail}"
-        )
+        logger.logger(f"HTTPException {e.status_code}: {e.detail}")
         raise e
     except Exception as e:
         logger.logger(f"Unexpected Exception {type(e)} during get_user_email: {str(e)}")

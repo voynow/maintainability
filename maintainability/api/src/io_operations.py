@@ -126,7 +126,11 @@ def write_log(loc: str, text: str) -> Tuple:
 
 def get_user_email(api_key: str) -> str:
     table = connect_to_supabase_table("api_keys")
+    logger.logger(api_key)
     response = table.select("user").eq('"api_key"', api_key).execute()
     if response.data:
+        logger.logger(response.data)
+        logger.logger('response.data[0]["user"]?')
         return response.data[0]["user"]
+    logger.logger("No data")
     return None

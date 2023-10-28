@@ -50,6 +50,8 @@ def call_api_wrapper(
     :return: The response from the API
     """
     url = f"{base_url}/{endpoint}"
+    logger.info(f"Calling {url} with payload={payload}")
+
     headers = {"Content-Type": "application/json"}
     if api_key:
         headers["X-API-KEY"] = api_key

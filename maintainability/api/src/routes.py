@@ -70,10 +70,12 @@ async def get_user_email(api_key: str):
             raise HTTPException(status_code=404, detail="User not found")
         return response
     except HTTPException as e:
-        logger.logger(f"Error 404: {str(e)}")
+        logger.logger(
+            f"HTTPException during get_user_email: Status Code: {e.status_code}, Detail: {e.detail}"
+        )
         raise e
     except Exception as e:
-        logger.logger(f"Error 500: {str(e)}")
+        logger.logger(f"Unexpected Exception {type(e)} during get_user_email: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

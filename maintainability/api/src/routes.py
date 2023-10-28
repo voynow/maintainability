@@ -35,10 +35,10 @@ def read_root():
 
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
-    import time
-
-    time.sleep(10)
     try:
+        import time
+
+        time.sleep(10)
         logger.logger(
             f"Extracting {extract_metrics_obj.metric} from {extract_metrics_obj.filepath}"
         )

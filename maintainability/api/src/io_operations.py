@@ -45,7 +45,7 @@ def write_file(file: models.FileTransaction) -> Tuple:
 
 
 def get_user_projects(user_email: str) -> List[Dict]:
-    table = connect_to_supabase_table("maintainability")
+    table = connect_to_supabase_table("files")
     response = table.select("project_name").eq("user_email", user_email).execute()
     if not response.data:
         return []
@@ -118,15 +118,19 @@ def delete_api_key(api_key: str) -> None:
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
 
 
-def write_log(loc: str, text: str) -> Tuple:
-    log_data = {"loc": loc, "text": text}
+def write_log(loc: str, text: str, session_id: str) -> Tuple:
+    log_data = {"loc": loc, "text": text, "session_id": session_id}
     table = connect_to_supabase_table("logs")
     return table.insert(log_data).execute()
 
 
 def get_user_email(api_key: str) -> str:
     table = connect_to_supabase_table("api_keys")
+    logger.logger(api_key)
     response = table.select("user").eq('"api_key"', api_key).execute()
     if response.data:
+        logger.logger(response.data)
+        logger.logger('response.data[0]["user"]?')
         return response.data[0]["user"]
+    logger.logger("No data")
     return None

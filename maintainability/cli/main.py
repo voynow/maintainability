@@ -1,14 +1,16 @@
 import json
 import logging
 import os
+import uuid
+from functools import partial
 from pathlib import Path
 from typing import Dict, Optional
-import uuid
 
 import click
 import requests
+from retrying import retry
 
-from . import file_operations, config
+from . import config, file_operations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,6 +34,45 @@ options = {
 }
 
 
+def build_headers(api_key: Optional[str] = None) -> Dict[str, str]:
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["X-API-KEY"] = api_key
+    return headers
+
+
+def handle_http_error(endpoint: str, err: requests.HTTPError):
+    status_code = err.response.status_code
+    response_content = err.response.content.decode("utf-8")
+    if status_code == 504:
+        logger.error(f"Timeout when calling {endpoint}, retrying...")
+        raise err
+    else:
+        try:
+            detail = json.loads(response_content)["detail"]
+        except json.JSONDecodeError:
+            detail = response_content
+        logger.error(f"HTTPError with code={status_code}, Detail: {detail}")
+        raise requests.HTTPError(detail, response=err.response)
+
+
+def response_validator(response: requests.Response, endpoint: str) -> requests.Response:
+    try:
+        response.raise_for_status()
+        response.json()
+    except requests.HTTPError as err:
+        handle_http_error(endpoint, err)
+    except json.JSONDecodeError:
+        logger.error(f"Response is not valid JSON: {response.content}")
+        raise json.JSONDecodeError
+    except Exception as e:
+        logger.error(f"Unexpected error when calling {endpoint}: {e}")
+        raise err
+
+    return response
+
+
+@retry(stop_max_attempt_number=3, wait_fixed=2000)
 def call_api_wrapper(
     base_url: str,
     endpoint: str,
@@ -39,47 +80,14 @@ def call_api_wrapper(
     payload: Optional[Dict] = None,
     api_key: Optional[str] = None,
 ):
-    """
-    Wrapper for calling the API. Handles errors and logging.
-
-    :param base_url: The base URL for the API
-    :param endpoint: The API endpoint to call
-    :param method: The HTTP method to use (GET or POST)
-    :param payload: The payload sent to the API
-    :param api_key: The API key for authentication
-    :return: The response from the API
-    """
     url = f"{base_url}/{endpoint}"
-    headers = {"Content-Type": "application/json"}
-    if api_key:
-        headers["X-API-KEY"] = api_key
-
-    try:
-        if method == "POST":
-            response = requests.post(url, json=payload, headers=headers)
-        elif method == "GET":
-            response = requests.get(url, params=payload, headers=headers)
-        else:
-            raise ValueError(f"Unsupported method: {method}")
-
-        response.raise_for_status()
-
-    except requests.HTTPError as e:
-        status_code = e.response.status_code
-        response_content = e.response.content.decode("utf-8")
-        try:
-            detail = json.loads(response_content)["detail"]
-        except json.JSONDecodeError:
-            detail = response_content
-        logger.error(
-            f"HTTPError on {endpoint} with code={status_code}, Detail: {detail}"
-        )
-        raise requests.HTTPError(detail, response=e.response)
-
-    except Exception as e:
-        logger.error(f"Unexpected error when calling {endpoint}: {e}")
-        raise e
-
+    headers = build_headers(api_key)
+    request_map = {
+        "POST": partial(requests.post, url=url, json=payload, headers=headers),
+        "GET": partial(requests.get, url=url, params=payload, headers=headers),
+    }
+    send_request = request_map[method]
+    response = response_validator(send_request(), endpoint)
     return response.json()
 
 

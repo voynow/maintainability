@@ -28,6 +28,7 @@ python-multipart = "*"
 passlib = "*"
 pyJWT = "*"
 plotly = "*"
+retrying = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.main:cli_runner"
@@ -49,8 +50,8 @@ ignore = [
     ".pytest_cache",
     ".vercel",
     ".github",
-    "maintainability",
-    # "webapp",
+    # "maintainability",
+    "webapp",
     "webapp/src/components/Register.js",
     "webapp/src/components/Login.js",
     "tests",

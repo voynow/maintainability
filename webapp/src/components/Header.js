@@ -10,6 +10,7 @@ const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
     const [projects, setProjects] = useState([]);
     const { selectedProject, setSelectedProject, email } = useAppContext();
+    const [error, setError] = useState(null);
 
     const togglePopup = () => {
         setPopupOpen(!popupOpen);

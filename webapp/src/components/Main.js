@@ -19,9 +19,6 @@ const Main = () => {
         <MainContent>
           <Routes>
             <Route index element={<Analytics />} />
-            <Route path="/apikeys" element={<APIKeys />} />
-            <Route path="/payments" element={<Payments />} />
-            <Route path="/profile" element={<Profile />} />
           </Routes>
         </MainContent>
       </div>

@@ -16,7 +16,6 @@ const Analytics = () => {
             setIsLoading(true);
             const response = await axios.get("/get_metrics", {
                 params: { user_email: email, project_name: selectedProject },
-                headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
             });
             if (response.status === 200) {
                 setPlotData(response.data);

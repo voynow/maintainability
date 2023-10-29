@@ -52,8 +52,6 @@ ignore = [
     ".github",
     # "maintainability",
     "webapp",
-    "webapp/src/components/Register.js",
-    "webapp/src/components/Login.js",
     "tests",
     "integration_tests.sh",
     "pyproject.toml",

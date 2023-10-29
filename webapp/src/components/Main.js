@@ -7,7 +7,6 @@ import Header from './Header';
 import MainContent from './MainContent';
 import Payments from './Payments';
 import Profile from './Profile';
-import Register from './Register';
 
 const Main = () => {
 
@@ -20,7 +19,6 @@ const Main = () => {
         <MainContent>
           <Routes>
             <Route index element={<Analytics />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/apikeys" element={<APIKeys />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/profile" element={<Profile />} />

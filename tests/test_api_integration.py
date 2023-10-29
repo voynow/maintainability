@@ -74,16 +74,6 @@ def test_insert_file(test_client):
     assert response.json()["data"][0]["file_id"] == payload["file_id"]
 
 
-def test_successful_registration(test_client):
-    user_data = {
-        "email": unique_email(),
-        "password": "test",
-        "role": "user",
-    }
-    response = test_client.post("/register", json=user_data)
-    assert response.status_code == 200
-    assert "email" in response.json()
-
 
 def test_successful_login(test_client):
     token_request = {"email": "login@test.com", "password": "test"}

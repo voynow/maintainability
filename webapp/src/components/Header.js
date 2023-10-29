@@ -21,7 +21,6 @@ const Header = () => {
             try {
                 const response = await axios.get("/get_user_projects", {
                     params: { user_email: email },
-                    headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
                 });
                 if (response.status === 200) {
                     setProjects(response.data);

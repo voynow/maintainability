@@ -91,13 +91,6 @@ async def get_metrics(user_email: str, project_name: str):
     return plot_json
 
 
-@router.post("/register", response_model=models.User)
-def register(user: models.User):
-    hashed_password = routes_helper.pwd_context.hash(user.password)
-    io_operations.write_user(user.email, hashed_password)
-    return {"email": user.email, "password": hashed_password, "role": user.role}
-
-
 @router.post("/token", response_model=models.Token)
 async def login_for_access_token(token_request: models.TokenRequest):
     email = token_request.email

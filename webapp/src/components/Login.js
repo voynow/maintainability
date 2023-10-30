@@ -6,6 +6,7 @@ function Login() {
     const { setIsLoggedIn, setEmail, isLoggedIn } = useAppContext();
     const [email, setInputEmail] = useState('');
     const [password, setInputPassword] = useState('');
+    const [emailSent, setEmailSent] = useState(false);
 
     useEffect(() => {
         const user = supabase.auth.user();
@@ -28,28 +29,57 @@ function Login() {
         }
     }
 
+    async function signUpWithEmail() {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+        });
+
+        if (error) {
+            console.error("Error during sign-up:", error);
+        } else {
+            setEmailSent(true);
+            console.log("Signed up:", data);
+        }
+    }
+
     return (
         <div className="h-screen bg-gray-100 flex items-center justify-center">
             {!isLoggedIn ? (
                 <div className="bg-white p-6 rounded-lg shadow-lg w-1/4 text-center">
-                    <h1 className="text-2xl font-semibold mb-4">Hello, please sign in!</h1>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setInputEmail(e.target.value)}
-                        className="mb-2 p-1 border rounded"
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setInputPassword(e.target.value)}
-                        className="mb-2 p-1 border rounded"
-                    />
-                    <button onClick={signInWithEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
-                        Sign In
-                    </button>
+                    {emailSent ? (
+                        <p>A verification email has been sent. Please check your inbox.</p>
+                    ) : (
+                        <>
+                            <h1 className="text-2xl font-semibold mb-4">Welcome</h1>
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setInputEmail(e.target.value)}
+                                className="mb-2 p-1 border rounded w-full"
+                            />
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setInputPassword(e.target.value)}
+                                className="mb-4 p-1 border rounded w-full"
+                            />
+                            <div className="flex flex-col items-center">
+                                <button
+                                    onClick={signInWithEmail}
+                                    className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full">
+                                    Sign In
+                                </button>
+                                <button
+                                    onClick={signUpWithEmail}
+                                    className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full">
+                                    Sign Up
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             ) : null}
         </div>

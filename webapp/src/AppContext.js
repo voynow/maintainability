@@ -18,6 +18,19 @@ export const AppProvider = ({ children }) => {
         if (session) {
             setEmail(session.user.email);
         }
+
+        // Listen for changes to authentication state
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            // Explicitly set state upon successful login
+            if (event === 'SIGNED_IN') {
+                setIsLoggedIn(true);
+                setEmail(session.user.email);
+            }
+        });
+
+        return () => {
+            authListener.unsubscribe();
+        };
     }, []);
 
     const logout = async () => {

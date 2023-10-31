@@ -12,5 +12,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.middleware("http")(routes.api_key_middleware)
+app.middleware("http")(routes.mixed_auth_middleware)
 app.include_router(routes.router)

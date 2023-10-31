@@ -14,7 +14,7 @@ def test_cli_command():
     args = ["--paths", "test_file.txt", "--api_key", MAINTAINABILITY_API_KEY]
     with runner.isolated_filesystem():
         with open("test_file.txt", "w") as f:
-            f.write("test content")
+            f.write("print('hello world')\n" * 100)
 
         result = runner.invoke(main.cli_runner, args)
     # for debugging

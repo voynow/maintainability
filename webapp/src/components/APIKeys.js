@@ -43,7 +43,7 @@ const APIKeys = () => {
     const generateApiKey = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('/generate_key', { email, name: newKeyName });
+            const response = await api.post('/generate_key', { email, name: newKeyName });
             const newKey = { ...response.data, name: newKeyName };
             setApiKeys([...apiKeys, newKey]);
             setNewKeyName('');

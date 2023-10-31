@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, ButtonBase, Select, MenuItem, InputLabel, 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAppContext } from '../AppContext';
 import Profile from './Profile';
-import axios from 'axios';
+import api from '../axiosConfig';
 
 
 const Header = () => {
@@ -19,7 +19,7 @@ const Header = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await axios.get("/get_user_projects", {
+                const response = await api.get("/get_user_projects", {
                     params: { user_email: email },
                 });
                 if (response.status === 200) {

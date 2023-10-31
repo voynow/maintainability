@@ -5,24 +5,36 @@ from typing import Dict
 import jwt
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
-from jose import jwt
+from jose import jwt, JWTError
 
 from . import io_operations, logger, models, routes_helper
 
 router = APIRouter()
+SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET")
 
 
-async def api_key_middleware(request: Request, call_next):
-    if request.url.path in ["/submit_metrics", "/extract_metrics"]:
-        api_key = request.headers.get("X-API-KEY", None)
-        if api_key is None:
-            logger.logger("Error 400: API key header missing")
-            return JSONResponse(
-                status_code=400, content={"detail": "API key header missing"}
-            )
-        if not io_operations.api_key_exists(api_key):
-            logger.logger("Error 401: Invalid API Key")
-            return JSONResponse(status_code=401, content={"detail": "Invalid API Key"})
+async def mixed_auth_middleware(request: Request, call_next):
+    logger.logger(f"Request: {request.url.path} {request.method} {request.headers}")
+    if request.method != "OPTIONS":
+        if request.url.path in ["/insert_file", "/extract_metrics"]:
+            api_key = request.headers.get("X-API-KEY", None)
+            if api_key is None or not io_operations.api_key_exists(api_key):
+                return JSONResponse(
+                    status_code=401, content={"detail": "Invalid API Key"}
+                )
+        else:
+            token = request.headers.get("authorization", None)
+            if token is None:
+                raise HTTPException(status_code=401, detail="Token missing")
+            try:
+                jwt.decode(
+                    token.replace("Bearer ", "", 1),
+                    SUPABASE_JWT_SECRET,
+                    algorithms=["HS256"],
+                    options={"verify_aud": False},
+                )
+            except JWTError:
+                raise HTTPException(status_code=401, detail="Invalid token")
 
     response = await call_next(request)
     return response

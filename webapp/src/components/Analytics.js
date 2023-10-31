@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
 import Plot from 'react-plotly.js';
 import { CircularProgress, Typography } from '@mui/material';
@@ -14,7 +14,7 @@ const Analytics = () => {
         if (!selectedProject) return;
         try {
             setIsLoading(true);
-            const response = await axios.get("/get_metrics", {
+            const response = await api.get("/get_metrics", {
                 params: { user_email: email, project_name: selectedProject },
             });
             if (response.status === 200) {

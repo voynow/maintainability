@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import routes
+from . import routes, middleware
 
 app = FastAPI()
 
@@ -16,5 +16,5 @@ app.add_middleware(
 )
 
 if os.environ.get("SKIP_AUTH_MIDDLEWARE") != "True":
-    app.middleware("http")(routes.mixed_auth_middleware)
+    app.middleware("http")(middleware.mixed_auth_middleware)
 app.include_router(routes.router)

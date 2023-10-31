@@ -85,6 +85,7 @@ async def get_user_projects(user_email: str):
 
 @router.get("/get_metrics")
 async def get_metrics(user_email: str, project_name: str):
+    logger.logger(f"Getting metrics for {user_email}:{project_name}")
     files_metrics = routes_helper.join_files_metrics(user_email, project_name)
     weighted_metrics = routes_helper.calculate_weighted_metrics(files_metrics)
     plot_json = routes_helper.generate_plotly_figs(weighted_metrics)

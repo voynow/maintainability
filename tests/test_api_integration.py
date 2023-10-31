@@ -74,7 +74,6 @@ def test_insert_file(test_client):
     assert response.json()["data"][0]["file_id"] == payload["file_id"]
 
 
-
 def test_successful_login(test_client):
     token_request = {"email": "login@test.com", "password": "test"}
     response = test_client.post("/token", json=token_request)
@@ -119,7 +118,7 @@ def test_invalidate_api_key(test_client, generated_api_key):
 
 
 def test_get_metrics_with_valid_project(test_client):
-    user_email = "test"
+    user_email = "voynow99@gmail.com"
     project_name = "test_project"
     params = {"user_email": user_email, "project_name": project_name}
     response = test_client.get("/get_metrics", params=params)
@@ -158,7 +157,7 @@ def test_get_user_projects_with_valid_email(test_client):
 
 def test_get_user_email(test_client):
     """Test /get_user_email route with valid data"""
-    user_email = "test"
+    user_email = "voynow99@gmail.com"
     params = {"email": user_email}
     response = test_client.get("/api_keys", params=params)
     key = response.json()["api_keys"][0]["api_key"]

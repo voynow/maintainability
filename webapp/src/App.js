@@ -1,5 +1,6 @@
 import React from 'react';
 import Login from './components/Login';
+import SignUp from './components/SignUp';
 import Main from './components/Main';
 import { useAppContext } from './AppContext';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';

@@ -6,6 +6,7 @@ function SignUp() {
     const [email, setInputEmail] = useState('');
     const [password, setInputPassword] = useState('');
     const [emailSent, setEmailSent] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     async function signUpWithEmail() {
         const { data, error } = await supabase.auth.signUp({
@@ -14,6 +15,7 @@ function SignUp() {
         });
 
         if (error) {
+            setErrorMessage(error.message || 'An error occurred during sign-up.');
             console.error("Error during sign-up:", error);
         } else {
             setEmailSent(true);
@@ -32,6 +34,7 @@ function SignUp() {
                         <input type="password" placeholder="Password" value={password} onChange={(e) => setInputPassword(e.target.value)} className="mb-4 p-1 border rounded w-full" />
                         <button onClick={signUpWithEmail} className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full">Sign Up</button>
                         <Link to="/login">Already have an account? Log In</Link>
+                        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                     </>
                 )}
             </div>

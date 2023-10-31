@@ -7,6 +7,7 @@ function Login() {
     const { setIsLoggedIn, setEmail } = useAppContext();
     const [email, setInputEmail] = useState('');
     const [password, setInputPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         const user = supabase.auth.user();
@@ -23,6 +24,7 @@ function Login() {
         });
 
         if (error) {
+            setErrorMessage(error.message || 'An error occurred during sign-in.');
             console.error("Error during sign-in:", error);
         }
     }
@@ -35,6 +37,7 @@ function Login() {
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setInputPassword(e.target.value)} className="mb-4 p-1 border rounded w-full" />
                 <button onClick={signInWithEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full">Sign In</button>
                 <Link to="/signup">Don't have an account? Sign Up</Link>
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
             </div>
         </div>
     );

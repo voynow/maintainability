@@ -1,4 +1,3 @@
-import json
 import os
 from uuid import uuid4
 
@@ -6,7 +5,8 @@ import pytest
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
-from maintainability.api.src import main, models
+os.environ["SKIP_AUTH_MIDDLEWARE"] = "True"
+from maintainability.api.src import main
 
 load_dotenv()
 MAINTAINABILITY_API_KEY = os.getenv("MAINTAINABILITY_API_KEY")

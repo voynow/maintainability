@@ -1,5 +1,6 @@
 import React from 'react';
 import Login from './components/Login';
+import SignUp from './components/SignUp';
 import Main from './components/Main';
 import { useAppContext } from './AppContext';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
@@ -15,6 +16,7 @@ const App = () => {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/" />} />
+                        <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/" />} />
                         <Route path="*" element={isLoggedIn ? <Main /> : <Navigate to="/login" />} />
                     </Routes>
                 </BrowserRouter>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { CircularProgress, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -31,7 +31,7 @@ const APIKeys = () => {
     useEffect(() => {
         const fetchApiKeys = async () => {
             try {
-                const response = await axios.get('/api_keys', { params: { email } });
+                const response = await api.get('/api_keys', { params: { email } });
                 setApiKeys(response.data.api_keys);
             } catch (err) {
                 setError('Failed to fetch API keys.');

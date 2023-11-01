@@ -48,7 +48,7 @@ async def get_metrics(user_email: str, project_name: str):
 
 @router.post("/generate_key")
 async def generate_key(new_key: Dict[str, str]):
-    api_key = routes_heper.generate_api_key_helper()
+    api_key = routes_helper.generate_api_key_helper()
 
     io_operations.write_api_key(
         api_key=api_key,

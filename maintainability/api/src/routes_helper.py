@@ -69,8 +69,9 @@ def generate_new_api_key():
 
 def generate_api_key_helper():
     api_key = generate_new_api_key()
-    while io_operations.api_key_exists(api_key):
+    while io_operations.select_api_key(api_key):
         api_key = generate_new_api_key()
+    return api_key
 
 
 def join_files_metrics(

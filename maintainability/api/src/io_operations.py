@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
-from typing import Dict, Tuple, List
+from typing import Dict, List, Tuple
 
+from fastapi import HTTPException
 from supabase import Client, create_client
 
-from . import models, io_operations
+from . import models
 
 
 def connect_to_supabase() -> Client:
@@ -84,13 +85,15 @@ def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:
 #     return None
 
 
-def api_key_exists(api_key: str) -> bool:
+def select_api_key(api_key: str) -> Dict:
     table = connect_to_supabase_table("api_keys")
     response = table.select("api_key").eq('"api_key"', api_key).execute()
+    return response.data
 
-    if response.data:
-        return True
-    return False
+
+def validate_api_key(api_key: str) -> bool:
+    if not select_api_key(api_key):
+        raise HTTPException(status_code=401, detail="Unauthorized: Invalid API key.")
 
 
 def write_api_key(
@@ -110,13 +113,11 @@ def write_api_key(
 def list_api_keys(email: str) -> List[Dict]:
     table = connect_to_supabase_table("api_keys")
     response = table.select("*").eq("user", email).eq("status", "active").execute()
-
     return response.data if response.data else []
 
 
 def delete_api_key(api_key: str) -> None:
-    if not api_key_exists(api_key):
-        raise Exception(f"API key {api_key} does not exist.")
+    validate_api_key(api_key)
     table = connect_to_supabase_table("api_keys")
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
 
@@ -128,8 +129,7 @@ def write_log(loc: str, text: str, session_id: str) -> Tuple:
 
 
 def get_user_email(api_key: str) -> str:
+    validate_api_key(api_key)
     table = connect_to_supabase_table("api_keys")
     response = table.select("user").eq('"api_key"', api_key).execute()
-    if response.data:
-        return response.data[0]["user"]
-    raise Exception(f"API key {api_key} does not exist.")
+    return response.data[0]["user"]

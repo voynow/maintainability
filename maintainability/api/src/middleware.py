@@ -13,7 +13,7 @@ SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET")
 def api_key_middleware(request: Request):
     """some functions are exposed via API key for data ingestion"""
     api_key = request.headers.get("X-API-KEY", None)
-    if api_key is None or not io_operations.api_key_exists(api_key):
+    if api_key is None or not io_operations.select_api_key(api_key):
         raise HTTPException(status_code=401, detail="Invalid API Key")
 
 

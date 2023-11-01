@@ -4,7 +4,7 @@ from typing import Dict, Tuple, List
 
 from supabase import Client, create_client
 
-from . import models, logger
+from . import models, io_operations
 
 
 def connect_to_supabase() -> Client:
@@ -74,13 +74,14 @@ def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:
     return table.insert(user_data).execute()
 
 
-def get_user(email: str) -> Dict:
-    table = connect_to_supabase_table("users")
-    response = table.select("email, password, role").eq("email", email).execute()
+# TODO depricate this function
+# def get_user(email: str) -> Dict:
+#     table = connect_to_supabase_table("users")
+#     response = table.select("email, password, role").eq("email", email).execute()
 
-    if response.data:
-        return response.data[0]
-    return None
+#     if response.data:
+#         return response.data[0]
+#     return None
 
 
 def api_key_exists(api_key: str) -> bool:
@@ -114,6 +115,8 @@ def list_api_keys(email: str) -> List[Dict]:
 
 
 def delete_api_key(api_key: str) -> None:
+    if not api_key_exists(api_key):
+        raise Exception(f"API key {api_key} does not exist.")
     table = connect_to_supabase_table("api_keys")
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
 
@@ -126,11 +129,7 @@ def write_log(loc: str, text: str, session_id: str) -> Tuple:
 
 def get_user_email(api_key: str) -> str:
     table = connect_to_supabase_table("api_keys")
-    logger.logger(api_key)
     response = table.select("user").eq('"api_key"', api_key).execute()
     if response.data:
-        logger.logger(response.data)
-        logger.logger('response.data[0]["user"]?')
         return response.data[0]["user"]
-    logger.logger("No data")
-    return None
+    raise Exception(f"API key {api_key} does not exist.")

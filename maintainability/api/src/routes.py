@@ -1,12 +1,9 @@
-import os
 from datetime import datetime
 from typing import Dict
 
-import jwt
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter
 
-from . import io_operations, logger, models, routes_helper
+from . import io_operations, models, routes_helper
 
 router = APIRouter()
 
@@ -33,18 +30,12 @@ async def insert_metrics(file: models.FileTransaction):
 
 @router.get("/get_user_email")
 async def get_user_email(api_key: str):
-    response = io_operations.get_user_email(api_key)
-    if response is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return response
+    return io_operations.get_user_email(api_key)
 
 
 @router.get("/get_user_projects")
 async def get_user_projects(user_email: str):
-    projects = io_operations.get_user_projects(user_email)
-    if not projects:
-        return JSONResponse(status_code=404, content={"detail": "Projects not found"})
-    return projects
+    return io_operations.get_user_projects(user_email)
 
 
 @router.get("/get_metrics")
@@ -57,9 +48,7 @@ async def get_metrics(user_email: str, project_name: str):
 
 @router.post("/generate_key")
 async def generate_key(new_key: Dict[str, str]):
-    api_key = routes_helper.generate_new_api_key()
-    while io_operations.api_key_exists(api_key):
-        api_key = routes_helper.generate_new_api_key()
+    api_key = routes_heper.generate_api_key_helper()
 
     io_operations.write_api_key(
         api_key=api_key,
@@ -79,9 +68,5 @@ async def list_api_keys(email: str):
 
 @router.delete("/api_keys/{api_key}")
 async def remove_api_key(api_key: str):
-    if io_operations.api_key_exists(api_key):
-        io_operations.delete_api_key(api_key)
-        return {"message": "API key deleted successfully"}
-    else:
-        logger.logger("Error 404: API key not found")
-        return {"message": "API key not found"}, 404
+    io_operations.delete_api_key(api_key)
+    return {"message": "API key deleted successfully"}

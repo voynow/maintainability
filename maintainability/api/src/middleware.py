@@ -1,5 +1,6 @@
 import os
 
+import json
 import jwt
 from fastapi import HTTPException, Request
 from jose import jwt, JWTError
@@ -61,7 +62,14 @@ def auth_strategy_dispatcher(request: Request):
 
 async def mixed_auth_middleware(request: Request, call_next):
     """middleware for handling auth"""
-    logger.logger(f"Request: {request.url.path} {request.method} {request.headers}")
+    log_data = {
+        "path": request.url.path,
+        "method": request.method,
+        "client_ip": request.client.host,
+        "user_agent": request.headers.get("User-Agent", "Unknown"),
+    }
+    logger.logger(f"Received Request: {json.dumps(log_data)}")
+
     if request.method != "OPTIONS":
         auth_strategy_dispatcher(request)
     response = await call_next(request)

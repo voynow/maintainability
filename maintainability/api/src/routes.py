@@ -19,9 +19,6 @@ def read_root():
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
     try:
-        logger.logger(
-            f"Extracting {extract_metrics_obj.metric} from {extract_metrics_obj.filepath}"
-        )
         return routes_helper.extract_metrics(
             file_id=extract_metrics_obj.file_id,
             filepath=extract_metrics_obj.filepath,
@@ -45,7 +42,6 @@ async def insert_metrics(file: models.FileTransaction):
 @router.get("/get_user_email")
 async def get_user_email(api_key: str):
     try:
-        logger.logger(f"api_key={api_key}")
         response = io_operations.get_user_email(api_key)
         if response is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -68,24 +64,10 @@ async def get_user_projects(user_email: str):
 
 @router.get("/get_metrics")
 async def get_metrics(user_email: str, project_name: str):
-    logger.logger(f"Getting metrics for {user_email}:{project_name}")
     files_metrics = routes_helper.join_files_metrics(user_email, project_name)
     weighted_metrics = routes_helper.calculate_weighted_metrics(files_metrics)
     plot_json = routes_helper.generate_plotly_figs(weighted_metrics)
     return plot_json
-
-
-@router.post("/token", response_model=models.Token)
-async def login_for_access_token(token_request: models.TokenRequest):
-    email = token_request.email
-    password = token_request.password
-    routes_helper.validate_user(email, password)
-
-    # TODO add secret key
-    access_token = jwt.encode(
-        {"sub": email}, os.getenv("JWT_SECRET", "your-secret-key"), algorithm="HS256"
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/generate_key")

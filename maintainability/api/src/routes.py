@@ -3,7 +3,7 @@ from typing import Dict
 
 from fastapi import APIRouter
 
-from . import io_operations, models, routes_helper
+from . import io_operations, models, routes_helper, config
 
 router = APIRouter()
 
@@ -70,3 +70,8 @@ async def list_api_keys(email: str):
 async def remove_api_key(api_key: str):
     io_operations.delete_api_key(api_key)
     return {"message": "API key deleted successfully"}
+
+
+@router.get("/get_metric_description/{metric}")
+async def get_metric_description(metric: str):
+    return config.METRIC_DESCRIPTIONS[metric]

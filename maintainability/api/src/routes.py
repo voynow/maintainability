@@ -1,75 +1,11 @@
-import os
 from datetime import datetime
 from typing import Dict
 
-import jwt
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
-from jose import jwt, JWTError
+from fastapi import APIRouter
 
-from . import io_operations, logger, models, routes_helper
+from . import io_operations, models, routes_helper
 
 router = APIRouter()
-SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET")
-
-
-def api_key_middleware(request: Request):
-    """some functions are exposed via API key for data ingestion"""
-    api_key = request.headers.get("X-API-KEY", None)
-    if api_key is None or not io_operations.api_key_exists(api_key):
-        raise HTTPException(status_code=401, detail="Invalid API Key")
-
-
-def jwt_middleware(request: Request):
-    """most functions are exposed via JWT for webapp access"""
-    token = request.headers.get("authorization", None)
-    if token is None:
-        raise HTTPException(status_code=401, detail="Token missing")
-    try:
-        jwt.decode(
-            token.replace("Bearer ", "", 1),
-            SUPABASE_JWT_SECRET,
-            algorithms=["HS256"],
-            options={"verify_aud": False},
-        )
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-
-def api_key_or_jwt_middleware(request: Request):
-    """some functions are used in API key workflows and in the webapp"""
-    auth_methods = [api_key_middleware, jwt_middleware]
-
-    errors = []
-    for method in auth_methods:
-        try:
-            method(request)
-            return  # Exit if any method succeeds
-        except HTTPException as e:
-            errors.append(str(e.detail))
-
-    raise HTTPException(status_code=401, detail=f"Failures: {', '.join(errors)}")
-
-
-def auth_strategy_dispatcher(request: Request):
-    """dispatches to the correct auth strategy based on the request path"""
-    path = request.url.path
-    auth_map = {
-        "/insert_file": api_key_middleware,
-        "/extract_metrics": api_key_middleware,
-        "/get_user_email": api_key_or_jwt_middleware,
-    }
-    middleware = auth_map.get(path, jwt_middleware)
-    middleware(request)
-
-
-async def mixed_auth_middleware(request: Request, call_next):
-    """middleware for handling auth"""
-    logger.logger(f"Request: {request.url.path} {request.method} {request.headers}")
-    if request.method != "OPTIONS":
-        auth_strategy_dispatcher(request)
-    response = await call_next(request)
-    return response
 
 
 @router.get("/health")
@@ -79,81 +15,40 @@ def read_root():
 
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
-    try:
-        logger.logger(
-            f"Extracting {extract_metrics_obj.metric} from {extract_metrics_obj.filepath}"
-        )
-        return routes_helper.extract_metrics(
-            file_id=extract_metrics_obj.file_id,
-            filepath=extract_metrics_obj.filepath,
-            code=extract_metrics_obj.file_content,
-            metric=extract_metrics_obj.metric,
-        )
-    except Exception as e:
-        logger.logger(f"Error 500: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return routes_helper.extract_metrics(
+        file_id=extract_metrics_obj.file_id,
+        filepath=extract_metrics_obj.filepath,
+        code=extract_metrics_obj.file_content,
+        metric=extract_metrics_obj.metric,
+    )
 
 
 @router.post("/insert_file")
 async def insert_metrics(file: models.FileTransaction):
-    try:
-        return io_operations.write_file(file)
-    except Exception as e:
-        logger.logger(f"Error 500: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return io_operations.write_file(file)
 
 
 @router.get("/get_user_email")
 async def get_user_email(api_key: str):
-    try:
-        logger.logger(f"api_key={api_key}")
-        response = io_operations.get_user_email(api_key)
-        if response is None:
-            raise HTTPException(status_code=404, detail="User not found")
-        return response
-    except HTTPException as e:
-        logger.logger(f"HTTPException {e.status_code}: {e.detail}")
-        raise e
-    except Exception as e:
-        logger.logger(f"Unexpected Exception {type(e)} during get_user_email: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return io_operations.get_user_email(api_key)
 
 
 @router.get("/get_user_projects")
 async def get_user_projects(user_email: str):
-    projects = io_operations.get_user_projects(user_email)
-    if not projects:
-        return JSONResponse(status_code=404, content={"detail": "Projects not found"})
-    return projects
+    return io_operations.get_user_projects(user_email)
 
 
 @router.get("/get_metrics")
 async def get_metrics(user_email: str, project_name: str):
-    logger.logger(f"Getting metrics for {user_email}:{project_name}")
     files_metrics = routes_helper.join_files_metrics(user_email, project_name)
     weighted_metrics = routes_helper.calculate_weighted_metrics(files_metrics)
     plot_json = routes_helper.generate_plotly_figs(weighted_metrics)
     return plot_json
 
 
-@router.post("/token", response_model=models.Token)
-async def login_for_access_token(token_request: models.TokenRequest):
-    email = token_request.email
-    password = token_request.password
-    routes_helper.validate_user(email, password)
-
-    # TODO add secret key
-    access_token = jwt.encode(
-        {"sub": email}, os.getenv("JWT_SECRET", "your-secret-key"), algorithm="HS256"
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
 @router.post("/generate_key")
 async def generate_key(new_key: Dict[str, str]):
-    api_key = routes_helper.generate_new_api_key()
-    while io_operations.api_key_exists(api_key):
-        api_key = routes_helper.generate_new_api_key()
+    api_key = routes_helper.generate_api_key_helper()
 
     io_operations.write_api_key(
         api_key=api_key,
@@ -173,9 +68,5 @@ async def list_api_keys(email: str):
 
 @router.delete("/api_keys/{api_key}")
 async def remove_api_key(api_key: str):
-    if io_operations.api_key_exists(api_key):
-        io_operations.delete_api_key(api_key)
-        return {"message": "API key deleted successfully"}
-    else:
-        logger.logger("Error 404: API key not found")
-        return {"message": "API key not found"}, 404
+    io_operations.delete_api_key(api_key)
+    return {"message": "API key deleted successfully"}

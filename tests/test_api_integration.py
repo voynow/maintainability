@@ -74,19 +74,6 @@ def test_insert_file(test_client):
     assert response.json()["data"][0]["file_id"] == payload["file_id"]
 
 
-def test_successful_login(test_client):
-    token_request = {"email": "login@test.com", "password": "test"}
-    response = test_client.post("/token", json=token_request)
-    assert response.status_code == 200
-    assert "access_token" in response.json()
-
-
-def test_unsuccessful_login(test_client):
-    token_request = {"email": "unsuccessfullogin@test.com", "password": "wrongpassword"}
-    response = test_client.post("/token", json=token_request)
-    assert response.status_code == 401
-
-
 def test_generate_api_key(test_client):
     new_key = {"email": "genapikey@test.com", "name": "testkey"}
     response = test_client.post("/generate_key", json=new_key)
@@ -172,4 +159,4 @@ def test_get_user_email_with_invalid_api_key(test_client):
     """Test /get_user_email route with invalid data"""
     params = {"api_key": "invalid"}
     response = test_client.get(f"/get_user_email", params=params)
-    assert response.status_code == 404
+    assert response.status_code == 401

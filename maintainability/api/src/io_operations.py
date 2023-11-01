@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
-from typing import Dict, Tuple, List
+from typing import Dict, List, Tuple
 
+from fastapi import HTTPException
 from supabase import Client, create_client
 
-from . import models, logger
+from . import models
 
 
 def connect_to_supabase() -> Client:
@@ -74,22 +75,25 @@ def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:
     return table.insert(user_data).execute()
 
 
-def get_user(email: str) -> Dict:
-    table = connect_to_supabase_table("users")
-    response = table.select("email, password, role").eq("email", email).execute()
+# TODO depricate this function
+# def get_user(email: str) -> Dict:
+#     table = connect_to_supabase_table("users")
+#     response = table.select("email, password, role").eq("email", email).execute()
 
-    if response.data:
-        return response.data[0]
-    return None
+#     if response.data:
+#         return response.data[0]
+#     return None
 
 
-def api_key_exists(api_key: str) -> bool:
+def select_api_key(api_key: str) -> Dict:
     table = connect_to_supabase_table("api_keys")
     response = table.select("api_key").eq('"api_key"', api_key).execute()
+    return response.data
 
-    if response.data:
-        return True
-    return False
+
+def validate_api_key(api_key: str) -> bool:
+    if not select_api_key(api_key):
+        raise HTTPException(status_code=401, detail="Unauthorized: Invalid API key.")
 
 
 def write_api_key(
@@ -109,11 +113,11 @@ def write_api_key(
 def list_api_keys(email: str) -> List[Dict]:
     table = connect_to_supabase_table("api_keys")
     response = table.select("*").eq("user", email).eq("status", "active").execute()
-
     return response.data if response.data else []
 
 
 def delete_api_key(api_key: str) -> None:
+    validate_api_key(api_key)
     table = connect_to_supabase_table("api_keys")
     return table.update({"status": "deleted"}).eq('"api_key"', api_key).execute()
 
@@ -125,12 +129,7 @@ def write_log(loc: str, text: str, session_id: str) -> Tuple:
 
 
 def get_user_email(api_key: str) -> str:
+    validate_api_key(api_key)
     table = connect_to_supabase_table("api_keys")
-    logger.logger(api_key)
     response = table.select("user").eq('"api_key"', api_key).execute()
-    if response.data:
-        logger.logger(response.data)
-        logger.logger('response.data[0]["user"]?')
-        return response.data[0]["user"]
-    logger.logger("No data")
-    return None
+    return response.data[0]["user"]

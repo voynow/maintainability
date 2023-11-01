@@ -67,6 +67,13 @@ def generate_new_api_key():
     return base64.urlsafe_b64encode(random_bytes).decode("utf-8").rstrip("=")
 
 
+def generate_api_key_helper():
+    api_key = generate_new_api_key()
+    while io_operations.select_api_key(api_key):
+        api_key = generate_new_api_key()
+    return api_key
+
+
 def join_files_metrics(
     user_email: str, project_name: str
 ) -> models.FileJoinedOnMetrics:

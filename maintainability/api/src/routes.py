@@ -18,40 +18,25 @@ def read_root():
 
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
-    try:
-        return routes_helper.extract_metrics(
-            file_id=extract_metrics_obj.file_id,
-            filepath=extract_metrics_obj.filepath,
-            code=extract_metrics_obj.file_content,
-            metric=extract_metrics_obj.metric,
-        )
-    except Exception as e:
-        logger.logger(f"Error 500: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return routes_helper.extract_metrics(
+        file_id=extract_metrics_obj.file_id,
+        filepath=extract_metrics_obj.filepath,
+        code=extract_metrics_obj.file_content,
+        metric=extract_metrics_obj.metric,
+    )
 
 
 @router.post("/insert_file")
 async def insert_metrics(file: models.FileTransaction):
-    try:
-        return io_operations.write_file(file)
-    except Exception as e:
-        logger.logger(f"Error 500: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return io_operations.write_file(file)
 
 
 @router.get("/get_user_email")
 async def get_user_email(api_key: str):
-    try:
-        response = io_operations.get_user_email(api_key)
-        if response is None:
-            raise HTTPException(status_code=404, detail="User not found")
-        return response
-    except HTTPException as e:
-        logger.logger(f"HTTPException {e.status_code}: {e.detail}")
-        raise e
-    except Exception as e:
-        logger.logger(f"Unexpected Exception {type(e)} during get_user_email: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    response = io_operations.get_user_email(api_key)
+    if response is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return response
 
 
 @router.get("/get_user_projects")

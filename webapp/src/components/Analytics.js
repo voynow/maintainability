@@ -3,6 +3,9 @@ import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
 import Plot from 'react-plotly.js';
 import { CircularProgress, Typography } from '@mui/material';
+import { Tooltip, IconButton } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+
 
 const Analytics = () => {
     const { email, selectedProject } = useAppContext();
@@ -43,7 +46,22 @@ const Analytics = () => {
                     <Typography variant="h6" color="error">{error}</Typography>
                 ) : plotData && (
                     plotData.map((plot, index) => (
-                        <div key={index} style={{ width: '100%', marginBottom: '128px' }}>
+                        <div key={index} style={{ width: '100%', marginBottom: '128px', position: 'relative' }}>
+                            <Tooltip title={plot.description || "Description unavailable"}>
+                                <IconButton
+                                    aria-label="info"
+                                    size="large"
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        color: '#9e9e9e', // modern light grey
+                                        zIndex: 1000
+                                    }}
+                                >
+                                    <InfoIcon fontSize="large" />
+                                </IconButton>
+                            </Tooltip>
                             <Plot
                                 data={plot.data}
                                 layout={{ ...plot.layout, autosize: true }}

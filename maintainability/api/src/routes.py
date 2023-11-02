@@ -43,7 +43,8 @@ async def get_metrics(user_email: str, project_name: str):
     files_metrics = routes_helper.join_files_metrics(user_email, project_name)
     weighted_metrics = routes_helper.calculate_weighted_metrics(files_metrics)
     plot_json = routes_helper.generate_plotly_figs(weighted_metrics)
-    return plot_json
+    enriched_plot = routes_helper.enrich_description(plot_json)
+    return enriched_plot
 
 
 @router.post("/generate_key")
@@ -70,8 +71,3 @@ async def list_api_keys(email: str):
 async def remove_api_key(api_key: str):
     io_operations.delete_api_key(api_key)
     return {"message": "API key deleted successfully"}
-
-
-@router.get("/get_metric_description/{metric}")
-async def get_metric_description(metric: str):
-    return config.METRIC_DESCRIPTIONS[metric]

@@ -224,3 +224,11 @@ def generate_plotly_figs(data):
         figs_json.append(fig.to_dict())
 
     return figs_json
+
+
+def enrich_description(plot_json):
+    """Add a description to each Plotly figure based on the metric name"""
+    for fig in plot_json:
+        metric_name = fig["data"][0]["name"].lower().replace(" ", "_")
+        fig["description"] = config.METRIC_DESCRIPTIONS[metric_name]
+    return plot_json

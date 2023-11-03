@@ -35,7 +35,6 @@ def write_metrics(
 
 def write_file(file: models.File) -> Tuple:
     table = connect_to_supabase_table("files")
-    print(file)
     return table.insert(file.model_dump()).execute()
 
 

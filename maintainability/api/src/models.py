@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-import pytz
+import json
 from uuid import UUID
 
 
@@ -29,6 +29,16 @@ class File(BaseModel):
     content: str
     timestamp: datetime
     session_id: UUID = Field(default_factory=UUID)
+
+    class Config:
+        json_encoders = {UUID: lambda v: str(v), datetime: lambda v: v.isoformat()}
+
+    def model_dump(self):
+        """
+        Custom serialization to handle the conversion of non-serializable types.
+        This replaces the deprecated '.dict()' method if it's no longer available.
+        """
+        return json.loads(self.model_dump_json(by_alias=True))
 
 
 class Metric(BaseModel):

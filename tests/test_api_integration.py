@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from uuid import uuid4
 
 import pytest
@@ -57,18 +58,21 @@ def test_extract_metrics_with_invalid_data(test_client):
 def test_insert_file(test_client):
     """Test /insert_file route with valid data"""
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
+    file_id = str(uuid4())
+    session_id = str(uuid4())
+    timestamp = datetime.now().isoformat()
     payload = {
-        "file_id": str(uuid4()),
+        "file_id": file_id,
         "file_path": "/test/path/testfile.py",
         "content": "print('hello world')\n" * 100,
         "user_email": "test",
         "project_name": "test_project",
-        "session_id": "88888888-8888-8888-8888-888888888888",
+        "session_id": session_id,
         "file_size": 100,
         "loc": 100,
         "extension": "",
+        "timestamp": timestamp,
     }
-    print("HELOOOOOOOOOOOOOOO")
     response = test_client.post("/insert_file", headers=headers, json=payload)
     assert response.status_code == 200
     assert isinstance(response.json(), dict)

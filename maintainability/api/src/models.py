@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 import pytz
-import uuid
+from uuid import UUID
 
 
 class ExtractMetrics(BaseModel):
@@ -18,33 +18,25 @@ class MetricTransaction(BaseModel):
     file_id: str
 
 
-class FileTransaction(BaseModel):
-    file_id: str
-    user_email: str
-    project_name: str
+class File(BaseModel):
+    file_id: UUID = Field(default_factory=UUID)
     file_path: str
+    project_name: str
+    user_email: str
     file_size: int
     loc: int
     extension: str
     content: str
-    session_id: str
-    timestamp: str = datetime.now(pytz.utc).isoformat()
+    timestamp: datetime
+    session_id: UUID = Field(default_factory=UUID)
 
 
-class FileJoinedOnMetrics(BaseModel):
-    file_id: str
-    user_email: str
-    project_name: str
-    file_path: str
-    file_size: int
-    loc: int
-    extension: str
-    content: str
-    session_id: str
-    timestamp: str
+class Metric(BaseModel):
+    primary_id: UUID = Field(default_factory=UUID)
     metric: str
     score: int
     reasoning: str
+    file_id: UUID
 
 
 class GetMetricsResponse(BaseModel):

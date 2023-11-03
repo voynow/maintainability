@@ -1,51 +1,64 @@
 from datetime import datetime
-
 import plotly.graph_objects as go
-from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import List
+from uuid import UUID
 
-from . import config, io_operations, models
+from . import models, config
 
 
-# TODO these types should be hard defined (in analytics.py probably)
-def join_files_metrics(metrics, files) -> models.FileJoinedOnMetrics:
+class FileMetric(BaseModel):
+    primary_id: UUID
+    file_id: UUID
+    user_email: str
+    project_name: str
+    file_path: str
+    file_size: int
+    loc: int
+    extension: str
+    content: str
+    session_id: UUID
+    timestamp: datetime
+    metric: str
+    score: int
+    reasoning: str
+
+
+def join_files_metrics(metrics: list[models.Metric], files: List[models.File]):
+    joined_data = []
     for metric in metrics:
-        if metric["file_id"] in files:
-            metric.update(files[metric["file_id"]])
-    return metrics
+        file = files.get(metric.file_id)
+        joined_data.append({**metric.model_dump(), **file.model_dump()})
+    return [FileMetric(**data) for data in joined_data]
 
 
-def calculate_weighted_metrics(files_metrics: models.FileJoinedOnMetrics):
+def calculate_weighted_metrics(file_metrics: List[FileMetric]):
     # group metrics by metric name
     groupby_metrics = {}
-    for obj in files_metrics:
-        if obj["metric"] not in groupby_metrics:
-            groupby_metrics[obj["metric"]] = []
-        groupby_metrics[obj["metric"]].append(obj)
-
-    # convert timestamp to datetime object
-    strptime_fmt = "%Y-%m-%dT%H:%M:%S.%f%z"
-    for metric_name, objs in groupby_metrics.items():
-        for obj in objs:
-            obj["timestamp"] = datetime.strptime(obj["timestamp"], strptime_fmt)
+    for file_metric in file_metrics:
+        if file_metric.metric not in groupby_metrics:
+            groupby_metrics[file_metric.metric] = []
+        groupby_metrics[file_metric.metric].append(file_metric)
 
     # groupby date within each metric group
-    for metric_name, objs in groupby_metrics.items():
+    for metric_name, file_metrics in groupby_metrics.items():
         dates = {}
-        for obj in objs:
-            date = obj["timestamp"].date()
+        for file_metric in file_metrics:
+            date = file_metric.timestamp.date()
             if date not in dates:
                 dates[date] = []
-            dates[date].append(obj)
+            dates[date].append(file_metric)
         groupby_metrics[metric_name] = dates
 
     # aggregate scores weighted by loc
     weighted_metrics = {}
     for metric, dates in groupby_metrics.items():
         weighted_metrics[metric] = {}
-        for date, objs in dates.items():
-            total_loc = sum(obj["loc"] for obj in objs)
+        for date, file_metrics in dates.items():
+            total_loc = sum(file_metric.loc for file_metric in file_metrics)
             weighted_score = sum(
-                obj["score"] * (obj["loc"] / total_loc) for obj in objs
+                file_metric.score * (file_metric.loc / total_loc)
+                for file_metric in file_metrics
             )
             weighted_metrics[metric][date] = weighted_score
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-import pytz
-import uuid
+import json
+from uuid import UUID
 
 
 class ExtractMetrics(BaseModel):
@@ -18,33 +18,35 @@ class MetricTransaction(BaseModel):
     file_id: str
 
 
-class FileTransaction(BaseModel):
-    file_id: str
-    user_email: str
-    project_name: str
+class File(BaseModel):
+    file_id: UUID = Field(default_factory=UUID)
     file_path: str
+    project_name: str
+    user_email: str
     file_size: int
     loc: int
     extension: str
     content: str
-    session_id: str
-    timestamp: str = datetime.now(pytz.utc).isoformat()
+    timestamp: datetime
+    session_id: UUID = Field(default_factory=UUID)
+
+    class Config:
+        json_encoders = {UUID: lambda v: str(v), datetime: lambda v: v.isoformat()}
+
+    def model_dump(self):
+        """
+        Custom serialization to handle the conversion of non-serializable types.
+        This replaces the deprecated '.dict()' method if it's no longer available.
+        """
+        return json.loads(self.model_dump_json(by_alias=True))
 
 
-class FileJoinedOnMetrics(BaseModel):
-    file_id: str
-    user_email: str
-    project_name: str
-    file_path: str
-    file_size: int
-    loc: int
-    extension: str
-    content: str
-    session_id: str
-    timestamp: str
+class Metric(BaseModel):
+    primary_id: UUID = Field(default_factory=UUID)
     metric: str
     score: int
     reasoning: str
+    file_id: UUID
 
 
 class GetMetricsResponse(BaseModel):

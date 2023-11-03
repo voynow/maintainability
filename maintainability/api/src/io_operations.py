@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from typing import Dict, List, Tuple
+from uuid import UUID
 
 from fastapi import HTTPException
 from supabase import Client, create_client
@@ -32,7 +33,7 @@ def write_metrics(
     ).execute()
 
 
-def write_file(file: models.FileTransaction) -> Tuple:
+def write_file(file: models.File) -> Tuple:
     table = connect_to_supabase_table("files")
     return table.insert(file.model_dump()).execute()
 
@@ -48,19 +49,22 @@ def get_user_projects(user_email: str) -> List[Dict]:
 
 def get_files(user_email: str, project_name: str):
     table = connect_to_supabase_table("files")
-    files = (
+    rows = (
         table.select("*")
         .eq("user_email", user_email)
         .eq("project_name", project_name)
         .execute()
+        .data
     )
-    return {file["file_id"]: file for file in files.data}
+    files = [models.File(**row) for row in rows]
+    return {file.file_id: file for file in files}
 
 
-def get_metrics(file_ids: List[str]):
+def get_metrics(file_ids: List[UUID]) -> List[models.Metric]:
     table = connect_to_supabase_table("metrics")
-    metrics = table.select("*").in_("file_id", file_ids).execute()
-    return metrics.data
+    rows = table.select("*").in_("file_id", file_ids).execute().data
+    metrics = [models.Metric(**row) for row in rows]
+    return metrics
 
 
 def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:

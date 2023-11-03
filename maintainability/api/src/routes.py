@@ -26,7 +26,7 @@ async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
 
 
 @router.post("/insert_file")
-async def insert_metrics(file: models.FileTransaction):
+async def insert_file(file: models.File):
     """Database proxy for inserting a file into the file table"""
     return io_operations.write_file(file)
 

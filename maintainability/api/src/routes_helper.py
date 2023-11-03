@@ -1,8 +1,7 @@
 import base64
-import json
 import re
 import secrets
-from datetime import datetime
+from typing import Any, Callable, List
 
 import plotly.graph_objects as go
 from fastapi import HTTPException
@@ -73,9 +72,33 @@ def generate_api_key_helper():
     return api_key
 
 
+def batch_process(
+    items: List[Any],
+    proccess_function: Callable,
+    batch_size: int = 100,
+    *args,
+    **kwargs,
+):
+    """Generically applies a function to a list of items in batches"""
+    results = []
+    for i in range(0, len(items), batch_size):
+        batch = items[i : i + batch_size]
+        result = proccess_function(batch, *args, **kwargs)
+        results.extend(result)
+    return results
+
+
 def get_metrics(user_email: str, project_name: str):
-    files_metrics = analytics.join_files_metrics(user_email, project_name)
+    """
+    query database for all files associated with the project, join data between
+    files and metrics tables, calculate weighted metrics, and generate plotly
+    """
+    files = io_operations.get_files(user_email, project_name)
+    metrics = batch_process(list(files), io_operations.get_metrics)
+
+    files_metrics = analytics.join_files_metrics(metrics, files)
     weighted_metrics = analytics.calculate_weighted_metrics(files_metrics)
     plot_json = analytics.generate_plotly_figs(weighted_metrics)
     enriched_plot = analytics.enrich_description(plot_json)
+
     return enriched_plot

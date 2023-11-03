@@ -6,34 +6,12 @@ from fastapi.responses import JSONResponse
 from . import config, io_operations, models
 
 
-def join_files_metrics(
-    user_email: str, project_name: str
-) -> models.FileJoinedOnMetrics:
-    # get all files from user="test", project="maintainability"
-    files = io_operations.get_files(user_email, project_name)
-    if not files.data:
-        return JSONResponse(
-            status_code=404,
-            content={
-                "detail": f"user_email={user_email}, project_name={project_name} combination not found"
-            },
-        )
-    # get all metrics associated with files
-    file_dict = {file["file_id"]: file for file in files.data}
-    metrics = io_operations.get_metrics(list(file_dict))
-    if not metrics.data:
-        return JSONResponse(
-            status_code=404,
-            content={
-                "detail": f"No metrics found for user_email={user_email}, project_name={project_name} combination"
-            },
-        )
-    # join tables
-    for metric in metrics.data:
-        if metric["file_id"] in file_dict:
-            metric.update(file_dict[metric["file_id"]])
-
-    return metrics.data
+# TODO these types should be hard defined (in analytics.py probably)
+def join_files_metrics(metrics, files) -> models.FileJoinedOnMetrics:
+    for metric in metrics:
+        if metric["file_id"] in files:
+            metric.update(files[metric["file_id"]])
+    return metrics
 
 
 def calculate_weighted_metrics(files_metrics: models.FileJoinedOnMetrics):
@@ -90,8 +68,10 @@ def generate_plotly_figs(data):
         # Create the figure
         fig = go.Figure()
 
-        x_values = list(metric_data.keys())
-        y_values = list(metric_data.values())
+        # Sort the dates in metric_data before plotting
+        sorted_dates = sorted(metric_data.keys())
+        x_values = sorted_dates
+        y_values = [metric_data[date] for date in sorted_dates]
 
         # Add trace for the metric
         fig.add_trace(

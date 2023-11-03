@@ -8,14 +8,6 @@ from supabase import Client, create_client
 from . import models
 
 
-def connect_to_supabase() -> Client:
-    """Connect to Supabase database"""
-    return create_client(
-        os.environ.get("SUPABASE_URL"),
-        os.environ.get("SUPABASE_KEY"),
-    )
-
-
 def connect_to_supabase_table(table_name: str) -> Client:
     return create_client(
         os.environ.get("SUPABASE_URL"),
@@ -56,17 +48,19 @@ def get_user_projects(user_email: str) -> List[Dict]:
 
 def get_files(user_email: str, project_name: str):
     table = connect_to_supabase_table("files")
-    return (
+    files = (
         table.select("*")
         .eq("user_email", user_email)
         .eq("project_name", project_name)
         .execute()
     )
+    return {file["file_id"]: file for file in files.data}
 
 
 def get_metrics(file_ids: List[str]):
     table = connect_to_supabase_table("metrics")
-    return table.select("*").in_("file_id", file_ids).execute()
+    metrics = table.select("*").in_("file_id", file_ids).execute()
+    return metrics.data
 
 
 def write_user(email: str, hashed_password: str, role: str = "user") -> Tuple:

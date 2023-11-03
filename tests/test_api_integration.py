@@ -68,6 +68,7 @@ def test_insert_file(test_client):
         "loc": 100,
         "extension": "",
     }
+    print("HELOOOOOOOOOOOOOOO")
     response = test_client.post("/insert_file", headers=headers, json=payload)
     assert response.status_code == 200
     assert isinstance(response.json(), dict)

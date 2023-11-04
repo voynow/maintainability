@@ -32,27 +32,28 @@ def join_files_metrics(metrics: list[models.Metric], files: List[models.File]):
     return [FileMetric(**data) for data in joined_data]
 
 
-def calculate_weighted_metrics(file_metrics: List[FileMetric]):
-    # group metrics by metric name
-    groupby_metrics = {}
+def group_metrics(file_metrics: List[FileMetric]):
+    grouped_metrics = {}
     for file_metric in file_metrics:
-        if file_metric.metric not in groupby_metrics:
-            groupby_metrics[file_metric.metric] = []
-        groupby_metrics[file_metric.metric].append(file_metric)
+        if file_metric.metric not in grouped_metrics:
+            grouped_metrics[file_metric.metric] = []
+        grouped_metrics[file_metric.metric].append(file_metric)
 
-    # groupby date within each metric group
-    for metric_name, file_metrics in groupby_metrics.items():
+    for metric_name, file_metrics_group in grouped_metrics.items():
         dates = {}
-        for file_metric in file_metrics:
+        for file_metric in file_metrics_group:
             date = file_metric.timestamp.date()
             if date not in dates:
                 dates[date] = []
             dates[date].append(file_metric)
-        groupby_metrics[metric_name] = dates
+        grouped_metrics[metric_name] = dates
+    return grouped_metrics
 
+
+def calculate_weighted_metrics(grouped_metrics):
     # aggregate scores weighted by loc
     weighted_metrics = {}
-    for metric, dates in groupby_metrics.items():
+    for metric, dates in grouped_metrics.items():
         weighted_metrics[metric] = {}
         for date, file_metrics in dates.items():
             total_loc = sum(file_metric.loc for file_metric in file_metrics)

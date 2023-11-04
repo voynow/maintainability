@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import uuid
+from datetime import datetime
 from functools import partial
 from pathlib import Path
 from typing import Dict, Optional
@@ -135,6 +136,7 @@ def cli_runner(paths, base_url, api_key):
     logger.info(f"Starting extraction for {user_email}:{project_name}")
     for filepath, content in filtered_repo.items():
         file_id = str(uuid.uuid4())
+        timestamp = datetime.now().isoformat()
 
         # insert file into file table
         call_api_wrapper(
@@ -150,6 +152,7 @@ def cli_runner(paths, base_url, api_key):
                 "loc": len(content.splitlines()),
                 "extension": filepath.split(".")[-1] if "." in filepath else "",
                 "content": content,
+                "timestamp": timestamp,
             },
             api_key=api_key,
         )

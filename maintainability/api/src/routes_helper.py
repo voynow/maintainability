@@ -97,7 +97,8 @@ def get_metrics(user_email: str, project_name: str):
     metrics = batch_process(list(files), io_operations.get_metrics)
 
     files_metrics = analytics.join_files_metrics(metrics, files)
-    weighted_metrics = analytics.calculate_weighted_metrics(files_metrics)
+    grouped_metrics = analytics.group_metrics(files_metrics)
+    weighted_metrics = analytics.calculate_weighted_metrics(grouped_metrics)
     plot_json = analytics.generate_plotly_figs(weighted_metrics)
     enriched_plot = analytics.enrich_description(plot_json)
 

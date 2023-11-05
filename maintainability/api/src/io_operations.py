@@ -47,7 +47,7 @@ def get_user_projects(user_email: str) -> List[Dict]:
     return [{"project_name": name} for name in unique_projects]
 
 
-def get_files(user_email: str, project_name: str):
+def get_files(user_email: str, project_name: str) -> Dict[UUID, models.File]:
     table = connect_to_supabase_table("files")
     rows = (
         table.select("*")

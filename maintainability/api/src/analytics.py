@@ -1,7 +1,7 @@
 from datetime import datetime
 import plotly.graph_objects as go
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict, Tuple
 from uuid import UUID
 
 from . import models, config
@@ -24,132 +24,166 @@ class FileMetric(BaseModel):
     reasoning: str
 
 
-def join_files_metrics(metrics: list[models.Metric], files: List[models.File]):
+class KeyFile(BaseModel):
+    file_path: str
+    contrib_percent: float
+    score: int
+
+
+class GroupMetrics(BaseModel):
+    score: float
+    key_files: List[KeyFile]
+
+
+GroupedMetrics = Dict[str, Dict[datetime, List[FileMetric]]]
+WeightedMetrics = Dict[str, Dict[datetime, GroupMetrics]]
+
+
+def join_files_metrics(
+    metrics: list[models.Metric], files: Dict[UUID, models.File]
+) -> list[FileMetric]:
     joined_data = []
     for metric in metrics:
-        file = files.get(metric.file_id)
+        file = files[metric.file_id]
         joined_data.append({**metric.model_dump(), **file.model_dump()})
     return [FileMetric(**data) for data in joined_data]
 
 
-def calculate_weighted_metrics(file_metrics: List[FileMetric]):
-    # group metrics by metric name
-    groupby_metrics = {}
+def group_metrics(file_metrics: List[FileMetric]) -> GroupedMetrics:
+    grouped_metrics = {}
     for file_metric in file_metrics:
-        if file_metric.metric not in groupby_metrics:
-            groupby_metrics[file_metric.metric] = []
-        groupby_metrics[file_metric.metric].append(file_metric)
+        if file_metric.metric not in grouped_metrics:
+            grouped_metrics[file_metric.metric] = []
+        grouped_metrics[file_metric.metric].append(file_metric)
 
-    # groupby date within each metric group
-    for metric_name, file_metrics in groupby_metrics.items():
+    for metric_name, file_metrics_group in grouped_metrics.items():
         dates = {}
-        for file_metric in file_metrics:
+        for file_metric in file_metrics_group:
             date = file_metric.timestamp.date()
             if date not in dates:
                 dates[date] = []
             dates[date].append(file_metric)
-        groupby_metrics[metric_name] = dates
+        grouped_metrics[metric_name] = dates
+    return grouped_metrics
 
-    # aggregate scores weighted by loc
-    weighted_metrics = {}
-    for metric, dates in groupby_metrics.items():
-        weighted_metrics[metric] = {}
-        for date, file_metrics in dates.items():
-            total_loc = sum(file_metric.loc for file_metric in file_metrics)
-            weighted_score = sum(
-                file_metric.score * (file_metric.loc / total_loc)
-                for file_metric in file_metrics
+
+def group_calc_helper(file_metrics: List[FileMetric]) -> GroupMetrics:
+    total_loc = sum(file_metric.loc for file_metric in file_metrics)
+    weighted_score = 0
+    key_files = []
+    for file_metric in file_metrics:
+        contrib_percent = file_metric.loc / total_loc
+        weighted_score += file_metric.score * contrib_percent
+        key_files.append(
+            KeyFile(
+                file_path=file_metric.file_path,
+                contrib_percent=contrib_percent,
+                score=file_metric.score,
             )
-            weighted_metrics[metric][date] = weighted_score
+        )
+
+    key_files = sorted(key_files, key=lambda x: x.contrib_percent, reverse=True)[:5]
+    return {"score": weighted_score, "key_files": key_files}
+
+
+def calculate_weighted_metrics(grouped_metrics: GroupedMetrics) -> WeightedMetrics:
+    """Orchestrate the calculation of weighted metrics for each metric type."""
+    weighted_metrics = {}
+    for metric, dates in grouped_metrics.items():
+        metric_name = metric.replace("_", " ").capitalize()
+        weighted_metrics[metric_name] = {}
+        for date, file_metrics in dates.items():
+            weighted_metrics[metric_name][date] = group_calc_helper(file_metrics)
 
     return weighted_metrics
 
 
-def generate_plotly_figs(data):
+def generate_plotly_layout(fig: go.Figure, title: str) -> go.Figure:
+    fig.update_layout(
+        template="plotly_dark",
+        title={
+            "text": title,
+            "y": 0.95,
+            "x": 0.5,
+            "xanchor": "center",
+            "yanchor": "top",
+            "font": dict(size=24, color="#FFFFFF"),
+        },
+        xaxis=dict(
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor="white",
+            linewidth=2,
+            ticks="outside",
+            tickfont=dict(
+                family="Arial, Helvetica, sans-serif", size=14, color="white"
+            ),
+        ),
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            showticklabels=True,
+            tickfont=dict(
+                family="Arial, Helvetica, sans-serif", size=14, color="white"
+            ),
+        ),
+        autosize=False,
+        margin=dict(
+            autoexpand=False,
+            l=50,
+            r=50,
+            t=100,
+        ),
+        showlegend=True,
+        plot_bgcolor="#2a2a2a",
+        paper_bgcolor="#2a2a2a",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    return fig
+
+
+def create_hover_templates(scores: Dict[datetime, GroupMetrics]) -> List[str]:
+    return [
+        f"<b>({date}) Score: {scores[date]['score']:.2f}</b><br>"
+        + "<br>".join(
+            [
+                f"{file.file_path}: {file.score} ({file.contrib_percent:.2f}%)"
+                for file in scores[date]["key_files"]
+            ]
+        )
+        for date in sorted(scores.keys())
+    ]
+
+
+def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
     """
     Generate a list of individual Plotly figures based on the given metrics data.
     """
-    # Define a polished color palette
     color_palette = ["#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD"]
-
     figs_json = []
 
-    # Iterate through metrics in the data
-    for idx, (metric_name, metric_data) in enumerate(data.items()):
-        title = metric_name.replace("_", " ").capitalize()
-
-        # Create the figure
+    for idx, (metric, scores) in enumerate(weighted_metrics.items()):
         fig = go.Figure()
-
-        # Sort the dates in metric_data before plotting
-        sorted_dates = sorted(metric_data.keys())
-        x_values = sorted_dates
-        y_values = [metric_data[date] for date in sorted_dates]
-
-        # Add trace for the metric
         fig.add_trace(
             go.Scatter(
-                x=x_values,
-                y=y_values,
+                x=sorted(scores.keys()),
+                y=[scores[date]["score"] for date in sorted(scores.keys())],
                 mode="lines+markers",
-                name=title,
+                name=metric,
                 marker=dict(size=10, color=color_palette[idx % len(color_palette)]),
                 line=dict(width=3, color=color_palette[idx % len(color_palette)]),
+                hovertemplate=create_hover_templates(scores),
             )
         )
-
-        # Repeating layout code. Consider centralizing if getting more complex.
-        fig.update_layout(
-            template="plotly_dark",
-            title={
-                "text": title,
-                "y": 0.95,
-                "x": 0.5,
-                "xanchor": "center",
-                "yanchor": "top",
-                "font": dict(size=24, color="#FFFFFF"),
-            },
-            xaxis=dict(
-                showline=True,
-                showgrid=False,
-                showticklabels=True,
-                linecolor="white",
-                linewidth=2,
-                ticks="outside",
-                tickfont=dict(
-                    family="Arial, Helvetica, sans-serif", size=14, color="white"
-                ),
-            ),
-            yaxis=dict(
-                showgrid=False,
-                zeroline=False,
-                showline=False,
-                showticklabels=True,
-                tickfont=dict(
-                    family="Arial, Helvetica, sans-serif", size=14, color="white"
-                ),
-            ),
-            autosize=False,
-            margin=dict(
-                autoexpand=False,
-                l=50,
-                r=50,
-                t=100,
-            ),
-            showlegend=True,
-            plot_bgcolor="#2a2a2a",
-            paper_bgcolor="#2a2a2a",
-            legend=dict(
-                orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
-            ),
-        )
-
+        fig = generate_plotly_layout(fig, metric)
         figs_json.append(fig.to_dict())
 
     return figs_json
 
 
-def enrich_description(plot_json):
+def enrich_description(plot_json: List[Dict]) -> List[Dict]:
     """Add a description to each Plotly figure based on the metric name"""
     for fig in plot_json:
         metric_name = fig["data"][0]["name"].lower().replace(" ", "_")

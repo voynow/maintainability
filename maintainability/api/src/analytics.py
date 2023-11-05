@@ -90,11 +90,71 @@ def calculate_weighted_metrics(grouped_metrics: GroupedMetrics) -> WeightedMetri
     """Orchestrate the calculation of weighted metrics for each metric type."""
     weighted_metrics = {}
     for metric, dates in grouped_metrics.items():
-        weighted_metrics[metric] = {}
+        metric_name = metric.replace("_", " ").capitalize()
+        weighted_metrics[metric_name] = {}
         for date, file_metrics in dates.items():
-            weighted_metrics[metric][date] = group_calc_helper(file_metrics)
+            weighted_metrics[metric_name][date] = group_calc_helper(file_metrics)
 
     return weighted_metrics
+
+
+def generate_plotly_layout(fig: go.Figure, title: str) -> go.Figure:
+    fig.update_layout(
+        template="plotly_dark",
+        title={
+            "text": title,
+            "y": 0.95,
+            "x": 0.5,
+            "xanchor": "center",
+            "yanchor": "top",
+            "font": dict(size=24, color="#FFFFFF"),
+        },
+        xaxis=dict(
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor="white",
+            linewidth=2,
+            ticks="outside",
+            tickfont=dict(
+                family="Arial, Helvetica, sans-serif", size=14, color="white"
+            ),
+        ),
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            showticklabels=True,
+            tickfont=dict(
+                family="Arial, Helvetica, sans-serif", size=14, color="white"
+            ),
+        ),
+        autosize=False,
+        margin=dict(
+            autoexpand=False,
+            l=50,
+            r=50,
+            t=100,
+        ),
+        showlegend=True,
+        plot_bgcolor="#2a2a2a",
+        paper_bgcolor="#2a2a2a",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    return fig
+
+
+def create_hover_templates(scores: Dict[datetime, GroupMetrics]) -> List[str]:
+    return [
+        f"<b>({date}) Score: {scores[date]['score']:.2f}</b><br>"
+        + "<br>".join(
+            [
+                f"{file.file_path}: {file.score} ({file.contrib_percent:.2f}%)"
+                for file in scores[date]["key_files"]
+            ]
+        )
+        for date in sorted(scores.keys())
+    ]
 
 
 def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
@@ -105,80 +165,19 @@ def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
     figs_json = []
 
     for idx, (metric, scores) in enumerate(weighted_metrics.items()):
-        title = metric.replace("_", " ").capitalize()
         fig = go.Figure()
-        sorted_dates = sorted(scores.keys())
-        print(scores[sorted_dates[0]])
-        x_values = sorted_dates
-        hover_templates = [
-            f"<b>({date}) Score: {scores[date]['score']:.2f}</b><br>"
-            + "<br>".join(
-                [
-                    f"{file.file_path}: {file.score} ({file.contrib_percent:.2f}%)"
-                    for file in scores[date]["key_files"]
-                ]
-            )
-            for date in sorted_dates
-        ]
-
         fig.add_trace(
             go.Scatter(
-                x=x_values,
-                y=[scores[date]["score"] for date in sorted_dates],
+                x=sorted(scores.keys()),
+                y=[scores[date]["score"] for date in sorted(scores.keys())],
                 mode="lines+markers",
-                name=title,
+                name=metric,
                 marker=dict(size=10, color=color_palette[idx % len(color_palette)]),
                 line=dict(width=3, color=color_palette[idx % len(color_palette)]),
-                hovertemplate=hover_templates,
+                hovertemplate=create_hover_templates(scores),
             )
         )
-
-        # Repeating layout code. Consider centralizing if getting more complex.
-        fig.update_layout(
-            template="plotly_dark",
-            title={
-                "text": title,
-                "y": 0.95,
-                "x": 0.5,
-                "xanchor": "center",
-                "yanchor": "top",
-                "font": dict(size=24, color="#FFFFFF"),
-            },
-            xaxis=dict(
-                showline=True,
-                showgrid=False,
-                showticklabels=True,
-                linecolor="white",
-                linewidth=2,
-                ticks="outside",
-                tickfont=dict(
-                    family="Arial, Helvetica, sans-serif", size=14, color="white"
-                ),
-            ),
-            yaxis=dict(
-                showgrid=False,
-                zeroline=False,
-                showline=False,
-                showticklabels=True,
-                tickfont=dict(
-                    family="Arial, Helvetica, sans-serif", size=14, color="white"
-                ),
-            ),
-            autosize=False,
-            margin=dict(
-                autoexpand=False,
-                l=50,
-                r=50,
-                t=100,
-            ),
-            showlegend=True,
-            plot_bgcolor="#2a2a2a",
-            paper_bgcolor="#2a2a2a",
-            legend=dict(
-                orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
-            ),
-        )
-
+        fig = generate_plotly_layout(fig, metric)
         figs_json.append(fig.to_dict())
 
     return figs_json

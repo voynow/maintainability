@@ -24,16 +24,27 @@ class FileMetric(BaseModel):
     reasoning: str
 
 
+class KeyFile(BaseModel):
+    file_path: str
+    contrib_percent: float
+    score: int
+
+
+class GroupMetrics(BaseModel):
+    score: float
+    key_files: List[KeyFile]
+
+
 GroupedMetrics = Dict[str, Dict[datetime, List[FileMetric]]]
-WeightedMetrics = Dict[str, Dict[datetime, Tuple[float, List[Tuple[str, float]]]]]
+WeightedMetrics = Dict[str, Dict[datetime, GroupMetrics]]
 
 
 def join_files_metrics(
-    metrics: list[models.Metric], files: List[models.File]
+    metrics: list[models.Metric], files: Dict[UUID, models.File]
 ) -> list[FileMetric]:
     joined_data = []
     for metric in metrics:
-        file = files.get(metric.file_id)
+        file = files[metric.file_id]
         joined_data.append({**metric.model_dump(), **file.model_dump()})
     return [FileMetric(**data) for data in joined_data]
 
@@ -56,21 +67,32 @@ def group_metrics(file_metrics: List[FileMetric]) -> GroupedMetrics:
     return grouped_metrics
 
 
+def group_calc_helper(file_metrics: List[FileMetric]) -> GroupMetrics:
+    total_loc = sum(file_metric.loc for file_metric in file_metrics)
+    weighted_score = 0
+    key_files = []
+    for file_metric in file_metrics:
+        contrib_percent = file_metric.loc / total_loc
+        weighted_score += file_metric.score * contrib_percent
+        key_files.append(
+            KeyFile(
+                file_path=file_metric.file_path,
+                contrib_percent=contrib_percent,
+                score=file_metric.score,
+            )
+        )
+
+    key_files = sorted(key_files, key=lambda x: x.contrib_percent, reverse=True)[:5]
+    return {"score": weighted_score, "key_files": key_files}
+
+
 def calculate_weighted_metrics(grouped_metrics: GroupedMetrics) -> WeightedMetrics:
+    """Orchestrate the calculation of weighted metrics for each metric type."""
     weighted_metrics = {}
     for metric, dates in grouped_metrics.items():
         weighted_metrics[metric] = {}
         for date, file_metrics in dates.items():
-            total_loc = sum(file_metric.loc for file_metric in file_metrics)
-            weighted_score = 0
-            key_files = []
-            for file_metric in file_metrics:
-                contribution_percentage = file_metric.loc / total_loc
-                weighted_score += file_metric.score * contribution_percentage
-                key_files.append((file_metric.file_path, contribution_percentage))
-
-            key_files = sorted(key_files, key=lambda x: x[1], reverse=True)[:5]
-            weighted_metrics[metric][date] = (weighted_score, key_files)
+            weighted_metrics[metric][date] = group_calc_helper(file_metrics)
 
     return weighted_metrics
 
@@ -86,15 +108,14 @@ def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
         title = metric.replace("_", " ").capitalize()
         fig = go.Figure()
         sorted_dates = sorted(scores.keys())
+        print(scores[sorted_dates[0]])
         x_values = sorted_dates
-        y_values = [scores[date][0] for date in sorted_dates]
         hover_templates = [
-            f"<b>({date}) Score: {scores[date][0]:.2f}</b><br>"
-            f"Contribution Percentages:<br>"
+            f"<b>({date}) Score: {scores[date]['score']:.2f}</b><br>"
             + "<br>".join(
                 [
-                    f"{path}: {contribution:.2f}%"
-                    for path, contribution in scores[date][1]
+                    f"{file.file_path}: {file.score} ({file.contrib_percent:.2f}%)"
+                    for file in scores[date]["key_files"]
                 ]
             )
             for date in sorted_dates
@@ -103,7 +124,7 @@ def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
         fig.add_trace(
             go.Scatter(
                 x=x_values,
-                y=y_values,
+                y=[scores[date]["score"] for date in sorted_dates],
                 mode="lines+markers",
                 name=title,
                 marker=dict(size=10, color=color_palette[idx % len(color_palette)]),

@@ -1,7 +1,7 @@
 from datetime import datetime
 import plotly.graph_objects as go
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, RootModel
+from typing import List, Dict
 from uuid import UUID
 
 from . import models, config
@@ -24,7 +24,13 @@ class FileMetric(BaseModel):
     reasoning: str
 
 
-def join_files_metrics(metrics: list[models.Metric], files: List[models.File]):
+GroupedMetric = Dict[str, Dict[datetime, List[FileMetric]]]
+WeightedMetrics = Dict[str, Dict[datetime, float]]
+
+
+def join_files_metrics(
+    metrics: list[models.Metric], files: List[models.File]
+) -> list[FileMetric]:
     joined_data = []
     for metric in metrics:
         file = files.get(metric.file_id)
@@ -32,7 +38,7 @@ def join_files_metrics(metrics: list[models.Metric], files: List[models.File]):
     return [FileMetric(**data) for data in joined_data]
 
 
-def group_metrics(file_metrics: List[FileMetric]):
+def group_metrics(file_metrics: List[FileMetric]) -> List[GroupedMetric]:
     grouped_metrics = {}
     for file_metric in file_metrics:
         if file_metric.metric not in grouped_metrics:
@@ -50,7 +56,7 @@ def group_metrics(file_metrics: List[FileMetric]):
     return grouped_metrics
 
 
-def calculate_weighted_metrics(grouped_metrics):
+def calculate_weighted_metrics(grouped_metrics: List[GroupedMetric]) -> WeightedMetrics:
     # aggregate scores weighted by loc
     weighted_metrics = {}
     for metric, dates in grouped_metrics.items():
@@ -66,7 +72,7 @@ def calculate_weighted_metrics(grouped_metrics):
     return weighted_metrics
 
 
-def generate_plotly_figs(data):
+def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
     """
     Generate a list of individual Plotly figures based on the given metrics data.
     """
@@ -76,16 +82,16 @@ def generate_plotly_figs(data):
     figs_json = []
 
     # Iterate through metrics in the data
-    for idx, (metric_name, metric_data) in enumerate(data.items()):
-        title = metric_name.replace("_", " ").capitalize()
+    for idx, (metric, scores) in enumerate(weighted_metrics.items()):
+        title = metric.replace("_", " ").capitalize()
 
         # Create the figure
         fig = go.Figure()
 
         # Sort the dates in metric_data before plotting
-        sorted_dates = sorted(metric_data.keys())
+        sorted_dates = sorted(scores.keys())
         x_values = sorted_dates
-        y_values = [metric_data[date] for date in sorted_dates]
+        y_values = [scores[date] for date in sorted_dates]
 
         # Add trace for the metric
         fig.add_trace(
@@ -150,7 +156,7 @@ def generate_plotly_figs(data):
     return figs_json
 
 
-def enrich_description(plot_json):
+def enrich_description(plot_json: List[Dict]) -> List[Dict]:
     """Add a description to each Plotly figure based on the metric name"""
     for fig in plot_json:
         metric_name = fig["data"][0]["name"].lower().replace(" ", "_")

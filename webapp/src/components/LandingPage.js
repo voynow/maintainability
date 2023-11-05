@@ -4,28 +4,27 @@ import { useNavigate } from 'react-router-dom';
 const LandingPage = () => {
     const navigate = useNavigate();
 
-    const handleNavigate = (path) => {
-        navigate(path);
-    };
-
     return (
         <main className="text-gray-700">
             <section className="flex flex-col items-center justify-center min-h-screen p-4">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h1 className="text-6xl font-bold mb-6">Maintainability</h1>
-                    <p className="text-xl mb-8">
-                        Streamline your projects and enhance your productivity. Discover the new age of project management with Maintainability.
+                    <h1 className="text-8xl mb-2 font-bold">
+                        Maint<span className="text-red-500">AI</span>nability
+                    </h1>
+                    <h1 className="text-6xl font-bold text-blue-300">Supercharge Your Codebase</h1>
+                    <p className='mt-4 mb-4 text-xl'>
+                        Leveraging advanced Language Models, our platform offers a nuanced code understanding that goes beyond traditional systems.
                     </p>
                     <div className="flex justify-center gap-4">
                         <button
-                            onClick={() => handleNavigate('/signup')}
-                            className="px-8 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
+                            onClick={() => navigate('/signup')}
+                            className="px-8 py-3 border-2 border-gray-300 text-lg text-lg font-semibold rounded-lg hover:bg-gray-100 transition duration-300"
                         >
                             Get Started
                         </button>
                         <button
-                            onClick={() => handleNavigate('/login')}
-                            className="px-8 py-3 border border-blue-600 text-blue-600 text-lg font-semibold rounded-lg hover:bg-blue-50 transition duration-300"
+                            onClick={() => navigate('/login')}
+                            className="px-8 py-3 border-2 border-gray-300 text-lg text-lg font-semibold rounded-lg hover:bg-gray-100 transition duration-300"
                         >
                             Log In
                         </button>
@@ -37,7 +36,7 @@ const LandingPage = () => {
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>
             </section>
-        </main>
+        </main >
     );
 };
 

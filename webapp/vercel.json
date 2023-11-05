@@ -2,7 +2,14 @@
     "version": 2,
     "routes": [
         {
-            "src": "^/static/(.*)",
+            "src": "/landing_page.png",
+            "dest": "/landing_page.png",
+            "headers": {
+                "cache-control": "public, max-age=0, must-revalidate"
+            }
+        },
+        {
+            "src": "/static/(.*)",
             "dest": "/static/$1"
         },
         {

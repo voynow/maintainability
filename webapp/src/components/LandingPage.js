@@ -13,7 +13,7 @@ const LandingPage = () => {
                     </h1>
                     <h1 className="text-6xl font-bold text-blue-300">Supercharge Your Codebase</h1>
                     <p className='mt-4 mb-4 text-xl'>
-                        Leveraging advanced Language Models, our platform offers a nuanced code understanding that goes beyond traditional systems.
+                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional systems.
                     </p>
                     <div className="flex justify-center gap-4">
                         <button

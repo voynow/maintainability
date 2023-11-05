@@ -30,18 +30,18 @@ function Login() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mb-2 p-1 border rounded w-64 bg-transparent"
+                className="mb-4 p-2 border-2 rounded w-64 bg-transparent"
             />
             <input
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mb-4 p-1 border rounded w-64 bg-transparent"
+                className="mb-4 p-2 border-2 rounded w-64 bg-transparent"
             />
             <button
                 onClick={signInWithEmail}
-                className="px-6 py-2 border rounded text-xl font-medium hover:bg-gray-200 transition duration-300 w-64"
+                className="px-6 py-2 border-2 rounded text-xl font-medium hover:bg-gray-200 transition duration-300 w-64"
             >
                 Sign In
             </button>

@@ -13,7 +13,7 @@ const LandingPage = () => {
                     </h1>
                     <h1 className="text-6xl font-bold text-blue-300">Supercharge Your Codebase</h1>
                     <p className='mt-4 mb-4 text-xl'>
-                        Leveraging advanced Language Models, our platform offers a nuanced code understanding that goes beyond traditional systems.
+                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional systems.
                     </p>
                     <div className="flex justify-center gap-4">
                         <button
@@ -31,7 +31,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 py-8 -mt-60">
+            <section className="w-full flex justify-center px-4 py-8 -mt-40">
                 <div className="shadow-2xl rounded-lg overflow-hidden">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>

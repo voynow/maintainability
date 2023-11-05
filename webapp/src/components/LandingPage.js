@@ -31,7 +31,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 py-8 -mt-60">
+            <section className="w-full flex justify-center px-4 py-8 -mt-40">
                 <div className="shadow-2xl rounded-lg overflow-hidden">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>

@@ -11,9 +11,9 @@ const LandingPage = () => {
                     <h1 className="text-8xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
                     </h1>
-                    <h1 className="text-6xl font-bold text-blue-300">Supercharge Your Codebase</h1>
+                    <h1 className="text-6xl font-bold text-blue-300">The Future of Code Analysis</h1>
                     <p className='mt-4 mb-4 text-xl'>
-                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional systems.
+                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional static code analysis systems.
                     </p>
                     <div className="flex justify-center gap-4">
                         <button
@@ -31,12 +31,28 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 py-8 -mt-40">
-                <div className="shadow-2xl rounded-lg overflow-hidden">
+            <section className="w-full flex justify-center px-4 pt-8 -mt-40 relative pb-32">
+                <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
+                    <div className="absolute bottom-0 translate-y-1/2 transform -translate-x-1/2 left-1/2 bg-gray-100 text-gray-700 px-8 py-4 rounded-lg shadow-lg w-full max-w-lg text-left">
+                        <h3 className="text-xl font-bold">Example Insights</h3>
+                        <p className="text-md mt-1">
+                            Out of the box your projects will be evaluated against:
+                        </p>
+                        <ul className="list-disc pl-6 mt-1 text-md">
+                            <li>Intuitive design</li>
+                            <li>Functional cohesion</li>
+                            <li>And more</li>
+                        </ul>
+                    </div>
                 </div>
             </section>
-        </main >
+            <footer className="text-center p-4 text-gray-800">
+                <p className="text-sm">
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved. Contact: voynow99@gmail.com, @jamievoynow on X.com
+                </p>
+            </footer>
+        </main>
     );
 };
 

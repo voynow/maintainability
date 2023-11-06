@@ -31,9 +31,20 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 py-8 -mt-40">
-                <div className="shadow-2xl rounded-lg overflow-hidden">
+            <section className="w-full flex justify-center px-4 pt-8 -mt-40 relative">
+                <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
+                    <div className="absolute bottom-0 translate-y-1/2 transform -translate-x-1/2 left-1/2 bg-gray-100 text-gray-700 px-8 py-4 rounded-lg shadow-lg w-full max-w-lg text-left">
+                        <h3 className="text-xl font-bold">Example Insights</h3>
+                        <p className="text-md mt-1">
+                            Out of the box your projects will be evaluated against:
+                        </p>
+                        <ul className="list-disc pl-6 mt-1 text-md">
+                            <li>Intuitive design</li>
+                            <li>Functional cohesion</li>
+                            <li>And more</li>
+                        </ul>
+                    </div>
                 </div>
             </section>
         </main >

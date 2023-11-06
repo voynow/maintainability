@@ -11,9 +11,9 @@ const LandingPage = () => {
                     <h1 className="text-8xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
                     </h1>
-                    <h1 className="text-6xl font-bold text-blue-300">Supercharge Your Codebase</h1>
+                    <h1 className="text-6xl font-bold text-blue-300">The Future of Code Analysis</h1>
                     <p className='mt-4 mb-4 text-xl'>
-                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional systems.
+                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional static code analysis systems.
                     </p>
                     <div className="flex justify-center gap-4">
                         <button

@@ -31,7 +31,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 pt-8 -mt-40 relative">
+            <section className="w-full flex justify-center px-4 pt-8 -mt-40 relative pb-32">
                 <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                     <div className="absolute bottom-0 translate-y-1/2 transform -translate-x-1/2 left-1/2 bg-gray-100 text-gray-700 px-8 py-4 rounded-lg shadow-lg w-full max-w-lg text-left">
@@ -47,7 +47,12 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-        </main >
+            <footer className="text-center p-4 text-gray-800">
+                <p className="text-sm">
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved. Contact: voynow99@gmail.com, @jamievoynow on X.com
+                </p>
+            </footer>
+        </main>
     );
 };
 

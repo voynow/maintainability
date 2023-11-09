@@ -5,7 +5,6 @@ import { useAppContext } from '../AppContext';
 import Profile from './Profile';
 import api from '../axiosConfig';
 
-
 const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
     const [projects, setProjects] = useState([]);
@@ -44,20 +43,26 @@ const Header = () => {
                         Maintainability
                     </Typography>
 
-                    <FormControl variant="outlined" size="small" sx={{ minWidth: 120, marginRight: 2 }}>
-                        <InputLabel id="project-select-label">Project</InputLabel>
-                        <Select
-                            labelId="project-select-label"
-                            id="project-select"
-                            value={selectedProject || ''}
-                            onChange={(e) => setSelectedProject(e.target.value)}
-                            label="Project"
-                        >
-                            {projects.map((project, index) => (
-                                <MenuItem key={index} value={project.project_name}>{project.project_name}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {projects.length ? (
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, marginRight: 2 }}>
+                            <InputLabel id="project-select-label">Project</InputLabel>
+                            <Select
+                                labelId="project-select-label"
+                                id="project-select"
+                                value={selectedProject || ''}
+                                onChange={(e) => setSelectedProject(e.target.value)}
+                                label="Project"
+                            >
+                                {projects.map((project, index) => (
+                                    <MenuItem key={index} value={project.project_name}>{project.project_name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    ) : (
+                        <Typography variant="body1" sx={{ marginRight: 2, color: '#aaaaaa' }}>
+                            No projects found
+                        </Typography>
+                    )}
 
                     <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
                         <AccountCircleIcon sx={{ marginRight: '6px', fontSize: '35x', color: '#CD5C5C' }} />

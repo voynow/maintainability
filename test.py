@@ -1,11 +1,11 @@
+import os
+import time
 import requests
 import base64
-import json
-import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
-
 
 EXTENSIONS = [
     ".py",
@@ -31,44 +31,56 @@ EXTENSIONS = [
 ]
 
 
-def extract_repo_from_github(user, repo, branch="main"):
-    """
-    Fetch the contents of a GitHub repository, filtered by file extension, with authentication.
-
-    :param user: Username of the repository owner.
-    :param repo: Repository name.
-    :param branch: Branch name, default is 'main'.
-    :param extensions: List of file extensions to include (e.g., ['.py', '.md']).
-    :param token: Personal access token for GitHub authentication.
-    :return: Dictionary with file paths as keys and their content as values.
-    """
-
+def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
+    start_time = time.perf_counter()
     headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
-    api_url = (
+    tree_api_url = (
         f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
     )
-    response = requests.get(api_url, headers=headers)
-    response.raise_for_status()
 
-    repo_files = {}
-    for file in response.json()["tree"]:
-        valid_extension = file["path"].endswith(tuple(EXTENSIONS))
-        if file["type"] == "blob" and valid_extension:
-            file_url = file["url"]
-            file_response = requests.get(file_url, headers=headers)
-            file_response.raise_for_status()
-            try:
-                file_content = base64.b64decode(file_response.json()["content"])
-                repo_files[file["path"]] = file_content.decode("utf-8")
-            except UnicodeDecodeError:
-                print(f"Could not decode file {file['path']}")
-                repo_files[file["path"]] = None
+    resp = requests.get(tree_api_url, headers=headers)
+    resp.raise_for_status()
 
-    return repo_files
+    file_paths = [
+        f["path"]
+        for f in resp.json().get("tree", [])
+        if f["type"] == "blob" and any(f["path"].endswith(ext) for ext in EXTENSIONS)
+    ]
+
+    elapsed_time = time.perf_counter() - start_time
+    print(f"Fetched repo structure in {elapsed_time:0.4f} seconds")
+    return file_paths
 
 
-repo_files = extract_repo_from_github("voynow", "maintainability")
+def fetch_file_content(file_url: str, headers: dict) -> str:
+    start_time = time.perf_counter()
 
-# write to json file
-with open("repo_files.json", "w") as outfile:
-    json.dump(repo_files, outfile)
+    file_resp = requests.get(file_url, headers=headers)
+    file_resp.raise_for_status()
+    content = base64.b64decode(file_resp.json()["content"]).decode("utf-8")
+
+    elapsed_time = time.perf_counter() - start_time
+    print(f"Fetched file content in {elapsed_time:0.4f} seconds")
+    return content
+
+
+# Example usage of the functions
+if __name__ == "__main__":
+    user = "voynow"
+    repo = "maintainability"
+    branch = "main"
+    headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
+
+    # Fetch the repo structure
+    file_paths = fetch_repo_structure(user, repo, branch)
+
+    # Fetch the content of each file
+    repodata = {}
+    for path in file_paths:
+        file_url = f"https://api.github.com/repos/{user}/{repo}/contents/{path}"
+        file_content = fetch_file_content(file_url, headers)
+        repodata[path] = file_content
+
+    # write the repo to a file
+    with open("repo.json", "w") as f:
+        f.write(json.dumps(repodata))

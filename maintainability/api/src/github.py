@@ -13,6 +13,7 @@ GH_AUTH_TOKEN = os.environ.get("GH_AUTH_TOKEN")
 @router.get("/fetch_repo_structure")
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
     headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
+    print(headers)
     url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
 
     resp = requests.get(url, headers=headers)

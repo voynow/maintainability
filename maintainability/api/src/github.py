@@ -3,7 +3,7 @@ import requests
 import base64
 from fastapi import APIRouter
 
-from . import config
+from . import config, logger
 
 router = APIRouter()
 
@@ -11,11 +11,9 @@ router = APIRouter()
 @router.get("/fetch_repo_structure")
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
     headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
-    tree_api_url = (
-        f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
-    )
+    url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
 
-    resp = requests.get(tree_api_url, headers=headers)
+    resp = requests.get(url, headers=headers)
     resp.raise_for_status()
 
     return [
@@ -26,7 +24,7 @@ def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
     ]
 
 
-@router.get("/fetch_repo_structure")
+@router.get("/fetch_file_content")
 def fetch_file_content(file_url: str) -> str:
     headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
     file_resp = requests.get(file_url, headers=headers)

@@ -24,4 +24,4 @@ API_PID=$!
 sleep 4
 
 # Run tests
-poetry run pytest || exit 1
+poetry run pytest -s || exit 1

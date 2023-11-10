@@ -175,7 +175,7 @@ def test_fetch_repo_structure(test_client):
 
 
 def test_fetch_file_content(test_client):
-    params = {"file_url": "test_url"}
+    params = {"user": "voynow", "repo": "turbo-docs", "path": "README.md"}
     response = test_client.get("/fetch_file_content", params=params)
     assert response.status_code == 200
     assert isinstance(response.json(), str)

@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from . import routes, middleware, logger
+from . import routes, middleware, logger, github
 
 app = FastAPI()
 
@@ -19,6 +19,7 @@ if os.environ.get("SKIP_AUTH_MIDDLEWARE") != "True":
     app.middleware("http")(middleware.mixed_auth_middleware)
 
 app.include_router(routes.router)
+app.include_router(github.router)
 
 
 @app.exception_handler(Exception)

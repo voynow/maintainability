@@ -25,8 +25,9 @@ def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
 
 
 @router.get("/fetch_file_content")
-def fetch_file_content(file_url: str) -> str:
+def fetch_file_content(user: str, repo: str, path: str) -> str:
     headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
+    file_url = f"https://api.github.com/repos/{user}/{repo}/contents/{path}"
     file_resp = requests.get(file_url, headers=headers)
     file_resp.raise_for_status()
     return base64.b64decode(file_resp.json()["content"]).decode("utf-8")

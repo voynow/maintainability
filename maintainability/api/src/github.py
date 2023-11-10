@@ -7,10 +7,12 @@ from . import config, logger
 
 router = APIRouter()
 
+GH_AUTH_TOKEN = os.environ.get("GH_AUTH_TOKEN")
+
 
 @router.get("/fetch_repo_structure")
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
-    headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
+    headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
     url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
 
     resp = requests.get(url, headers=headers)
@@ -26,7 +28,7 @@ def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
 
 @router.get("/fetch_file_content")
 def fetch_file_content(user: str, repo: str, path: str) -> str:
-    headers = {"Authorization": f"token {os.environ.get('GITHUB_AUTH_TOKEN')}"}
+    headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
     file_url = f"https://api.github.com/repos/{user}/{repo}/contents/{path}"
     file_resp = requests.get(file_url, headers=headers)
     file_resp.raise_for_status()

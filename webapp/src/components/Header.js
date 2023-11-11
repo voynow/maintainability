@@ -59,21 +59,21 @@ const Header = () => {
 
     const selectedProjectStyle = {
         fontWeight: 600,
-        fontSize: '18px', // Slightly smaller for a more refined look
+        fontSize: '18px',
         marginRight: '16px',
-        color: '#4A4A4A', // A softer shade of black
+        color: '#4A4A4A',
         cursor: 'pointer',
         '&:hover': {
             textDecoration: 'underline',
-            color: '#333' // Darker on hover for contrast
+            color: '#333'
         }
     };
 
     const projectLabelStyle = {
-        color: '#CEC7C1', // Darkest shade of tan orange
+        color: '#CEC7C1',
         marginRight: '4px',
-        fontSize: '18px', // Smaller size for the label
-        fontWeight: 400, // Lighter weight
+        fontSize: '18px',
+        fontWeight: 400,
     };
 
     const buttonStyle = {

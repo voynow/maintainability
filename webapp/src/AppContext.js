@@ -43,6 +43,8 @@ export const AppProvider = ({ children }) => {
         } else {
             setIsLoggedIn(false);
             setEmail(null);
+            setProjects([]);
+            setSelectedProject(null);
         }
     };
 

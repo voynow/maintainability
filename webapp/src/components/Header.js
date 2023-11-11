@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, ButtonBase, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppContext } from '../AppContext';
 import Profile from './Profile';
 import ProjectsDashboard from './ProjectsDashboard';
 import api from '../axiosConfig';
-
+import { Box } from '@mui/system';
+import Button from '@mui/material/Button';
 
 const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
@@ -52,33 +53,75 @@ const Header = () => {
         };
     }, [email, selectedProject, setSelectedProject]);
 
+    const handleProjectClick = () => {
+        // Logic to open project details or summary
+    };
+
+    const selectedProjectStyle = {
+        fontWeight: 600,
+        fontSize: '18px', // Slightly smaller for a more refined look
+        marginRight: '16px',
+        color: '#4A4A4A', // A softer shade of black
+        cursor: 'pointer',
+        '&:hover': {
+            textDecoration: 'underline',
+            color: '#333' // Darker on hover for contrast
+        }
+    };
+
+    const projectLabelStyle = {
+        color: '#CEC7C1', // Darkest shade of tan orange
+        marginRight: '4px',
+        fontSize: '18px', // Smaller size for the label
+        fontWeight: 400, // Lighter weight
+    };
+
+    const buttonStyle = {
+        margin: '0 10px',
+        padding: '5px 10px',
+        borderRadius: '20px',
+        backgroundColor: '#EDE4DC',
+        '&:hover': {
+            backgroundColor: '#FDF2E9',
+            boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)'
+        },
+        color: '#333',
+        textTransform: 'none'
+    };
 
     return (
         <>
             <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#FDF2E9' }}>
-                <Toolbar>
-                    <Typography variant="h5" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#333' }}>
                         Maintainability
                     </Typography>
 
-                    {projects.length ? (
-                        <IconButton onClick={() => setDashboardOpen(true)} sx={{ marginRight: 2 }}>
-                            <DashboardIcon sx={{ color: '#333333' }} />
-                        </IconButton>
-                    ) : (
-                        <Typography variant="body1" sx={{ marginRight: 2, color: '#aaaaaa' }}>
-                            No projects found
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="caption" sx={projectLabelStyle}>
+                            Current Project:
                         </Typography>
-                    )}
+                        <Typography
+                            variant="subtitle1"
+                            sx={selectedProjectStyle}
+                            onClick={handleProjectClick}
+                            title="Click for project details"
+                        >
+                            {selectedProject || 'No projects found'}
+                        </Typography>
 
-                    <IconButton onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
-                        <AccountCircleIcon sx={{ marginRight: '6px', fontSize: '35px', color: '#CD5C5C' }} />
-                        <Typography variant="body1" sx={{ fontSize: '20px', color: '#333333' }}>
-                            {email}
-                        </Typography>
-                    </IconButton>
+                        <Button sx={buttonStyle} onClick={() => setDashboardOpen(true)}>
+                            <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
+                            My Projects
+                        </Button>
+
+                        <Button sx={buttonStyle} onClick={togglePopup}>
+                            <AccountCircleIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
+                            My Profile
+                        </Button>
+                    </Box>
                 </Toolbar>
-            </AppBar>
+            </AppBar >
 
             <Profile open={popupOpen} onClose={togglePopup} />
             <ProjectsDashboard open={dashboardOpen} onClose={() => setDashboardOpen(false)} />

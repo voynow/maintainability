@@ -8,7 +8,7 @@ import api from '../axiosConfig';
 const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
     const [projects, setProjects] = useState([]);
-    const { selectedProject, setSelectedProject, email } = useAppContext();
+    const { selectedProject, setSelectedProject, email, isFetchingProjects, setIsFetchingProjects } = useAppContext();
     const [error, setError] = useState(null);
 
     const togglePopup = () => {
@@ -17,6 +17,7 @@ const Header = () => {
 
     useEffect(() => {
         const fetchProjects = async () => {
+            setIsFetchingProjects(true);
             try {
                 const response = await api.get("/get_user_projects", {
                     params: { user_email: email },
@@ -29,6 +30,8 @@ const Header = () => {
                 }
             } catch (err) {
                 setError("An error occurred while fetching projects.");
+            } finally {
+                setIsFetchingProjects(false);
             }
         };
 

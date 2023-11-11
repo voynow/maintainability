@@ -5,7 +5,6 @@ import Plot from 'react-plotly.js';
 import { CircularProgress, Typography, IconButton, Tooltip, tooltipClasses } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/material/styles';
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 
 const CustomTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -16,16 +15,23 @@ const CustomTooltip = styled(({ className, ...props }) => (
 });
 
 const Analytics = () => {
-    const { email, selectedProject } = useAppContext();
+    const { email, selectedProject, isFetchingProjects } = useAppContext();
     const [plotData, setPlotData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const fetchMetrics = useCallback(async () => {
         if (!selectedProject) {
-            setIsLoading(false);
-            return;
+            if (isFetchingProjects) {
+                setIsLoading(true);
+                return;
+            } else {
+                setError("No projects found. Please create a project to view analytics.");
+                setIsLoading(false);
+                return;
+            }
         }
+
         try {
             setIsLoading(true);
             const response = await api.get("/get_metrics", {
@@ -40,19 +46,7 @@ const Analytics = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [email, selectedProject]);
-
-    const NoProjectMessage = () => (
-        <div style={{ textAlign: 'center' }}>
-            <SentimentVeryDissatisfiedIcon style={{ fontSize: 80, color: '#aaaaaa' }} />
-            <Typography variant="h5" gutterBottom style={{ color: '#aaaaaa' }}>
-                It's a bit lonely here...
-            </Typography>
-            <Typography variant="subtitle1" style={{ color: '#aaaaaa' }}>
-                Looks like you don't have any projects yet. Start by creating one and I'll provide the cool analytics!
-            </Typography>
-        </div>
-    );
+    }, [email, selectedProject, isFetchingProjects]);
 
 
     useEffect(() => {
@@ -97,8 +91,6 @@ const Analytics = () => {
                         />
                     </div>
                 ))
-            ) : !selectedProject ? (
-                <NoProjectMessage />
             ) : null
             }
         </div>

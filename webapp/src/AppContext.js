@@ -11,6 +11,7 @@ export const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [email, setEmail] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
+    const [isFetchingProjects, setIsFetchingProjects] = useState(true);
 
     useEffect(() => {
         const session = supabase.auth.session();
@@ -50,7 +51,9 @@ export const AppProvider = ({ children }) => {
         setEmail,
         logout,
         selectedProject,
-        setSelectedProject
+        setSelectedProject,
+        isFetchingProjects,
+        setIsFetchingProjects
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

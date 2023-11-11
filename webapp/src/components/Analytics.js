@@ -5,6 +5,9 @@ import Plot from 'react-plotly.js';
 import { CircularProgress, Typography, IconButton, Tooltip, tooltipClasses } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/material/styles';
+import DownhillSkiingIcon from '@mui/icons-material/DownhillSkiing';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+import InsightsIcon from '@mui/icons-material/Insights';
 
 const CustomTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -53,12 +56,27 @@ const Analytics = () => {
         fetchMetrics();
     }, [fetchMetrics]);
 
+
+    const NoProjectsUI = () => (
+        <div style={{ textAlign: 'center', marginTop: '50px' }}>
+            <DownhillSkiingIcon style={{ fontSize: 120, color: '#CD5C5C' }} />
+
+            <Typography variant="h3" style={{ marginTop: '20px', color: '#999999' }}>
+                Ready to dive in?
+            </Typography>
+            <Typography variant="body1" style={{ marginTop: '15px', color: '#555555' }}>
+                You haven't created any projects yet. Start your journey by adding a new project.
+            </Typography>
+            {/* add a button here that links to project creation if such a workflow exists */}
+        </div>
+    );
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0 16px' }}>
             {isLoading ? (
                 <CircularProgress />
             ) : error ? (
-                <Typography variant="h6" color="error">{error}</Typography>
+                NoProjectsUI()
             ) : plotData ? (
                 plotData.map((plot, index) => (
                     <div key={index} style={{ width: '100%', marginBottom: '128px', position: 'relative' }}>

@@ -17,8 +17,4 @@ def test_cli_command():
             f.write("print('hello world')\n" * 100)
 
         result = runner.invoke(main.cli_runner, args)
-    # for debugging
-    print(result.output)
-    print(result.exception)
-    print(result.exit_code)
     assert result.exit_code == 0

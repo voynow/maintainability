@@ -165,3 +165,17 @@ def test_get_user_email_with_invalid_api_key(test_client):
     params = {"api_key": "invalid"}
     response = test_client.get(f"/get_user_email", params=params)
     assert response.status_code == 401
+
+
+def test_fetch_repo_structure(test_client):
+    params = {"user": "voynow", "repo": "turbo-docs"}
+    response = test_client.get("/fetch_repo_structure", params=params)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+def test_fetch_file_content(test_client):
+    params = {"user": "voynow", "repo": "turbo-docs", "path": "README.md"}
+    response = test_client.get("/fetch_file_content", params=params)
+    assert response.status_code == 200
+    assert isinstance(response.json(), str)

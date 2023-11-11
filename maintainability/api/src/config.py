@@ -12,6 +12,29 @@ Write two-three bullet points on your initial thoughts while being as brief as p
 MODEL_NAME = "gpt-3.5-turbo"
 TEMPERATURE = 0.0
 
+EXTENSIONS = [
+    ".py",
+    ".js",
+    ".java",
+    ".c",
+    ".cpp",
+    ".h",
+    ".cs",
+    ".go",
+    ".rb",
+    ".php",
+    ".swift",
+    ".ts",
+    ".kt",
+    ".rs",
+    ".scala",
+    ".m",
+    ".sh",
+    ".sql",
+    ".html",
+    ".css",
+]
+
 METRIC_DESCRIPTIONS = {
     "intuitive_design": """Variable and Function Naming: Clear names indicating purpose and type.
 Good: total_amount, calculate_tax(income)

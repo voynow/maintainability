@@ -63,4 +63,5 @@ ignore = [
     # "ErrorBoundary.js",
     # "theme.js",
     "docs",
+    "*.png",
 ]

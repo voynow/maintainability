@@ -1,82 +1,130 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, ButtonBase, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppContext } from '../AppContext';
 import Profile from './Profile';
+import ProjectsDashboard from './ProjectsDashboard';
 import api from '../axiosConfig';
+import { Box } from '@mui/system';
+import Button from '@mui/material/Button';
 
 const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
-    const [projects, setProjects] = useState([]);
-    const { selectedProject, setSelectedProject, email, isFetchingProjects, setIsFetchingProjects } = useAppContext();
+    const { selectedProject, setSelectedProject, email, isFetchingProjects, setIsFetchingProjects, projects, setProjects } = useAppContext();
     const [error, setError] = useState(null);
+    const [dashboardOpen, setDashboardOpen] = useState(false);
+
 
     const togglePopup = () => {
         setPopupOpen(!popupOpen);
     };
 
     useEffect(() => {
+        let isMounted = true;
         const fetchProjects = async () => {
             setIsFetchingProjects(true);
             try {
                 const response = await api.get("/get_user_projects", {
                     params: { user_email: email },
                 });
-                if (response.status === 200) {
+                if (isMounted && response.status === 200) {
                     setProjects(response.data);
                     if (!selectedProject && response.data.length > 0) {
                         setSelectedProject(response.data[0].project_name);
                     }
                 }
             } catch (err) {
-                setError("An error occurred while fetching projects.");
+                if (isMounted) {
+                    setError("An error occurred while fetching projects.");
+                }
             } finally {
-                setIsFetchingProjects(false);
+                if (isMounted) {
+                    setIsFetchingProjects(false);
+                }
             }
         };
 
         fetchProjects();
+
+        return () => {
+            // Set the flag to false when the component unmounts
+            isMounted = false;
+        };
     }, [email, selectedProject, setSelectedProject]);
+
+    const handleProjectClick = () => {
+        // Logic to open project details or summary
+    };
+
+    const selectedProjectStyle = {
+        fontWeight: 600,
+        fontSize: '18px',
+        marginRight: '16px',
+        color: '#4A4A4A',
+        cursor: 'pointer',
+        '&:hover': {
+            textDecoration: 'underline',
+            color: '#333'
+        }
+    };
+
+    const projectLabelStyle = {
+        color: '#CEC7C1',
+        marginRight: '4px',
+        fontSize: '18px',
+        fontWeight: 400,
+    };
+
+    const buttonStyle = {
+        margin: '0 10px',
+        padding: '5px 10px',
+        borderRadius: '20px',
+        backgroundColor: '#EDE4DC',
+        '&:hover': {
+            backgroundColor: '#FDF2E9',
+            boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)'
+        },
+        color: '#333',
+        textTransform: 'none'
+    };
 
     return (
         <>
             <AppBar position="static" elevation={0} sx={{ zIndex: 1201, backgroundColor: '#FDF2E9' }}>
-                <Toolbar>
-                    <Typography variant="h5" sx={{ fontWeight: 600, flexGrow: 1, color: '#333333' }}>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#333' }}>
                         Maintainability
                     </Typography>
 
-                    {projects.length ? (
-                        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, marginRight: 2 }}>
-                            <InputLabel id="project-select-label">Project</InputLabel>
-                            <Select
-                                labelId="project-select-label"
-                                id="project-select"
-                                value={selectedProject || ''}
-                                onChange={(e) => setSelectedProject(e.target.value)}
-                                label="Project"
-                            >
-                                {projects.map((project, index) => (
-                                    <MenuItem key={index} value={project.project_name}>{project.project_name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    ) : (
-                        <Typography variant="body1" sx={{ marginRight: 2, color: '#aaaaaa' }}>
-                            No projects found
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="caption" sx={projectLabelStyle}>
+                            Current Project:
                         </Typography>
-                    )}
+                        <Typography
+                            variant="subtitle1"
+                            sx={selectedProjectStyle}
+                            onClick={handleProjectClick}
+                            title="Click for project details"
+                        >
+                            {selectedProject || 'No projects found'}
+                        </Typography>
 
-                    <ButtonBase onClick={togglePopup} sx={{ borderRadius: '50%', padding: '12px' }}>
-                        <AccountCircleIcon sx={{ marginRight: '6px', fontSize: '35x', color: '#CD5C5C' }} />
-                        <Typography variant="body1" sx={{ fontSize: '20px', color: '#333333' }}>
-                            {email}
-                        </Typography>
-                    </ButtonBase>
+                        <Button sx={buttonStyle} onClick={() => setDashboardOpen(true)}>
+                            <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
+                            My Projects
+                        </Button>
+
+                        <Button sx={buttonStyle} onClick={togglePopup}>
+                            <AccountCircleIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
+                            My Profile
+                        </Button>
+                    </Box>
                 </Toolbar>
-            </AppBar>
+            </AppBar >
 
             <Profile open={popupOpen} onClose={togglePopup} />
+            <ProjectsDashboard open={dashboardOpen} onClose={() => setDashboardOpen(false)} />
         </>
     );
 };

@@ -1,16 +1,26 @@
-import React from 'react';
-import { Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Accordion, AccordionSummary, AccordionDetails, Tooltip } from '@mui/material';
+import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Accordion, AccordionSummary, AccordionDetails, ListItemText } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppContext } from '../AppContext';
 
 const ProjectsDashboard = ({ open, onClose }) => {
     const { email, projects, selectedProject, setSelectedProject } = useAppContext();
+    const [expandedProject, setExpandedProject] = useState(null);
+
+    const handleAccordionChange = (projectName) => (event, isExpanded) => {
+        setExpandedProject(isExpanded ? projectName : null);
+    };
 
     const handleSelectProject = (projectName) => {
         setSelectedProject(projectName);
         onClose();
     };
+
+    const accordionStyle = (projectName) => ({
+        margin: '2px 0',
+        borderRadius: '4px'
+    });
 
     return (
         <Dialog onClose={onClose} open={open} fullWidth maxWidth="md">
@@ -21,30 +31,25 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 </div>
             </DialogTitle>
             <DialogContent>
-                <List>
-                    {projects.map(project => (
-                        <ListItem
-                            button
-                            onClick={() => handleSelectProject(project.project_name)}
-                            selected={selectedProject === project.project_name}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            {selectedProject === project.project_name}
+                {projects.map(project => (
+                    <Accordion key={project.id} style={accordionStyle(project.project_name)} expanded={expandedProject === project.project_name} onChange={handleAccordionChange(project.project_name)}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <ListItemText primary={project.project_name} />
-                            <Accordion>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Tooltip title="Project Details">
-                                        <span>Details</span>
-                                    </Tooltip>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    {/* Project specific details */}
-                                </AccordionDetails>
-                            </Accordion>
-                        </ListItem>
-                    ))}
-                </List>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {/* Insert project specific details here */}
+                            <Button onClick={() => handleSelectProject(project.project_name)}>
+                                Select This Project
+                            </Button>
+                        </AccordionDetails>
+                    </Accordion>
+                ))}
             </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>
+                    Close
+                </Button>
+            </DialogActions>
         </Dialog>
     );
 };

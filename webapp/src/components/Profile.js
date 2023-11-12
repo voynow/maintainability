@@ -36,10 +36,10 @@ const ProfilePopup = ({ open, onClose }) => {
                 </Accordion>
             </DialogContent>
             <DialogActions>
-                <Button onClick={logout} color="primary">
+                <Button onClick={logout}>
                     Logout
                 </Button>
-                <Button onClick={onClose} color="secondary">
+                <Button onClick={onClose}>
                     Close
                 </Button>
             </DialogActions>

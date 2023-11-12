@@ -17,7 +17,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
         onClose();
     };
 
-    const accordionStyle = (projectName) => ({
+    const accordionStyle = () => ({
         margin: '2px 0',
         borderRadius: '4px'
     });
@@ -32,7 +32,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogTitle>
             <DialogContent>
                 {projects.map(project => (
-                    <Accordion key={project.id} style={accordionStyle(project.project_name)} expanded={expandedProject === project.project_name} onChange={handleAccordionChange(project.project_name)}>
+                    <Accordion key={project.id} style={accordionStyle()} expanded={expandedProject === project.project_name} onChange={handleAccordionChange(project.project_name)}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <ListItemText primary={project.project_name} />
                         </AccordionSummary>

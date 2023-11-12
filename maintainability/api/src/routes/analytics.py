@@ -1,10 +1,10 @@
 from datetime import datetime
 import plotly.graph_objects as go
 from pydantic import BaseModel
-from typing import List, Dict, Tuple
+from typing import List, Dict, Any, Callable
 from uuid import UUID
 
-from . import models, config
+from . import models, config, io_operations
 
 
 class FileMetric(BaseModel):
@@ -189,3 +189,39 @@ def enrich_description(plot_json: List[Dict]) -> List[Dict]:
         metric_name = fig["data"][0]["name"].lower().replace(" ", "_")
         fig["description"] = config.METRIC_DESCRIPTIONS[metric_name]
     return plot_json
+
+
+def batch_process(
+    items: List[Any],
+    proccess_function: Callable,
+    batch_size: int = 100,
+    *args,
+    **kwargs,
+):
+    """Generically applies a function to a list of items in batches"""
+    results = []
+    for i in range(0, len(items), batch_size):
+        batch = items[i : i + batch_size]
+        result = proccess_function(batch, *args, **kwargs)
+        results.extend(result)
+    return results
+
+
+def get_metrics(user_email: str, project_name: str):
+    """
+    query database for all files associated with the project, join data between
+    files and metrics tables, calculate weighted metrics, and generate plotly
+    """
+    files = io_operations.get_files(user_email, project_name)
+    metrics = batch_process(list(files), io_operations.get_metrics)
+
+    files_metrics = join_files_metrics(metrics, files)
+    grouped_metrics = group_metrics(files_metrics)
+    weighted_metrics = calculate_weighted_metrics(grouped_metrics)
+    plot_json = generate_plotly_figs(weighted_metrics)
+    enriched_plot = enrich_description(plot_json)
+
+    return enriched_plot
+
+
+

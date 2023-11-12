@@ -48,10 +48,10 @@ async def get_user_email(api_key: str):
     return io_operations.get_user_email(api_key)
 
 
-@router.get("/get_user_projects")
-async def get_user_projects(user_email: str):
+@router.get("/list_projects")
+async def list_projects(user_email: str):
     """Database proxy for getting user projects given email"""
-    return io_operations.get_user_projects(user_email)
+    return io_operations.list_projects(user_email)
 
 
 @router.post("/generate_key")

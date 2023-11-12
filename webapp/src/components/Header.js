@@ -25,7 +25,7 @@ const Header = () => {
         const fetchProjects = async () => {
             setIsFetchingProjects(true);
             try {
-                const response = await api.get("/get_user_projects", {
+                const response = await api.get("/list_projects", {
                     params: { user_email: email },
                 });
                 if (isMounted && response.status === 200) {

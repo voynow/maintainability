@@ -38,13 +38,12 @@ def write_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
-def get_user_projects(user_email: str) -> List[Dict]:
-    table = connect_to_supabase_table("files")
-    response = table.select("project_name").eq("user_email", user_email).execute()
+def list_projects(user_email: str) -> List[Dict]:
+    table = connect_to_supabase_table("projects")
+    response = table.select("name").eq("user", user_email).execute()
     if not response.data:
         return []
-    unique_projects = list(set([obj["project_name"] for obj in response.data]))
-    return [{"project_name": name} for name in unique_projects]
+    return [{"project_name": row["name"]} for row in response.data]
 
 
 def get_files(user_email: str, project_name: str) -> Dict[UUID, models.File]:

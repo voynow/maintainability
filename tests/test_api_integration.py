@@ -135,11 +135,11 @@ def test_get_metrics_with_valid_project(test_client):
             assert "type" in first_data
 
 
-def test_get_user_projects_with_valid_email(test_client):
-    """Test /get_user_projects route with a valid email"""
+def test_list_projects(test_client):
+    """Test /list_projects route with valid data"""
     user_email = "test"
     params = {"user_email": user_email}
-    response = test_client.get("/get_user_projects", params=params)
+    response = test_client.get("/list_projects", params=params)
 
     assert response.status_code == 200
     assert isinstance(response.json(), list)

@@ -4,7 +4,7 @@ import secrets
 from fastapi import HTTPException
 from passlib.context import CryptContext
 
-from . import io_operations, logger
+from .. import io_operations, logger
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Callable
 from uuid import UUID
 
-from . import models, config, io_operations
+from .. import models, config, io_operations
 
 
 class FileMetric(BaseModel):
@@ -222,6 +222,3 @@ def get_metrics(user_email: str, project_name: str):
     enriched_plot = enrich_description(plot_json)
 
     return enriched_plot
-
-
-

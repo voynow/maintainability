@@ -5,7 +5,7 @@ import re
 import requests
 from llm_blocks import block_factory
 
-from . import config, io_operations, logger
+from .. import config, io_operations, logger
 
 GH_AUTH_TOKEN = os.environ.get("GH_AUTH_TOKEN")
 

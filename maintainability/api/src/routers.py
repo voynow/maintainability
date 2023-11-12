@@ -54,6 +54,12 @@ async def list_projects(user_email: str):
     return io_operations.list_projects(user_email)
 
 
+@router.get("/get_project", response_model=models.Project)
+async def get_project(user_email: str, project_name: str):
+    """Database proxy for getting user projects given email"""
+    return io_operations.get_project(user_email, project_name)
+
+
 @router.post("/generate_key")
 async def generate_key(new_key: Dict[str, str]):
     """Allows users to generate new API keys"""

@@ -46,6 +46,15 @@ def list_projects(user_email: str) -> List[Dict]:
     return [{"project_name": row["name"]} for row in response.data]
 
 
+def get_project(user_email: str, project_name: str) -> models.Project:
+    table = connect_to_supabase_table("projects")
+    response = (
+        table.select("*").eq("user", user_email).eq("name", project_name).execute()
+    )
+    # centralized error handling will catch missing projects
+    return models.Project(**response.data[0])
+
+
 def get_files(user_email: str, project_name: str) -> Dict[UUID, models.File]:
     table = connect_to_supabase_table("files")
     rows = (

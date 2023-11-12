@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 import json
 from uuid import UUID
+from typing import Optional
 
 
 class ExtractMetrics(BaseModel):
@@ -47,6 +48,18 @@ class Metric(BaseModel):
     score: int
     reasoning: str
     file_id: UUID
+
+
+class Project(BaseModel):
+    primary_id: UUID = Field(default_factory=UUID)
+    name: str
+    user: str
+    created_at: datetime
+    favorite: bool = Field(default=False)
+    github_username: Optional[str] = Field(default=None)
+
+    class Config:
+        populate_by_name = True
 
 
 class GetMetricsResponse(BaseModel):

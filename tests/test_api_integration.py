@@ -147,6 +147,22 @@ def test_list_projects(test_client):
         assert "project_name" in project
 
 
+def test_get_project(test_client):
+    """Test /get_project route with valid data"""
+    user_email = "voynow99@gmail.com"
+    project_name = "test_project"
+    params = {"user_email": user_email, "project_name": project_name}
+    response = test_client.get("/get_project", params=params)
+
+    assert response.status_code == 200
+    project = response.json()
+
+    # Validate returned project data
+    assert project["name"] == project_name
+    assert project["user"] == user_email
+    assert project["favorite"] == False
+
+
 def test_get_user_email(test_client):
     """Test /get_user_email route with valid data"""
     user_email = "voynow99@gmail.com"

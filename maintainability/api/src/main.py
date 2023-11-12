@@ -1,9 +1,10 @@
 import os
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from . import middleware, logger, routers
+from . import logger, middleware, routers
 
 app = FastAPI()
 

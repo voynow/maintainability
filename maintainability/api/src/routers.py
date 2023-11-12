@@ -79,10 +79,10 @@ async def get_metrics(user_email: str, project_name: str):
 
 
 @router.get("/fetch_repo_structure")
-def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
+def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
     return github.fetch_repo_structure(user, repo, branch)
 
 
 @router.get("/fetch_file_content")
-def fetch_file_content(user: str, repo: str, path: str) -> str:
+def fetch_file_content(user: str, repo: str, path: str):
     return github.fetch_file_content(user, repo, path)

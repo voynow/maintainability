@@ -135,16 +135,47 @@ def test_get_metrics_with_valid_project(test_client):
             assert "type" in first_data
 
 
-def test_get_user_projects_with_valid_email(test_client):
-    """Test /get_user_projects route with a valid email"""
+def test_list_projects(test_client):
+    """Test /list_projects route with valid data"""
     user_email = "test"
     params = {"user_email": user_email}
-    response = test_client.get("/get_user_projects", params=params)
+    response = test_client.get("/list_projects", params=params)
 
     assert response.status_code == 200
     assert isinstance(response.json(), list)
     for project in response.json():
         assert "project_name" in project
+
+
+def test_get_project(test_client):
+    """Test /get_project route with valid data"""
+    user_email = "voynow99@gmail.com"
+    project_name = "test_project"
+    params = {"user_email": user_email, "project_name": project_name}
+    response = test_client.get("/get_project", params=params)
+
+    assert response.status_code == 200
+    project = response.json()
+
+    # Validate returned project data
+    assert project["name"] == project_name
+    assert project["user"] == user_email
+    assert project["favorite"] == False
+
+
+def test_set_favorite_project(test_client):
+    """Test /set_favorite_project route with valid data"""
+    user_email = "voynow99@gmail.com"
+    project_name = "maintainability"
+
+    # Test setting a project as favorite
+    response = test_client.post(
+        "/set_favorite_project",
+        json={"user_email": user_email, "project_name": project_name},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"message": f"{project_name} set as favorite project"}
 
 
 def test_get_user_email(test_client):

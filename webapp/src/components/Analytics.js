@@ -6,8 +6,6 @@ import { CircularProgress, Typography, IconButton, Tooltip, tooltipClasses } fro
 import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/material/styles';
 import DownhillSkiingIcon from '@mui/icons-material/DownhillSkiing';
-import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import InsightsIcon from '@mui/icons-material/Insights';
 
 const CustomTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />

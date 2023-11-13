@@ -38,13 +38,38 @@ def write_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
-def get_user_projects(user_email: str) -> List[Dict]:
-    table = connect_to_supabase_table("files")
-    response = table.select("project_name").eq("user_email", user_email).execute()
+def list_projects(user_email: str) -> List[Dict]:
+    table = connect_to_supabase_table("projects")
+    response = table.select("name").eq("user", user_email).execute()
     if not response.data:
         return []
-    unique_projects = list(set([obj["project_name"] for obj in response.data]))
-    return [{"project_name": name} for name in unique_projects]
+    return [{"project_name": row["name"]} for row in response.data]
+
+
+def get_project(user_email: str, project_name: str) -> models.Project:
+    table = connect_to_supabase_table("projects")
+    response = (
+        table.select("*").eq("user", user_email).eq("name", project_name).execute()
+    )
+    # centralized error handling will catch missing projects
+    return models.Project(**response.data[0])
+
+
+def set_favorite_project(user_email: str, project_name: str) -> Dict:
+    table = connect_to_supabase_table("projects")
+
+    # Set all projects to non-favorite
+    resp = table.update({"favorite": False}).eq("user", user_email).execute()
+
+    # Set the specified project as favorit
+    resp = (
+        table.update({"favorite": True})
+        .eq("user", user_email)
+        .eq("name", project_name)
+        .execute()
+    )
+
+    return {"message": f"{project_name} set as favorite project"}
 
 
 def get_files(user_email: str, project_name: str) -> Dict[UUID, models.File]:

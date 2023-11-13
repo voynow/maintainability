@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 import json
 import jwt
@@ -7,7 +8,8 @@ from jose import jwt, JWTError
 
 from . import io_operations, logger
 
-SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET")
+load_dotenv()
+SUPABASE_JWT_SECRET = os.environ["SUPABASE_JWT_SECRET"]
 
 
 def api_key_middleware(request: Request):

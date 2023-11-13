@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import Dict
 
 from fastapi import APIRouter
+from .router_utils import analytics, extract, user
 
-from . import io_operations, models, routes_helper, config
+from . import io_operations, models
 
 router = APIRouter()
 
@@ -17,12 +18,22 @@ def read_root():
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
     """Extract some metrics from a single file of code"""
-    return routes_helper.extract_metrics(
+    return extract.extract_metrics(
         file_id=extract_metrics_obj.file_id,
         filepath=extract_metrics_obj.filepath,
         code=extract_metrics_obj.file_content,
         metric=extract_metrics_obj.metric,
     )
+
+
+@router.get("/fetch_repo_structure")
+def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
+    return extract.fetch_repo_structure(user, repo, branch)
+
+
+@router.get("/fetch_file_content")
+def fetch_file_content(user: str, repo: str, path: str):
+    return extract.fetch_file_content(user, repo, path)
 
 
 @router.post("/insert_file")
@@ -37,22 +48,27 @@ async def get_user_email(api_key: str):
     return io_operations.get_user_email(api_key)
 
 
-@router.get("/get_user_projects")
-async def get_user_projects(user_email: str):
+@router.get("/list_projects")
+async def list_projects(user_email: str):
     """Database proxy for getting user projects given email"""
-    return io_operations.get_user_projects(user_email)
+    return io_operations.list_projects(user_email)
 
 
-@router.get("/get_metrics")
-async def get_metrics(user_email: str, project_name: str):
-    """DB connector and analytics engine for project metrics"""
-    return routes_helper.get_metrics(user_email, project_name)
+@router.get("/get_project", response_model=models.Project)
+async def get_project(user_email: str, project_name: str):
+    """Database proxy for getting user projects given email"""
+    return io_operations.get_project(user_email, project_name)
+
+
+@router.post("/set_favorite_project")
+async def set_favorite_project(request: models.FavoriteProjectRequest):
+    return io_operations.set_favorite_project(request.user_email, request.project_name)
 
 
 @router.post("/generate_key")
 async def generate_key(new_key: Dict[str, str]):
     """Allows users to generate new API keys"""
-    api_key = routes_helper.generate_api_key_helper()
+    api_key = user.generate_api_key_helper()
 
     io_operations.write_api_key(
         api_key=api_key,
@@ -76,3 +92,9 @@ async def remove_api_key(api_key: str):
     """Allows users to delete API keys"""
     io_operations.delete_api_key(api_key)
     return {"message": "API key deleted successfully"}
+
+
+@router.get("/get_metrics")
+async def get_metrics(user_email: str, project_name: str):
+    """DB connector and analytics engine for project metrics"""
+    return analytics.get_metrics(user_email, project_name)

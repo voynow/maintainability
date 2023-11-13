@@ -13,6 +13,7 @@ jobs:
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       GH_AUTH_TOKEN: ${{ secrets.GH_AUTH_TOKEN }}
+      SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
 
     steps:
     - name: Checkout code

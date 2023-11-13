@@ -163,6 +163,21 @@ def test_get_project(test_client):
     assert project["favorite"] == False
 
 
+def test_set_favorite_project(test_client):
+    """Test /set_favorite_project route with valid data"""
+    user_email = "voynow99@gmail.com"
+    project_name = "maintainability"
+
+    # Test setting a project as favorite
+    response = test_client.post(
+        "/set_favorite_project",
+        json={"user_email": user_email, "project_name": project_name},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"message": f"{project_name} set as favorite project"}
+
+
 def test_get_user_email(test_client):
     """Test /get_user_email route with valid data"""
     user_email = "voynow99@gmail.com"

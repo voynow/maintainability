@@ -60,6 +60,11 @@ async def get_project(user_email: str, project_name: str):
     return io_operations.get_project(user_email, project_name)
 
 
+@router.post("/set_favorite_project")
+async def set_favorite_project(request: models.FavoriteProjectRequest):
+    return io_operations.set_favorite_project(request.user_email, request.project_name)
+
+
 @router.post("/generate_key")
 async def generate_key(new_key: Dict[str, str]):
     """Allows users to generate new API keys"""

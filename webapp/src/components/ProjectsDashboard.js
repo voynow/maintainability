@@ -91,16 +91,26 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                 {/* Action Buttons */}
                                 <div>
                                     <Tooltip title="Select Project">
-                                        <Button variant="contained" style={buttonStyle} startIcon={<CheckCircleOutlineIcon fontSize="small" />} onClick={() => handleSelectProject(project.project_name)}>
+                                        <Button variant="outlined" style={buttonStyle} startIcon={<CheckCircleOutlineIcon fontSize="small" />} onClick={() => handleSelectProject(project.project_name)}>
                                             Select
                                         </Button>
                                     </Tooltip>
                                     <Tooltip title="Set as Favorite">
-                                        <Button variant="outlined" style={buttonStyle} startIcon={<FavoriteBorderIcon fontSize="small" />} onClick={(e) => handleSetFavorite(project.project_name, e)}>
+                                        <Button variant="outlined"
+                                            style={{
+                                                ...buttonStyle,
+                                                color: projectDetails[project.project_name]?.favorite ? 'white' : '',
+                                                backgroundColor: projectDetails[project.project_name]?.favorite ? '#CD5C5C' : '',
+                                                outlineColor: projectDetails[project.project_name]?.favorite ? 'white' : '',
+
+                                            }}
+                                            startIcon={<FavoriteBorderIcon fontSize="small" />}
+                                            onClick={(e) => handleSetFavorite(project.project_name, e)}>
                                             Favorite
                                         </Button>
                                     </Tooltip>
                                 </div>
+
                             </div>
                         </AccordionDetails>
                     </Accordion>

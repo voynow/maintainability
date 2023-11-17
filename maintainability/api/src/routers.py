@@ -24,7 +24,7 @@ async def validate_github_project(user: str, github_username: str, github_repo: 
 @router.post("/insert_project")
 async def insert_project(user: str, github_username: str, github_repo: str):
     """Insert project into database"""
-    return io_operations.insert_project(user, github_username, github_repo)
+    return extract.insert_project(user, github_username, github_repo)
 
 
 @router.get("/fetch_repo_structure")
@@ -40,7 +40,7 @@ async def fetch_file_content(user: str, repo: str, path: str):
 @router.post("/insert_file")
 async def insert_file(file: models.File):
     """Database proxy for inserting a file into the file table"""
-    return io_operations.write_file(file)
+    return io_operations.insert_file(file)
 
 
 @router.post("/extract_metrics")

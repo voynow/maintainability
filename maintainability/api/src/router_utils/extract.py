@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 import os
 import re
 
@@ -60,6 +61,17 @@ def validate_github_project(user: str, github_username: str, github_repo: str):
         raise HTTPException(
             status_code=400, detail="Project already exists in the database"
         )
+    return True
+
+
+def insert_project(user, github_username, github_repo):
+    project = models.Project(
+        name=github_repo,
+        user=user,
+        created_at=datetime.now(),
+        github_username=github_username,
+    )
+    io_operations.insert_project(project)
     return True
 
 

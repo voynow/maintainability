@@ -62,6 +62,10 @@ class Project(BaseModel):
         populate_by_name = True
 
 
+class ProjectList(BaseModel):
+    projects: list[Project]
+
+
 class FavoriteProjectRequest(BaseModel):
     user_email: str
     project_name: str

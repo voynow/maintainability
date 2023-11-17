@@ -1,38 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Accordion, AccordionSummary, AccordionDetails, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import Button from '@mui/material/Button';
 import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Tooltip } from '@mui/material';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setProjects, selectedProject, setSelectedProject } = useAppContext();
-    const [expandedProject, setExpandedProject] = useState(null);
+    const { email, projects, setProjects, setSelectedProject } = useAppContext();
+    const theme = useTheme();
+    const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await api.get("/list_projects", {
-                    params: { user_email: email },
-                });
-                if (response.status === 200 && response.data.projects) {
+                const response = await api.get("/list_projects", { params: { user_email: email } });
+                if (response.status === 200) {
                     setProjects(response.data.projects);
-                    if (!selectedProject && response.data.projects.length > 0) {
-                        setSelectedProject(response.data.projects[0].name);
-                    }
                 }
             } catch (error) {
                 console.error("An error occurred while fetching projects.", error);
             }
         };
-        fetchProjects();
-    }, [open, email, setProjects, setSelectedProject]);
 
-    const handleAccordionChange = (projectName) => {
-        setExpandedProject(expandedProject === projectName ? null : projectName);
-    };
+        fetchProjects();
+    }, [open, email, setProjects]);
 
     const handleSelectProject = (projectName) => {
         setSelectedProject(projectName);
@@ -43,70 +39,49 @@ const ProjectsDashboard = ({ open, onClose }) => {
         e.stopPropagation();
         try {
             await api.post('/set_favorite_project', { user_email: email, project_name: projectName });
-            setProjects(prevProjects => prevProjects.map(project =>
-                project.name === projectName ? { ...project, favorite: !project.favorite } : project
-            ));
+            setProjects(prev => prev.map(p => p.name === projectName ? { ...p, favorite: !p.favorite } : p));
         } catch (error) {
             console.error('Error setting favorite project', error);
         }
     };
 
-    const buttonStyle = {
-        minWidth: '30px',
-        padding: '6px 8px',
-        margin: '0 4px',
-    };
-
-    const projectStyle = {
-        margin: '2px 0',
-        borderRadius: '4px',
-        backgroundColor: '#f7f7f7',
-        boxShadow: 'none',
-        borderBottom: '1px solid #e0e0e0'
-    };
-
     return (
-        <Dialog onClose={onClose} open={open} fullWidth maxWidth="md">
-            <DialogTitle>
-                <Typography variant="subtitle1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Dialog onClose={onClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
+            <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
+                    <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
                     {email}'s Projects
                 </Typography>
             </DialogTitle>
-            <DialogContent>
-                {projects.map(project => (
-                    <Accordion key={project.primary_id} style={projectStyle} expanded={expandedProject === project.name} onChange={() => handleAccordionChange(project.name)}>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="subtitle1">{project.name}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div>
-                                    <p>Created at: {project.created_at}</p>
-                                    <p>Favorite: {project.favorite ? 'Yes' : 'No'}</p>
-                                    <p>GitHub Username: {project.github_username || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <Tooltip title="Select Project">
-                                        <Button variant="outlined" style={buttonStyle} startIcon={<CheckCircleOutlineIcon fontSize="small" />} onClick={() => handleSelectProject(project.name)}>
-                                            Select
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip title="Set as Favorite">
-                                        <Button variant="outlined"
-                                            style={{
-                                                ...buttonStyle,
-                                                color: project.favorite ? 'white' : '',
-                                                backgroundColor: project.favorite ? '#CD5C5C' : '',
-                                                outlineColor: project.favorite ? 'white' : '',
 
-                                            }}
-                                            startIcon={<FavoriteBorderIcon fontSize="small" />}
-                                            onClick={(e) => handleSetFavorite(project.name, e)}>
-                                            Favorite
-                                        </Button>
-                                    </Tooltip>
+            <DialogContent dividers>
+                {projects.map((project) => (
+                    <Accordion key={project.primary_id} elevation={1} square>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id={`panel1a-header-${project.primary_id}`}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
+                                    {project.name}
+                                </Typography>
+                                <div>
+                                    <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
+                                        {project.favorite ? (
+                                            <FavoriteIcon style={{ color: '#CD5C5C' }} />
+                                        ) : (
+                                            <FavoriteBorderIcon />
+                                        )}
+                                    </IconButton>
+                                    <IconButton onClick={() => handleSelectProject(project.name)} size="small">
+                                        <CheckCircleOutlineIcon />
+                                    </IconButton>
                                 </div>
                             </div>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography variant="body2">
+                                Created at: {new Date(project.created_at).toLocaleDateString()}
+                                <br />
+                                GitHub Username: {project.github_username || 'Not provided'}
+                            </Typography>
                         </AccordionDetails>
                     </Accordion>
                 ))}

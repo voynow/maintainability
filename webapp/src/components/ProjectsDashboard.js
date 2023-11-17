@@ -10,9 +10,21 @@ import Button from '@mui/material/Button';
 import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
 import Tooltip from '@mui/material/Tooltip';
+import Zoom from '@mui/material/Zoom';
+import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import StorageIcon from '@mui/icons-material/Storage';
+
 
 const ProjectsDashboard = ({ open, onClose }) => {
     const { email, projects, setProjects, selectedProject, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
+    const [githubUsername, setGithubUsername] = useState('');
+    const [githubRepo, setGithubRepo] = useState('');
+    const [addProjectError, setAddProjectError] = useState('');
+    const [addingProject, setAddingProject] = useState(false);
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -22,11 +34,10 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
                 const response = await api.get("/list_projects", { params: { user_email: email } });
                 if (response.status === 200) {
-                    console.log(response.data.projects);
                     // Check if the response data for projects is null
                     if (response.data.projects === null) {
-                        setProjects([]); // Set projects to an empty array
-                        setSelectedProject(null); // Since there are no projects, there's nothing to select
+                        setProjects([]);
+                        setSelectedProject(null);
                     } else {
                         setProjects(response.data.projects);
                         // Find a favorite project or default to the first project
@@ -39,7 +50,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 setProjects([]);
                 setSelectedProject(null);
             } finally {
-                console.log("Done fetching projects.");
                 setIsFetchingProjects(false);
             }
         };
@@ -79,6 +89,40 @@ const ProjectsDashboard = ({ open, onClose }) => {
             console.error('Error setting favorite project', error);
         }
     };
+
+    const handleToggleAddProject = () => {
+        setAddingProject((prev) => !prev);
+    };
+
+    const handleAddProject = async (e) => {
+        e.preventDefault();
+        setAddProjectError('');
+
+        try {
+            // Validate GitHub project
+            const validationResponse = await api.get("/validate_github_project", {
+                params: { user: email, github_username: githubUsername, github_repo: githubRepo }
+            });
+
+            if (validationResponse.data) {
+                // Insert project into the database
+                const insertResponse = await api.post("/insert_project", {
+                    user: email,
+                    github_username: githubUsername,
+                    github_repo: githubRepo
+                });
+
+                if (insertResponse.status === 200) {
+                    // Fetch updated projects list
+                    // ... (fetch projects logic)
+                }
+            }
+        } catch (error) {
+            console.error('Error adding project:', error);
+            setAddProjectError('Failed to add project. ' + error.response?.data?.detail || error.message);
+        }
+    };
+
     return (
         <Dialog onClose={onClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -123,6 +167,46 @@ const ProjectsDashboard = ({ open, onClose }) => {
                         </AccordionDetails>
                     </Accordion>
                 ))}
+
+                {addingProject ? (
+                    <Zoom in={addingProject}>
+                        <form onSubmit={handleAddProject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px' }}>
+                            <TextField
+                                label="GitHub Username"
+                                variant="standard"
+                                value={githubUsername}
+                                onChange={(e) => setGithubUsername(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <AccountCircle />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <TextField
+                                label="GitHub Repository"
+                                variant="standard"
+                                value={githubRepo}
+                                onChange={(e) => setGithubRepo(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <StorageIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <IconButton type="submit" color="primary" aria-label="add project">
+                                <CheckIcon />
+                            </IconButton>
+                        </form>
+                    </Zoom>
+                ) : (
+                    <IconButton onClick={handleToggleAddProject} color="primary" aria-label="add project">
+                        <AddIcon />
+                    </IconButton>
+                )}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Close</Button>

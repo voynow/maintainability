@@ -5,53 +5,18 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppContext } from '../AppContext';
 import Profile from './Profile';
 import ProjectsDashboard from './ProjectsDashboard';
-import api from '../axiosConfig';
 import { Box } from '@mui/system';
 import Button from '@mui/material/Button';
 
 const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
-    const { selectedProject, setSelectedProject, email, isFetchingProjects, setIsFetchingProjects, projects, setProjects } = useAppContext();
-    const [error, setError] = useState(null);
+    const { selectedProject, setSelectedProject } = useAppContext();
     const [dashboardOpen, setDashboardOpen] = useState(false);
 
 
     const togglePopup = () => {
         setPopupOpen(!popupOpen);
     };
-
-    useEffect(() => {
-        let isMounted = true;
-        const fetchProjects = async () => {
-            setIsFetchingProjects(true);
-            try {
-                const response = await api.get("/list_projects", {
-                    params: { user_email: email },
-                });
-                if (isMounted && response.status === 200) {
-                    setProjects(response.data);
-                    if (!selectedProject && response.data.length > 0) {
-                        setSelectedProject(response.data[0].project_name);
-                    }
-                }
-            } catch (err) {
-                if (isMounted) {
-                    setError("An error occurred while fetching projects.");
-                }
-            } finally {
-                if (isMounted) {
-                    setIsFetchingProjects(false);
-                }
-            }
-        };
-
-        fetchProjects();
-
-        return () => {
-            // Set the flag to false when the component unmounts
-            isMounted = false;
-        };
-    }, [email, selectedProject, setSelectedProject]);
 
     const handleProjectClick = () => {
         // Logic to open project details or summary

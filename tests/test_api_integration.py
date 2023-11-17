@@ -137,30 +137,16 @@ def test_get_metrics_with_valid_project(test_client):
 
 def test_list_projects(test_client):
     """Test /list_projects route with valid data"""
-    user_email = "test"
+    user_email = "voynow99@gmail.com"
     params = {"user_email": user_email}
     response = test_client.get("/list_projects", params=params)
 
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    for project in response.json():
-        assert "project_name" in project
-
-
-def test_get_project(test_client):
-    """Test /get_project route with valid data"""
-    user_email = "voynow99@gmail.com"
-    project_name = "test_project"
-    params = {"user_email": user_email, "project_name": project_name}
-    response = test_client.get("/get_project", params=params)
-
-    assert response.status_code == 200
-    project = response.json()
-
-    # Validate returned project data
-    assert project["name"] == project_name
-    assert project["user"] == user_email
-    assert project["favorite"] == False
+    assert isinstance(response.json(), dict)
+    assert "projects" in response.json()
+    for project in response.json()["projects"]:
+        assert "name" in project
+        assert "user" in project
 
 
 def test_set_favorite_project(test_client):

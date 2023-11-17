@@ -1,107 +1,125 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Accordion, AccordionSummary, AccordionDetails, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import Button from '@mui/material/Button';
 import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Button as MuiButton, Tooltip } from '@mui/material';
-
+import Tooltip from '@mui/material/Tooltip';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setSelectedProject } = useAppContext();
-    const [expandedProject, setExpandedProject] = useState(null);
-    const [projectDetails, setProjectDetails] = useState({});
+    const { email, projects, setProjects, selectedProject, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
+    const theme = useTheme();
+    const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     useEffect(() => {
-        projects.forEach(project => {
-            api.get(`/get_project`, { params: { user_email: email, project_name: project.project_name } })
-                .then(response => {
-                    setProjectDetails(prevDetails => ({ ...prevDetails, [project.project_name]: response.data }));
-                })
-                .catch(error => {
-                    console.error('Error fetching project details', error);
-                });
-        });
-    }, [projects, email]);
+        const fetchProjects = async () => {
+            try {
 
-    const handleAccordionChange = (projectName) => (event, isExpanded) => {
-        setExpandedProject(isExpanded ? projectName : null);
-    };
+                const response = await api.get("/list_projects", { params: { user_email: email } });
+                if (response.status === 200) {
+                    console.log(response.data.projects);
+                    // Check if the response data for projects is null
+                    if (response.data.projects === null) {
+                        setProjects([]); // Set projects to an empty array
+                        setSelectedProject(null); // Since there are no projects, there's nothing to select
+                    } else {
+                        setProjects(response.data.projects);
+                        // Find a favorite project or default to the first project
+                        const favoriteProject = response.data.projects.find(p => p.favorite);
+                        setSelectedProject(favoriteProject ? favoriteProject.name : response.data.projects[0]?.name);
+                    }
+                }
+            } catch (error) {
+                console.error("An error occurred while fetching projects.", error);
+                setProjects([]);
+                setSelectedProject(null);
+            } finally {
+                console.log("Done fetching projects.");
+                setIsFetchingProjects(false);
+            }
+        };
+
+        // Call fetchProjects if projects array is empty and it's not currently fetching
+        if (!projects.length) {
+            fetchProjects();
+        }
+    }, [open, email, setProjects, setSelectedProject]);
 
     const handleSelectProject = (projectName) => {
         setSelectedProject(projectName);
         onClose();
     };
 
-    const handleSetFavorite = (projectName, e) => {
-        e.stopPropagation(); // Prevents accordion from toggling
-        api.post('/set_favorite_project', { user_email: email, project_name: projectName })
-            .then(() => {
-                // Update project details to reflect the new favorite
-                setProjectDetails(prevDetails => {
-                    const updatedDetails = { ...prevDetails };
-                    Object.keys(updatedDetails).forEach(key => {
-                        updatedDetails[key].favorite = key === projectName;
-                    });
-                    return updatedDetails;
-                });
-            })
-            .catch(error => {
-                console.error('Error setting favorite project', error);
-            });
-    };
+    const handleSetFavorite = async (projectName, e) => {
+        e.stopPropagation();
 
-    const buttonStyle = {
-        minWidth: '30px',
-        padding: '6px 8px',
-        margin: '0 4px',
-    };
+        // If the project is already favorited, do nothing
+        const currentProject = projects.find(p => p.name === projectName);
+        if (currentProject && currentProject.favorite) {
+            return;
+        }
 
-    const projectStyle = {
-        margin: '2px 0',
-        borderRadius: '4px',
-        backgroundColor: '#f7f7f7',
-        boxShadow: 'none',
-        borderBottom: '1px solid #e0e0e0'
-    };
+        try {
+            await api.post('/set_favorite_project', { user_email: email, project_name: projectName });
 
+            // Set the selected project as favorite and remove favorite from all others
+            setProjects(prevProjects =>
+                prevProjects.map(p =>
+                    p.name === projectName
+                        ? { ...p, favorite: true } // Set the selected project as favorite
+                        : { ...p, favorite: false } // Remove favorite from all other projects
+                )
+            );
+        } catch (error) {
+            console.error('Error setting favorite project', error);
+        }
+    };
     return (
-        <Dialog onClose={onClose} open={open} fullWidth maxWidth="md">
-            <DialogTitle>
-                <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Dialog onClose={onClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
+            <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
+                    <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
                     {email}'s Projects
                 </Typography>
             </DialogTitle>
-            <DialogContent>
-                {projects.map(project => (
-                    <Accordion key={project.project_name} style={projectStyle} expanded={expandedProject === project.project_name} onChange={handleAccordionChange(project.project_name)}>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="subtitle1">{project.project_name}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                {/* Project Details */}
-                                <div>
-                                    <p>Created at: {projectDetails[project.project_name]?.created_at}</p>
-                                    <p>Favorite: {projectDetails[project.project_name]?.favorite ? 'Yes' : 'No'}</p>
-                                    <p>GitHub Username: {projectDetails[project.project_name]?.github_username || 'N/A'}</p>
-                                </div>
 
-                                {/* Action Buttons */}
+            <DialogContent dividers>
+                {projects.map((project) => (
+                    <Accordion key={project.primary_id} elevation={1} square>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id={`panel1a-header-${project.primary_id}`}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
+                                    {project.name}
+                                </Typography>
                                 <div>
-                                    <Tooltip title="Select Project">
-                                        <Button variant="contained" style={buttonStyle} startIcon={<CheckCircleOutlineIcon fontSize="small" />} onClick={() => handleSelectProject(project.project_name)}>
-                                            Select
-                                        </Button>
-                                    </Tooltip>
                                     <Tooltip title="Set as Favorite">
-                                        <Button variant="outlined" style={buttonStyle} startIcon={<FavoriteBorderIcon fontSize="small" />} onClick={(e) => handleSetFavorite(project.project_name, e)}>
-                                            Favorite
-                                        </Button>
+                                        <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
+                                            {project.favorite ? (
+                                                <FavoriteIcon style={{ color: '#CD5C5C' }} />
+                                            ) : (
+                                                <FavoriteBorderIcon />
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Select Project">
+                                        <IconButton onClick={() => handleSelectProject(project.name)} size="small">
+                                            <CheckCircleOutlineIcon />
+                                        </IconButton>
                                     </Tooltip>
                                 </div>
                             </div>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography variant="body2">
+                                Created at: {new Date(project.created_at).toLocaleDateString()}
+                                <br />
+                                GitHub Username: {project.github_username || 'Not provided'}
+                            </Typography>
                         </AccordionDetails>
                     </Accordion>
                 ))}

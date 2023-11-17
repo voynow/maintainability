@@ -1,9 +1,9 @@
 import base64
-from datetime import datetime
 import os
 import re
 
 import requests
+from fastapi import HTTPException
 from llm_blocks import block_factory
 
 from .. import config, io_operations, logger, models
@@ -49,21 +49,18 @@ def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
     return metric_quantity
 
 
-def link_github_project(user: str, github_username: str, github_repo: str):
-    """Validate project exists on GitHub and insert into project table"""
+def validate_github_project(user: str, github_username: str, github_repo: str):
     url = f"https://api.github.com/repos/{github_username}/{github_repo}"
     response = requests.get(url)
     if response.status_code != 200:
-        raise ValueError(f"GitHub project {github_username}/{github_repo} not found")
+        raise HTTPException(status_code=404, detail="GitHub project not found")
 
-    project = models.Project(
-        name=github_repo,
-        user=user,
-        created_at=datetime.now(),
-        github_username=github_username,
-    )
-
-    return io_operations.insert_into_project_table(project)
+    # Check for duplicates in the database
+    if io_operations.check_duplicate_project(user, github_username, github_repo):
+        raise HTTPException(
+            status_code=400, detail="Project already exists in the database"
+        )
+    return True
 
 
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:

@@ -10,7 +10,6 @@ import { Tooltip } from '@mui/material';
 const ProjectsDashboard = ({ open, onClose }) => {
     const { email, projects, setProjects, selectedProject, setSelectedProject } = useAppContext();
     const [expandedProject, setExpandedProject] = useState(null);
-    const [projectDetails, setProjectDetails] = useState({});
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -18,10 +17,10 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 const response = await api.get("/list_projects", {
                     params: { user_email: email },
                 });
-                if (response.status === 200) {
-                    setProjects(response.data);
-                    if (!selectedProject && response.data.length > 0) {
-                        setSelectedProject(response.data[0].project_name);
+                if (response.status === 200 && response.data.projects) {
+                    setProjects(response.data.projects);
+                    if (!selectedProject && response.data.projects.length > 0) {
+                        setSelectedProject(response.data.projects[0].name);
                     }
                 }
             } catch (error) {
@@ -29,20 +28,10 @@ const ProjectsDashboard = ({ open, onClose }) => {
             }
         };
         fetchProjects();
-
-        projects.forEach(project => {
-            api.get(`/get_project`, { params: { user_email: email, project_name: project.project_name } })
-                .then(response => {
-                    setProjectDetails(prevDetails => ({ ...prevDetails, [project.project_name]: response.data }));
-                })
-                .catch(error => {
-                    console.error('Error fetching project details', error);
-                });
-        });
     }, [open, email, setProjects, setSelectedProject]);
 
-    const handleAccordionChange = (projectName) => (event, isExpanded) => {
-        setExpandedProject(isExpanded ? projectName : null);
+    const handleAccordionChange = (projectName) => {
+        setExpandedProject(expandedProject === projectName ? null : projectName);
     };
 
     const handleSelectProject = (projectName) => {
@@ -50,22 +39,16 @@ const ProjectsDashboard = ({ open, onClose }) => {
         onClose();
     };
 
-    const handleSetFavorite = (projectName, e) => {
-        e.stopPropagation(); // Prevents accordion from toggling
-        api.post('/set_favorite_project', { user_email: email, project_name: projectName })
-            .then(() => {
-                // Update project details to reflect the new favorite
-                setProjectDetails(prevDetails => {
-                    const updatedDetails = { ...prevDetails };
-                    Object.keys(updatedDetails).forEach(key => {
-                        updatedDetails[key].favorite = key === projectName;
-                    });
-                    return updatedDetails;
-                });
-            })
-            .catch(error => {
-                console.error('Error setting favorite project', error);
-            });
+    const handleSetFavorite = async (projectName, e) => {
+        e.stopPropagation();
+        try {
+            await api.post('/set_favorite_project', { user_email: email, project_name: projectName });
+            setProjects(prevProjects => prevProjects.map(project =>
+                project.name === projectName ? { ...project, favorite: !project.favorite } : project
+            ));
+        } catch (error) {
+            console.error('Error setting favorite project', error);
+        }
     };
 
     const buttonStyle = {
@@ -91,23 +74,20 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogTitle>
             <DialogContent>
                 {projects.map(project => (
-                    <Accordion key={project.project_name} style={projectStyle} expanded={expandedProject === project.project_name} onChange={handleAccordionChange(project.project_name)}>
+                    <Accordion key={project.primary_id} style={projectStyle} expanded={expandedProject === project.name} onChange={() => handleAccordionChange(project.name)}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="subtitle1">{project.project_name}</Typography>
+                            <Typography variant="subtitle1">{project.name}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                {/* Project Details */}
                                 <div>
-                                    <p>Created at: {projectDetails[project.project_name]?.created_at}</p>
-                                    <p>Favorite: {projectDetails[project.project_name]?.favorite ? 'Yes' : 'No'}</p>
-                                    <p>GitHub Username: {projectDetails[project.project_name]?.github_username || 'N/A'}</p>
+                                    <p>Created at: {project.created_at}</p>
+                                    <p>Favorite: {project.favorite ? 'Yes' : 'No'}</p>
+                                    <p>GitHub Username: {project.github_username || 'N/A'}</p>
                                 </div>
-
-                                {/* Action Buttons */}
                                 <div>
                                     <Tooltip title="Select Project">
-                                        <Button variant="outlined" style={buttonStyle} startIcon={<CheckCircleOutlineIcon fontSize="small" />} onClick={() => handleSelectProject(project.project_name)}>
+                                        <Button variant="outlined" style={buttonStyle} startIcon={<CheckCircleOutlineIcon fontSize="small" />} onClick={() => handleSelectProject(project.name)}>
                                             Select
                                         </Button>
                                     </Tooltip>
@@ -115,18 +95,17 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                         <Button variant="outlined"
                                             style={{
                                                 ...buttonStyle,
-                                                color: projectDetails[project.project_name]?.favorite ? 'white' : '',
-                                                backgroundColor: projectDetails[project.project_name]?.favorite ? '#CD5C5C' : '',
-                                                outlineColor: projectDetails[project.project_name]?.favorite ? 'white' : '',
+                                                color: project.favorite ? 'white' : '',
+                                                backgroundColor: project.favorite ? '#CD5C5C' : '',
+                                                outlineColor: project.favorite ? 'white' : '',
 
                                             }}
                                             startIcon={<FavoriteBorderIcon fontSize="small" />}
-                                            onClick={(e) => handleSetFavorite(project.project_name, e)}>
+                                            onClick={(e) => handleSetFavorite(project.name, e)}>
                                             Favorite
                                         </Button>
                                     </Tooltip>
                                 </div>
-
                             </div>
                         </AccordionDetails>
                     </Accordion>

@@ -5,15 +5,31 @@ import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Button as MuiButton, Tooltip } from '@mui/material';
-
+import { Tooltip } from '@mui/material';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setSelectedProject } = useAppContext();
+    const { email, projects, setProjects, selectedProject, setSelectedProject } = useAppContext();
     const [expandedProject, setExpandedProject] = useState(null);
     const [projectDetails, setProjectDetails] = useState({});
 
     useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await api.get("/list_projects", {
+                    params: { user_email: email },
+                });
+                if (response.status === 200) {
+                    setProjects(response.data);
+                    if (!selectedProject && response.data.length > 0) {
+                        setSelectedProject(response.data[0].project_name);
+                    }
+                }
+            } catch (error) {
+                console.error("An error occurred while fetching projects.", error);
+            }
+        };
+        fetchProjects();
+
         projects.forEach(project => {
             api.get(`/get_project`, { params: { user_email: email, project_name: project.project_name } })
                 .then(response => {
@@ -23,7 +39,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
                     console.error('Error fetching project details', error);
                 });
         });
-    }, [projects, email]);
+    }, [open, email, setProjects, setSelectedProject]);
 
     const handleAccordionChange = (projectName) => (event, isExpanded) => {
         setExpandedProject(isExpanded ? projectName : null);
@@ -69,7 +85,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
     return (
         <Dialog onClose={onClose} open={open} fullWidth maxWidth="md">
             <DialogTitle>
-                <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="subtitle1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {email}'s Projects
                 </Typography>
             </DialogTitle>

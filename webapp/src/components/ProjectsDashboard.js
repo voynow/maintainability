@@ -22,7 +22,14 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 const response = await api.get("/list_projects", { params: { user_email: email } });
                 if (response.status === 200) {
                     setProjects(response.data.projects);
-                    if (!selectedProject && response.data.projects.length > 0) {
+
+                    // Find a favorite project
+                    const favoriteProject = response.data.projects.find(p => p.favorite);
+
+                    // If there's a favorite project, select it, otherwise select the first project
+                    if (favoriteProject) {
+                        setSelectedProject(favoriteProject.name);
+                    } else if (response.data.projects.length > 0) {
                         setSelectedProject(response.data.projects[0].name);
                     }
                 }
@@ -31,7 +38,10 @@ const ProjectsDashboard = ({ open, onClose }) => {
             }
         };
 
-        fetchProjects();
+        // fetch projects only if no projects are loaded
+        if (projects.length === 0)
+            fetchProjects();
+
     }, [open, email, setProjects, setSelectedProject]);
 
     const handleSelectProject = (projectName) => {
@@ -41,14 +51,28 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
     const handleSetFavorite = async (projectName, e) => {
         e.stopPropagation();
+
+        // If the project is already favorited, do nothing
+        const currentProject = projects.find(p => p.name === projectName);
+        if (currentProject && currentProject.favorite) {
+            return;
+        }
+
         try {
             await api.post('/set_favorite_project', { user_email: email, project_name: projectName });
-            setProjects(prev => prev.map(p => p.name === projectName ? { ...p, favorite: !p.favorite } : p));
+
+            // Set the selected project as favorite and remove favorite from all others
+            setProjects(prevProjects =>
+                prevProjects.map(p =>
+                    p.name === projectName
+                        ? { ...p, favorite: true } // Set the selected project as favorite
+                        : { ...p, favorite: false } // Remove favorite from all other projects
+                )
+            );
         } catch (error) {
             console.error('Error setting favorite project', error);
         }
     };
-
     return (
         <Dialog onClose={onClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

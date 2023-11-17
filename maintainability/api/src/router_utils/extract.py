@@ -1,11 +1,12 @@
 import base64
+from datetime import datetime
 import os
 import re
 
 import requests
 from llm_blocks import block_factory
 
-from .. import config, io_operations, logger
+from .. import config, io_operations, logger, models
 
 GH_AUTH_TOKEN = os.environ.get("GH_AUTH_TOKEN")
 
@@ -46,6 +47,23 @@ def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
         reasoning=response,
     )
     return metric_quantity
+
+
+def link_github_project(user: str, github_username: str, github_repo: str):
+    """Validate project exists on GitHub and insert into project table"""
+    url = f"https://api.github.com/repos/{github_username}/{github_repo}"
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise ValueError(f"GitHub project {github_username}/{github_repo} not found")
+
+    project = models.Project(
+        name=github_repo,
+        user=user,
+        created_at=datetime.now(),
+        github_username=github_username,
+    )
+
+    return io_operations.insert_into_project_table(project)
 
 
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:

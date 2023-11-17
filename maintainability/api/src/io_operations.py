@@ -38,6 +38,11 @@ def write_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
+def insert_into_project_table(project: models.Project) -> Tuple:
+    table = connect_to_supabase_table("projects")
+    return table.insert(project.model_dump()).execute()
+
+
 def list_projects(user_email: str) -> models.ProjectList:
     table = connect_to_supabase_table("projects")
     response = table.select("*").eq("user", user_email).execute()

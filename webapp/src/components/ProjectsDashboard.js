@@ -9,9 +9,10 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import Button from '@mui/material/Button';
 import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
+import Tooltip from '@mui/material/Tooltip';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setProjects, setSelectedProject } = useAppContext();
+    const { email, projects, setProjects, selectedProject, setSelectedProject } = useAppContext();
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -21,6 +22,9 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 const response = await api.get("/list_projects", { params: { user_email: email } });
                 if (response.status === 200) {
                     setProjects(response.data.projects);
+                    if (!selectedProject && response.data.projects.length > 0) {
+                        setSelectedProject(response.data.projects[0].name);
+                    }
                 }
             } catch (error) {
                 console.error("An error occurred while fetching projects.", error);
@@ -28,7 +32,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
         };
 
         fetchProjects();
-    }, [open, email, setProjects]);
+    }, [open, email, setProjects, setSelectedProject]);
 
     const handleSelectProject = (projectName) => {
         setSelectedProject(projectName);
@@ -63,16 +67,20 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                     {project.name}
                                 </Typography>
                                 <div>
-                                    <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
-                                        {project.favorite ? (
-                                            <FavoriteIcon style={{ color: '#CD5C5C' }} />
-                                        ) : (
-                                            <FavoriteBorderIcon />
-                                        )}
-                                    </IconButton>
-                                    <IconButton onClick={() => handleSelectProject(project.name)} size="small">
-                                        <CheckCircleOutlineIcon />
-                                    </IconButton>
+                                    <Tooltip title="Set as Favorite">
+                                        <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
+                                            {project.favorite ? (
+                                                <FavoriteIcon style={{ color: '#CD5C5C' }} />
+                                            ) : (
+                                                <FavoriteBorderIcon />
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Select Project">
+                                        <IconButton onClick={() => handleSelectProject(project.name)} size="small">
+                                            <CheckCircleOutlineIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                 </div>
                             </div>
                         </AccordionSummary>

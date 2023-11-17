@@ -12,36 +12,42 @@ import { useAppContext } from '../AppContext';
 import Tooltip from '@mui/material/Tooltip';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setProjects, selectedProject, setSelectedProject } = useAppContext();
+    const { email, projects, setProjects, selectedProject, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
+
                 const response = await api.get("/list_projects", { params: { user_email: email } });
                 if (response.status === 200) {
-                    setProjects(response.data.projects);
-
-                    // Find a favorite project
-                    const favoriteProject = response.data.projects.find(p => p.favorite);
-
-                    // If there's a favorite project, select it, otherwise select the first project
-                    if (favoriteProject) {
-                        setSelectedProject(favoriteProject.name);
-                    } else if (response.data.projects.length > 0) {
-                        setSelectedProject(response.data.projects[0].name);
+                    console.log(response.data.projects);
+                    // Check if the response data for projects is null
+                    if (response.data.projects === null) {
+                        setProjects([]); // Set projects to an empty array
+                        setSelectedProject(null); // Since there are no projects, there's nothing to select
+                    } else {
+                        setProjects(response.data.projects);
+                        // Find a favorite project or default to the first project
+                        const favoriteProject = response.data.projects.find(p => p.favorite);
+                        setSelectedProject(favoriteProject ? favoriteProject.name : response.data.projects[0]?.name);
                     }
                 }
             } catch (error) {
                 console.error("An error occurred while fetching projects.", error);
+                setProjects([]);
+                setSelectedProject(null);
+            } finally {
+                console.log("Done fetching projects.");
+                setIsFetchingProjects(false);
             }
         };
 
-        // fetch projects only if no projects are loaded
-        if (projects.length === 0)
+        // Call fetchProjects if projects array is empty and it's not currently fetching
+        if (!projects.length) {
             fetchProjects();
-
+        }
     }, [open, email, setProjects, setSelectedProject]);
 
     const handleSelectProject = (projectName) => {

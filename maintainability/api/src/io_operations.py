@@ -44,7 +44,7 @@ def check_duplicate_project(user: str, github_username: str, github_repo: str) -
         table.select("*")
         .eq("user", user)
         .eq("github_username", github_username)
-        .eq("github_repo", github_repo)
+        .eq("name", github_repo)
         .execute()
     )
     return True if response.data else False

@@ -53,6 +53,8 @@ def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
 def validate_github_project(user: str, github_username: str, github_repo: str):
     url = f"https://api.github.com/repos/{github_username}/{github_repo}"
     response = requests.get(url)
+
+    # Check that project exists on GitHub
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="GitHub project not found")
 

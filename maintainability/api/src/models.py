@@ -63,7 +63,7 @@ class Project(BaseModel):
 
 
 class ProjectList(BaseModel):
-    projects: list[Project]
+    projects: Optional[list[Project]]
 
 
 class FavoriteProjectRequest(BaseModel):

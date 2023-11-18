@@ -1,8 +1,10 @@
-from pydantic import BaseModel, Field
-from datetime import datetime
 import json
-from uuid import UUID
+from datetime import datetime
+from enum import Enum
 from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field
 
 
 class ExtractMetrics(BaseModel):
@@ -65,6 +67,12 @@ class Project(BaseModel):
 
 class ProjectList(BaseModel):
     projects: Optional[list[Project]]
+
+
+class ProjectStatus(Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    NOT_FOUND = "not found"
 
 
 class FavoriteProjectRequest(BaseModel):

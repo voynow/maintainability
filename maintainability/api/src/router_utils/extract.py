@@ -51,7 +51,9 @@ def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
     return metric_quantity
 
 
-def validate_github_project(user: str, github_username: str, github_repo: str):
+def validate_github_project(
+    user: str, github_username: str, github_repo: str
+) -> models.ProjectStatus:
     url = f"https://api.github.com/repos/{github_username}/{github_repo}"
     response = requests.get(url)
 
@@ -59,21 +61,27 @@ def validate_github_project(user: str, github_username: str, github_repo: str):
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="GitHub project not found")
 
-    # Check for duplicates in the database
-    if io_operations.check_project_exists(user, github_username, github_repo):
+    # Check for active project in the database
+    project_status: models.ProjectStatus = io_operations.get_project_status(
+        user, github_username, github_repo
+    )
+
+    # raise error if project is active
+    if project_status == models.ProjectStatus.ACTIVE:
         raise HTTPException(
             status_code=400, detail="Project already exists in the database"
         )
-    return True
+
+    return project_status
 
 
 def insert_project(user, github_username, github_repo):
-    project_exists = io_operations.check_project_exists(
+    project_status: models.ProjectStatus = validate_github_project(
         user, github_username, github_repo
     )
-    if project_exists:
+    if project_status == models.ProjectStatus.INACTIVE:
         return io_operations.mark_project_active(user, github_username, github_repo)
-    else:
+    elif project_status == models.ProjectStatus.NOT_FOUND:
         return io_operations.insert_project(
             models.Project(
                 primary_id=uuid.uuid4(),
@@ -84,11 +92,18 @@ def insert_project(user, github_username, github_repo):
                 is_active=True,
             )
         )
+    else:
+        raise HTTPException(
+            status_code=400, detail="Invalid project status in the database"
+        )
 
 
 def delete_project(user, github_username, github_repo):
     """Mark project as inactive in the database"""
-    if not io_operations.check_project_exists(user, github_username, github_repo):
+    project_status: models.ProjectStatus = io_operations.get_project_status(
+        user, github_username, github_repo
+    )
+    if project_status == models.ProjectStatus.NOT_FOUND:
         raise HTTPException(status_code=404, detail="Project not found in the database")
     return io_operations.mark_project_inactive(user, github_username, github_repo)
 

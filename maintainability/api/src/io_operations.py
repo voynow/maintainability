@@ -38,7 +38,7 @@ def insert_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
-def check_project_exists(user: str, github_username: str, github_repo: str) -> bool:
+def get_project_status(user: str, github_username: str, github_repo: str) -> bool:
     """
     Check for duplicates in the database, return True if project exists and is
     active, False otherwise
@@ -66,7 +66,7 @@ def insert_project(project: models.Project) -> Tuple:
     return table.insert(project.model_dump()).execute()
 
 
-def mark_project_active(user: str, github_username: str, github_repo: str) -> bool:
+def mark_project_active(user: str, github_username: str, github_repo: str):
     table = connect_to_supabase_table("projects")
     return (
         table.update({"is_active": True})
@@ -77,7 +77,7 @@ def mark_project_active(user: str, github_username: str, github_repo: str) -> bo
     )
 
 
-def mark_project_inactive(user: str, github_username: str, github_repo: str) -> bool:
+def mark_project_inactive(user: str, github_username: str, github_repo: str):
     table = connect_to_supabase_table("projects")
     return (
         table.update({"is_active": False})

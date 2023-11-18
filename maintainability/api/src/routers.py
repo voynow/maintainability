@@ -15,12 +15,6 @@ def read_root():
     return {"status": "ok"}
 
 
-@router.get("/validate_github_project")
-async def validate_github_project(user: str, github_username: str, github_repo: str):
-    """Validate project exists and is not already linked to user"""
-    return extract.validate_github_project(user, github_username, github_repo)
-
-
 @router.post("/insert_project")
 async def insert_project(user: str, github_username: str, github_repo: str):
     """Insert project into database"""

@@ -4,7 +4,7 @@ from typing import Dict
 from fastapi import APIRouter
 from .router_utils import analytics, extract, user
 
-from . import io_operations, models
+from . import io_operations, models, logger
 
 router = APIRouter()
 
@@ -13,6 +13,34 @@ router = APIRouter()
 def read_root():
     """Health check endpoint"""
     return {"status": "ok"}
+
+
+@router.get("/validate_github_project")
+async def validate_github_project(user: str, github_username: str, github_repo: str):
+    """Validate project exists and is not already linked to user"""
+    return extract.validate_github_project(user, github_username, github_repo)
+
+
+@router.post("/insert_project")
+async def insert_project(user: str, github_username: str, github_repo: str):
+    """Insert project into database"""
+    return extract.insert_project(user, github_username, github_repo)
+
+
+@router.get("/fetch_repo_structure")
+async def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
+    return extract.fetch_repo_structure(user, repo, branch)
+
+
+@router.get("/fetch_file_content")
+async def fetch_file_content(user: str, repo: str, path: str):
+    return extract.fetch_file_content(user, repo, path)
+
+
+@router.post("/insert_file")
+async def insert_file(file: models.File):
+    """Database proxy for inserting a file into the file table"""
+    return io_operations.insert_file(file)
 
 
 @router.post("/extract_metrics")
@@ -24,22 +52,6 @@ async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
         code=extract_metrics_obj.file_content,
         metric=extract_metrics_obj.metric,
     )
-
-
-@router.get("/fetch_repo_structure")
-def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
-    return extract.fetch_repo_structure(user, repo, branch)
-
-
-@router.get("/fetch_file_content")
-def fetch_file_content(user: str, repo: str, path: str):
-    return extract.fetch_file_content(user, repo, path)
-
-
-@router.post("/insert_file")
-async def insert_file(file: models.File):
-    """Database proxy for inserting a file into the file table"""
-    return io_operations.write_file(file)
 
 
 @router.get("/get_user_email")

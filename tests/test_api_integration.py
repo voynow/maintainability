@@ -196,3 +196,34 @@ def test_fetch_file_content(test_client):
     response = test_client.get("/fetch_file_content", params=params)
     assert response.status_code == 200
     assert isinstance(response.json(), str)
+
+
+def test_validate_github_project(test_client):
+    params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "turbo-docs",
+    }
+    response = test_client.get("/validate_github_project", params=params)
+    assert response.status_code == 200
+    assert response.json() == True
+
+
+def test_validate_github_project_not_found(test_client):
+    params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "non-existent-repo",
+    }
+    response = test_client.get("/validate_github_project", params=params)
+    assert response.status_code == 404
+
+
+def test_validate_github_project_duplicate(test_client):
+    params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "maintainability",
+    }
+    response = test_client.get("/validate_github_project", params=params)
+    assert response.status_code == 400

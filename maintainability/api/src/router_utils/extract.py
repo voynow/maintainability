@@ -1,11 +1,14 @@
 import base64
+from datetime import datetime
 import os
 import re
+import uuid
 
 import requests
+from fastapi import HTTPException
 from llm_blocks import block_factory
 
-from .. import config, io_operations, logger
+from .. import config, io_operations, logger, models
 
 GH_AUTH_TOKEN = os.environ.get("GH_AUTH_TOKEN")
 
@@ -46,6 +49,34 @@ def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
         reasoning=response,
     )
     return metric_quantity
+
+
+def validate_github_project(user: str, github_username: str, github_repo: str):
+    url = f"https://api.github.com/repos/{github_username}/{github_repo}"
+    response = requests.get(url)
+
+    # Check that project exists on GitHub
+    if response.status_code != 200:
+        raise HTTPException(status_code=404, detail="GitHub project not found")
+
+    # Check for duplicates in the database
+    if io_operations.check_duplicate_project(user, github_username, github_repo):
+        raise HTTPException(
+            status_code=400, detail="Project already exists in the database"
+        )
+    return True
+
+
+def insert_project(user, github_username, github_repo):
+    project = models.Project(
+        primary_id=uuid.uuid4(),
+        name=github_repo,
+        user=user,
+        created_at=datetime.now(),
+        github_username=github_username,
+    )
+    io_operations.insert_project(project)
+    return True
 
 
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:

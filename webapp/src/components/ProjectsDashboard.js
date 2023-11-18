@@ -10,45 +10,58 @@ import Button from '@mui/material/Button';
 import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
 import Tooltip from '@mui/material/Tooltip';
+import Zoom from '@mui/material/Zoom';
+import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import StorageIcon from '@mui/icons-material/Storage';
+import { LinearProgress } from '@mui/material';
+
 
 const ProjectsDashboard = ({ open, onClose }) => {
     const { email, projects, setProjects, selectedProject, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
+    const [githubUsername, setGithubUsername] = useState('');
+    const [githubRepo, setGithubRepo] = useState('');
+    const [addProjectError, setAddProjectError] = useState('');
+    const [addingProject, setAddingProject] = useState(false);
+    const [isAddingProject, setIsAddingProject] = useState(false);
+
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-
-                const response = await api.get("/list_projects", { params: { user_email: email } });
-                if (response.status === 200) {
-                    console.log(response.data.projects);
-                    // Check if the response data for projects is null
-                    if (response.data.projects === null) {
-                        setProjects([]); // Set projects to an empty array
-                        setSelectedProject(null); // Since there are no projects, there's nothing to select
-                    } else {
-                        setProjects(response.data.projects);
-                        // Find a favorite project or default to the first project
-                        const favoriteProject = response.data.projects.find(p => p.favorite);
-                        setSelectedProject(favoriteProject ? favoriteProject.name : response.data.projects[0]?.name);
-                    }
-                }
-            } catch (error) {
-                console.error("An error occurred while fetching projects.", error);
-                setProjects([]);
-                setSelectedProject(null);
-            } finally {
-                console.log("Done fetching projects.");
-                setIsFetchingProjects(false);
-            }
-        };
-
         // Call fetchProjects if projects array is empty and it's not currently fetching
         if (!projects.length) {
             fetchProjects();
         }
     }, [open, email, setProjects, setSelectedProject]);
+
+    const fetchProjects = async () => {
+        try {
+
+            const response = await api.get("/list_projects", { params: { user_email: email } });
+            if (response.status === 200) {
+                // Check if the response data for projects is null
+                if (response.data.projects === null) {
+                    setProjects([]);
+                    setSelectedProject(null);
+                } else {
+                    setProjects(response.data.projects);
+                    // Find a favorite project or default to the first project
+                    const favoriteProject = response.data.projects.find(p => p.favorite);
+                    setSelectedProject(favoriteProject ? favoriteProject.name : response.data.projects[0]?.name);
+                }
+            }
+        } catch (error) {
+            console.error("An error occurred while fetching projects.", error);
+            setProjects([]);
+            setSelectedProject(null);
+        } finally {
+            setIsFetchingProjects(false);
+        }
+    };
 
     const handleSelectProject = (projectName) => {
         setSelectedProject(projectName);
@@ -79,8 +92,69 @@ const ProjectsDashboard = ({ open, onClose }) => {
             console.error('Error setting favorite project', error);
         }
     };
+
+    const handleToggleAddProject = () => {
+        setAddingProject((prev) => !prev);
+    };
+
+    const handleAddProject = async (e) => {
+        e.preventDefault();
+        setAddProjectError('');
+        setIsAddingProject(true);
+
+        try {
+            // Validate GitHub project
+            const validationResponse = await api.get("/validate_github_project", {
+                params: { user: email, github_username: githubUsername, github_repo: githubRepo }
+            });
+
+            if (validationResponse.data) {
+                // Insert project into the database
+                const insertResponse = await api.post("/insert_project", null, {
+                    params: {
+                        user: email,
+                        github_username: githubUsername,
+                        github_repo: githubRepo
+                    }
+                });
+
+                if (insertResponse.status === 200) {
+                    await fetchProjects();
+                    setGithubUsername('');
+                    setGithubRepo('');
+                    setAddingProject(false);
+                }
+            }
+        } catch (error) {
+            console.error('Error adding project:', error);
+
+            // Check if the error response and data are available and log them
+            if (error.response && error.response.data) {
+                console.error('Validation errors:', error.response.data);
+                // If your server sends back a JSON with error messages, you can log them like this
+                // If the error details are in a specific property, adjust the key accordingly
+                const errorDetails = error.response.data.detail || error.response.data.errors;
+                console.error('Error details:', errorDetails);
+
+                // Update the state with the error message to display to the user if needed
+                setAddProjectError('Failed to add project. ' + (errorDetails || error.message));
+            } else {
+                // Fallback error message
+                setAddProjectError('Failed to add project. An unexpected error occurred.');
+            }
+        } finally {
+            setIsAddingProject(false);
+        }
+    };
+
+    const handleClose = () => {
+        setAddingProject(false);
+        onClose();
+    };
+
     return (
-        <Dialog onClose={onClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
+        <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
+            {isAddingProject && <LinearProgress />}
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
@@ -123,9 +197,55 @@ const ProjectsDashboard = ({ open, onClose }) => {
                         </AccordionDetails>
                     </Accordion>
                 ))}
+
+                {addingProject ? (
+                    <Zoom in={addingProject}>
+                        <form onSubmit={handleAddProject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '20px' }}>
+                            <TextField
+                                label="GitHub Username"
+                                variant="standard"
+                                value={githubUsername}
+                                onChange={(e) => setGithubUsername(e.target.value)}
+                                helperText="Enter your GitHub username."
+                                error={Boolean(addProjectError)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <AccountCircle />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <TextField
+                                label="GitHub Repository"
+                                variant="standard"
+                                value={githubRepo}
+                                onChange={(e) => setGithubRepo(e.target.value)}
+                                helperText="Enter your GitHub repository name."
+                                error={Boolean(addProjectError)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <StorageIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <IconButton type="submit" color="primary" aria-label="add project">
+                                <CheckIcon />
+                            </IconButton>
+                        </form>
+                    </Zoom>
+                ) : (
+                    <Tooltip title="Add New Project">
+                        <IconButton onClick={handleToggleAddProject} color="primary" aria-label="add project" size="large">
+                            <AddIcon fontSize="large" />
+                        </IconButton>
+                    </Tooltip>
+                )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Close</Button>
+                <Button onClick={handleClose}>Close</Button>
             </DialogActions>
         </Dialog>
     );

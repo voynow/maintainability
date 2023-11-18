@@ -33,9 +33,28 @@ def write_metrics(
     ).execute()
 
 
-def write_file(file: models.File) -> Tuple:
+def insert_file(file: models.File) -> Tuple:
     table = connect_to_supabase_table("files")
     return table.insert(file.model_dump()).execute()
+
+
+def check_duplicate_project(user: str, github_username: str, github_repo: str) -> bool:
+    table = connect_to_supabase_table("projects")
+    response = (
+        table.select("*")
+        .eq("user", user)
+        .eq("github_username", github_username)
+        .eq("name", github_repo)
+        .execute()
+    )
+    return True if response.data else False
+
+
+def insert_project(project: models.Project) -> Tuple:
+    table = connect_to_supabase_table("projects")
+    project.primary_id = str(project.primary_id)
+    project.created_at = project.created_at.isoformat()
+    return table.insert(project.model_dump()).execute()
 
 
 def list_projects(user_email: str) -> models.ProjectList:

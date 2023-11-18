@@ -67,10 +67,9 @@ async def mixed_auth_middleware(request: Request, call_next):
     log_data = {
         "path": request.url.path,
         "method": request.method,
-        "client_ip": request.client.host,
-        "user_agent": request.headers.get("User-Agent", "Unknown"),
+        "client_ip": str(request.headers),
     }
-    logger.logger(f"Received Request: {json.dumps(log_data)}")
+    logger.logger(f"{json.dumps(log_data)}")
 
     if request.method != "OPTIONS":
         auth_strategy_dispatcher(request)

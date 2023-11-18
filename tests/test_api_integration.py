@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 os.environ["SKIP_AUTH_MIDDLEWARE"] = "True"
-from maintainability.api.src import main
+from maintainability.api.src import main, io_operations
 
 load_dotenv()
 MAINTAINABILITY_API_KEY = os.getenv("MAINTAINABILITY_API_KEY")
@@ -227,3 +227,41 @@ def test_validate_github_project_duplicate(test_client):
     }
     response = test_client.get("/validate_github_project", params=params)
     assert response.status_code == 400
+
+
+def test_insert_delete_project(test_client):
+    insert_params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "turbo-docs",
+    }
+    response = test_client.post("/insert_project", json=insert_params)
+    assert response.status_code == 200
+
+    delete_params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "turbo-docs",
+    }
+    response = test_client.put("/delete_project", json=delete_params)
+    assert response.status_code == 200
+
+
+def test_insert_new_project(test_client):
+    # Setup: Ensure the project does not exist
+    io_operations.delete_project_for_testing(
+        "voynow99@gmail.com", "voynow", "new-test-repo"
+    )
+
+    insert_params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "new-test-repo",
+    }
+    response = test_client.post("/insert_project", json=insert_params)
+    assert response.status_code == 200
+
+    # Teardown: Clean up by deleting the project
+    io_operations.delete_project_for_testing(
+        "voynow99@gmail.com", "voynow", "new-test-repo"
+    )

@@ -83,6 +83,15 @@ def mark_project_inactive(user: str, github_username: str, github_repo: str) -> 
     )
 
 
+def delete_project_for_testing(user: str, github_username: str, github_repo: str):
+    table = connect_to_supabase_table("projects")
+    return (
+        table.delete()
+        .match({"user": user, "github_username": github_username, "name": github_repo})
+        .execute()
+    )
+
+
 def list_projects(user_email: str) -> models.ProjectList:
     table = connect_to_supabase_table("projects")
     response = table.select("*").eq("user", user_email).execute()

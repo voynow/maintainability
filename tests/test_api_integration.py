@@ -232,8 +232,20 @@ def test_validate_github_project_duplicate(test_client):
 
 
 def test_insert_delete_project(test_client):
+    # Start up
+    #   Check that project exists but is inactive
+    # Insert project
+    #   Check that project exists and is active
+    # Delete project
+    #   Check that project exists but is inactive
     assert True
 
 
 def test_insert_new_project(test_client):
+    # Start up
+    #   Check that project does not exist
+    # Insert project
+    #   Check that project exists and is active
+    # Delete project
+    #   Check that project exists but is inactive
     assert True

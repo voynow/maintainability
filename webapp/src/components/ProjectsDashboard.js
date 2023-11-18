@@ -100,17 +100,33 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
         try {
             // Validate GitHub project
+            console.log("Before /validate_github_project");
+            console.log("email: " + email);
+            console.log("githubUsername: " + githubUsername);
+            console.log("githubRepo: " + githubRepo);
             const validationResponse = await api.get("/validate_github_project", {
                 params: { user: email, github_username: githubUsername, github_repo: githubRepo }
             });
+            console.log("After /validate_github_project and before /insert_project");
+            console.log("validationResponse: " + validationResponse.data);
+            console.log("email: " + email);
+            console.log("githubUsername: " + githubUsername);
+            console.log("githubRepo: " + githubRepo);
 
             if (validationResponse.data) {
                 // Insert project into the database
-                const insertResponse = await api.post("/insert_project", {
-                    user: email,
-                    github_username: githubUsername,
-                    github_repo: githubRepo
+                const insertResponse = await api.post("/insert_project", null, {
+                    params: {
+                        user: email,
+                        github_username: githubUsername,
+                        github_repo: githubRepo
+                    }
                 });
+                console.log("After /insert_project");
+                console.log("insertResponse: " + insertResponse);
+                console.log("email: " + email);
+                console.log("githubUsername: " + githubUsername);
+                console.log("githubRepo: " + githubRepo);
 
                 if (insertResponse.status === 200) {
                     // Fetch updated projects list
@@ -119,12 +135,31 @@ const ProjectsDashboard = ({ open, onClose }) => {
             }
         } catch (error) {
             console.error('Error adding project:', error);
-            setAddProjectError('Failed to add project. ' + error.response?.data?.detail || error.message);
+
+            // Check if the error response and data are available and log them
+            if (error.response && error.response.data) {
+                console.error('Validation errors:', error.response.data);
+                // If your server sends back a JSON with error messages, you can log them like this
+                // If the error details are in a specific property, adjust the key accordingly
+                const errorDetails = error.response.data.detail || error.response.data.errors;
+                console.error('Error details:', errorDetails);
+
+                // Update the state with the error message to display to the user if needed
+                setAddProjectError('Failed to add project. ' + (errorDetails || error.message));
+            } else {
+                // Fallback error message
+                setAddProjectError('Failed to add project. An unexpected error occurred.');
+            }
         }
     };
 
+    const handleClose = () => {
+        setAddingProject(false);
+        onClose();
+    };
+
     return (
-        <Dialog onClose={onClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
+        <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
@@ -170,12 +205,14 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
                 {addingProject ? (
                     <Zoom in={addingProject}>
-                        <form onSubmit={handleAddProject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px' }}>
+                        <form onSubmit={handleAddProject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '20px' }}>
                             <TextField
                                 label="GitHub Username"
                                 variant="standard"
                                 value={githubUsername}
                                 onChange={(e) => setGithubUsername(e.target.value)}
+                                helperText="Enter your GitHub username."
+                                error={Boolean(addProjectError)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -189,6 +226,8 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                 variant="standard"
                                 value={githubRepo}
                                 onChange={(e) => setGithubRepo(e.target.value)}
+                                helperText="Enter your GitHub repository name."
+                                error={Boolean(addProjectError)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -203,13 +242,15 @@ const ProjectsDashboard = ({ open, onClose }) => {
                         </form>
                     </Zoom>
                 ) : (
-                    <IconButton onClick={handleToggleAddProject} color="primary" aria-label="add project">
-                        <AddIcon />
-                    </IconButton>
+                    <Tooltip title="Add New Project">
+                        <IconButton onClick={handleToggleAddProject} color="primary" aria-label="add project" size="large">
+                            <AddIcon fontSize="large" />
+                        </IconButton>
+                    </Tooltip>
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Close</Button>
+                <Button onClick={handleClose}>Close</Button>
             </DialogActions>
         </Dialog>
     );

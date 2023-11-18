@@ -2,6 +2,7 @@ import base64
 from datetime import datetime
 import os
 import re
+import uuid
 
 import requests
 from fastapi import HTTPException
@@ -68,6 +69,7 @@ def validate_github_project(user: str, github_username: str, github_repo: str):
 
 def insert_project(user, github_username, github_repo):
     project = models.Project(
+        primary_id=uuid.uuid4(),
         name=github_repo,
         user=user,
         created_at=datetime.now(),

@@ -4,7 +4,7 @@ from typing import Dict
 from fastapi import APIRouter
 from .router_utils import analytics, extract, user
 
-from . import io_operations, models
+from . import io_operations, models, logger
 
 router = APIRouter()
 

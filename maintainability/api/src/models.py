@@ -66,6 +66,12 @@ class ProjectList(BaseModel):
     projects: Optional[list[Project]]
 
 
+class NewProjectRequest(BaseModel):
+    user_email: str
+    github_username: str
+    github_repo: str
+
+
 class FavoriteProjectRequest(BaseModel):
     user_email: str
     project_name: str

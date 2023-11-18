@@ -63,16 +63,28 @@ def auth_strategy_dispatcher(request: Request):
 
 
 async def mixed_auth_middleware(request: Request, call_next):
-    """middleware for handling auth"""
-    log_data = {
-        "path": request.url.path,
-        "method": request.method,
-        "client_ip": request.client.host,
-        "user_agent": request.headers.get("User-Agent", "Unknown"),
-    }
-    logger.logger(f"Received Request: {json.dumps(log_data)}")
+    # Log URL and method
+    logger.logger(f"Request URL: {request.url.path}")
+    logger.logger(f"Request method: {request.method}")
+    logger.logger(f"Request headers: {request.headers}")
 
-    if request.method != "OPTIONS":
-        auth_strategy_dispatcher(request)
+    # Read and log the body
+    body = await request.body()
+    if body:
+        logger.logger(f"Request body: {body.decode('utf-8')}")
+
+    # Set the body back to the request
+    request._body = body
+
+    # Call the next middleware or route handler
     response = await call_next(request)
+
+    # Optionally, log the response status and headers
+    logger.logger(f"Response status: {response.status_code}")
+    logger.logger(f"Response headers: {response.headers}")
+
+    # If you want to log the response body, it's a bit more complex because
+    # you need to take care of not changing the original response.
+    # If you need to log the response body, additional code will be required.
+
     return response

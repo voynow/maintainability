@@ -52,6 +52,8 @@ def check_duplicate_project(user: str, github_username: str, github_repo: str) -
 
 def insert_project(project: models.Project) -> Tuple:
     table = connect_to_supabase_table("projects")
+    project.primary_id = str(project.primary_id)
+    project.created_at = project.created_at.isoformat()
     return table.insert(project.model_dump()).execute()
 
 

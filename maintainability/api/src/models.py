@@ -57,6 +57,7 @@ class Project(BaseModel):
     created_at: datetime
     favorite: bool = Field(default=False)
     github_username: Optional[str] = Field(default=None)
+    is_active: bool = Field(default=True)
 
     class Config:
         populate_by_name = True
@@ -64,7 +65,6 @@ class Project(BaseModel):
 
 class ProjectList(BaseModel):
     projects: Optional[list[Project]]
-    
 
 
 class FavoriteProjectRequest(BaseModel):

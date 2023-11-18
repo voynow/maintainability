@@ -74,6 +74,7 @@ def insert_project(user, github_username, github_repo):
         user=user,
         created_at=datetime.now(),
         github_username=github_username,
+        is_active=True,
     )
     io_operations.insert_project(project)
     return True

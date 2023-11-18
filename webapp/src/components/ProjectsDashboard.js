@@ -100,18 +100,9 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
         try {
             // Validate GitHub project
-            console.log("Before /validate_github_project");
-            console.log("email: " + email);
-            console.log("githubUsername: " + githubUsername);
-            console.log("githubRepo: " + githubRepo);
             const validationResponse = await api.get("/validate_github_project", {
                 params: { user: email, github_username: githubUsername, github_repo: githubRepo }
             });
-            console.log("After /validate_github_project and before /insert_project");
-            console.log("validationResponse: " + validationResponse.data);
-            console.log("email: " + email);
-            console.log("githubUsername: " + githubUsername);
-            console.log("githubRepo: " + githubRepo);
 
             if (validationResponse.data) {
                 // Insert project into the database
@@ -122,11 +113,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
                         github_repo: githubRepo
                     }
                 });
-                console.log("After /insert_project");
-                console.log("insertResponse: " + insertResponse);
-                console.log("email: " + email);
-                console.log("githubUsername: " + githubUsername);
-                console.log("githubRepo: " + githubRepo);
 
                 if (insertResponse.status === 200) {
                     // Fetch updated projects list

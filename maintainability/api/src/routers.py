@@ -27,6 +27,12 @@ async def insert_project(user: str, github_username: str, github_repo: str):
     return extract.insert_project(user, github_username, github_repo)
 
 
+@router.put("/delete_project")
+async def delete_project(user: str, github_username: str, github_repo: str):
+    """Mark project as inactive"""
+    return extract.delete_project(user, github_username, github_repo)
+
+
 @router.get("/fetch_repo_structure")
 async def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
     return extract.fetch_repo_structure(user, repo, branch)

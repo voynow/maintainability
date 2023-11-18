@@ -57,6 +57,17 @@ def insert_project(project: models.Project) -> Tuple:
     return table.insert(project.model_dump()).execute()
 
 
+def mark_project_inactive(user: str, github_username: str, github_repo: str) -> bool:
+    table = connect_to_supabase_table("projects")
+    return (
+        table.update({"is_active": False})
+        .eq("user", user)
+        .eq("github_username", github_username)
+        .eq("name", github_repo)
+        .execute()
+    )
+
+
 def list_projects(user_email: str) -> models.ProjectList:
     table = connect_to_supabase_table("projects")
     response = table.select("*").eq("user", user_email).execute()

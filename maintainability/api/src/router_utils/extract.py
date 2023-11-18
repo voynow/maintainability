@@ -80,6 +80,13 @@ def insert_project(user, github_username, github_repo):
     return True
 
 
+def delete_project(user, github_username, github_repo):
+    """Mark project as inactive in the database"""
+    if not io_operations.check_duplicate_project(user, github_username, github_repo):
+        raise HTTPException(status_code=404, detail="Project not found in the database")
+    return io_operations.mark_project_inactive(user, github_username, github_repo)
+
+
 def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
     headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
     url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"

@@ -26,9 +26,9 @@ def unique_email():
 def test_health_route(test_client):
     """Test /health route"""
     response = test_client.get("/health")
-    assert response.status_code == 200
-    assert "status" in response.json()
-    assert response.json()["status"] == "ok"
+    assert response.status_code == 200, response.text
+    assert "status" in response.json(), response.text
+    assert response.json()["status"] == "ok", response.text
 
 
 def test_extract_metrics_with_valid_data(test_client):
@@ -41,9 +41,9 @@ def test_extract_metrics_with_valid_data(test_client):
         "metric": "adaptive_resilience",
     }
     response = test_client.post("/extract_metrics", headers=headers, json=payload)
-    assert response.status_code == 200
-    assert isinstance(response.json(), int)
-    assert response.json() >= 0 and response.json() <= 10
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json(), int), response.text
+    assert response.json() >= 0 and response.json() <= 10, response.text
 
 
 def test_extract_metrics_with_invalid_data(test_client):
@@ -52,7 +52,7 @@ def test_extract_metrics_with_invalid_data(test_client):
     response = test_client.post(
         "/extract_metrics", headers=headers, json={"invalid": -1}
     )
-    assert response.status_code == 422
+    assert response.status_code == 422, response.text
 
 
 def test_insert_file(test_client):
@@ -74,22 +74,22 @@ def test_insert_file(test_client):
         "timestamp": timestamp,
     }
     response = test_client.post("/insert_file", headers=headers, json=payload)
-    assert response.status_code == 200
-    assert isinstance(response.json(), dict)
-    assert response.json()["data"][0]["file_id"] == payload["file_id"]
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json(), dict), response.text
+    assert response.json()["data"][0]["file_id"] == payload["file_id"], response.text
 
 
 def test_generate_api_key(test_client):
     new_key = {"email": "genapikey@test.com", "name": "testkey"}
     response = test_client.post("/generate_key", json=new_key)
-    assert response.status_code == 200
-    assert "api_key" in response.json()
+    assert response.status_code == 200, response.text
+    assert "api_key" in response.json(), response.text
 
 
 def test_list_api_keys(test_client):
     response = test_client.get("/api_keys?email=listapikey@test.com")
-    assert response.status_code == 200
-    assert isinstance(response.json()["api_keys"], list)
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json()["api_keys"], list), response.text
 
 
 @pytest.fixture(scope="module")
@@ -104,9 +104,9 @@ def generated_api_key(test_client):
 
 def test_invalidate_api_key(test_client, generated_api_key):
     response = test_client.delete(f"/api_keys/{generated_api_key}")
-    assert response.status_code == 200
-    assert "message" in response.json()
-    assert response.json()["message"] == "API key deleted successfully"
+    assert response.status_code == 200, response.text
+    assert "message" in response.json(), response.text
+    assert response.json()["message"] == "API key deleted successfully", response.text
 
 
 def test_get_metrics_with_valid_project(test_client):
@@ -114,25 +114,25 @@ def test_get_metrics_with_valid_project(test_client):
     project_name = "test_project"
     params = {"user_email": user_email, "project_name": project_name}
     response = test_client.get("/get_metrics", params=params)
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
 
     response_data = response.json()
 
     for metric in response_data:
-        assert "data" in metric
-        assert "layout" in metric
-        assert isinstance(metric["data"], list)
-        assert isinstance(metric["layout"], dict)
+        assert "data" in metric, response.text
+        assert "layout" in metric, response.text
+        assert isinstance(metric["data"], list), response.text
+        assert isinstance(metric["layout"], dict), response.text
 
         if metric["data"]:
             first_data = metric["data"][0]
-            assert "line" in first_data
-            assert "marker" in first_data
-            assert "mode" in first_data
-            assert "name" in first_data
-            assert "x" in first_data
-            assert "y" in first_data
-            assert "type" in first_data
+            assert "line" in first_data, response.text
+            assert "marker" in first_data, response.text
+            assert "mode" in first_data, response.text
+            assert "name" in first_data, response.text
+            assert "x" in first_data, response.text
+            assert "y" in first_data, response.text
+            assert "type" in first_data, response.text
 
 
 def test_list_projects(test_client):
@@ -141,12 +141,12 @@ def test_list_projects(test_client):
     params = {"user_email": user_email}
     response = test_client.get("/list_projects", params=params)
 
-    assert response.status_code == 200
-    assert isinstance(response.json(), dict)
-    assert "projects" in response.json()
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json(), dict), response.text
+    assert "projects" in response.json(), response.text
     for project in response.json()["projects"]:
-        assert "name" in project
-        assert "user" in project
+        assert "name" in project, response.text
+        assert "user" in project, response.text
 
 
 def test_set_favorite_project(test_client):
@@ -160,8 +160,10 @@ def test_set_favorite_project(test_client):
         json={"user_email": user_email, "project_name": project_name},
     )
 
-    assert response.status_code == 200
-    assert response.json() == {"message": f"{project_name} set as favorite project"}
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "message": f"{project_name} set as favorite project"
+    }, response.text
 
 
 def test_get_user_email(test_client):
@@ -173,29 +175,29 @@ def test_get_user_email(test_client):
 
     params = {"api_key": key}
     response = test_client.get(f"/get_user_email", params=params)
-    assert response.status_code == 200
-    assert response.json() == user_email
+    assert response.status_code == 200, response.text
+    assert response.json() == user_email, response.text
 
 
 def test_get_user_email_with_invalid_api_key(test_client):
     """Test /get_user_email route with invalid data"""
     params = {"api_key": "invalid"}
     response = test_client.get(f"/get_user_email", params=params)
-    assert response.status_code == 401
+    assert response.status_code == 401, response.text
 
 
 def test_fetch_repo_structure(test_client):
     params = {"user": "voynow", "repo": "turbo-docs"}
     response = test_client.get("/fetch_repo_structure", params=params)
-    assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json(), list), response.text
 
 
 def test_fetch_file_content(test_client):
     params = {"user": "voynow", "repo": "turbo-docs", "path": "README.md"}
     response = test_client.get("/fetch_file_content", params=params)
-    assert response.status_code == 200
-    assert isinstance(response.json(), str)
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json(), str), response.text
 
 
 def test_validate_github_project(test_client):
@@ -205,8 +207,8 @@ def test_validate_github_project(test_client):
         "github_repo": "turbo-docs",
     }
     response = test_client.get("/validate_github_project", params=params)
-    assert response.status_code == 200
-    assert response.json() == True
+    assert response.status_code == 200, response.text
+    assert response.json() == True, response.text
 
 
 def test_validate_github_project_not_found(test_client):
@@ -216,7 +218,7 @@ def test_validate_github_project_not_found(test_client):
         "github_repo": "non-existent-repo",
     }
     response = test_client.get("/validate_github_project", params=params)
-    assert response.status_code == 404
+    assert response.status_code == 404, response.text
 
 
 def test_validate_github_project_duplicate(test_client):
@@ -226,7 +228,7 @@ def test_validate_github_project_duplicate(test_client):
         "github_repo": "maintainability",
     }
     response = test_client.get("/validate_github_project", params=params)
-    assert response.status_code == 400
+    assert response.status_code == 400, response.text
 
 
 def test_insert_delete_project(test_client):
@@ -235,16 +237,16 @@ def test_insert_delete_project(test_client):
         "github_username": "voynow",
         "github_repo": "turbo-docs",
     }
-    response = test_client.post("/insert_project", json=insert_params)
-    assert response.status_code == 200
+    response = test_client.post("/insert_project", params=insert_params)
+    assert response.status_code == 200, response.text
 
     delete_params = {
         "user": "voynow99@gmail.com",
         "github_username": "voynow",
         "github_repo": "turbo-docs",
     }
-    response = test_client.put("/delete_project", json=delete_params)
-    assert response.status_code == 200
+    response = test_client.put("/delete_project", params=delete_params)
+    assert response.status_code == 200, response.text
 
 
 def test_insert_new_project(test_client):
@@ -258,8 +260,8 @@ def test_insert_new_project(test_client):
         "github_username": "voynow",
         "github_repo": "new-test-repo",
     }
-    response = test_client.post("/insert_project", json=insert_params)
-    assert response.status_code == 200
+    response = test_client.post("/insert_project", params=insert_params)
+    assert response.status_code == 200, response.text
 
     # Teardown: Clean up by deleting the project
     io_operations.delete_project_for_testing(

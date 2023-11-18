@@ -17,6 +17,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import StorageIcon from '@mui/icons-material/Storage';
+import { LinearProgress } from '@mui/material';
 
 
 const ProjectsDashboard = ({ open, onClose }) => {
@@ -25,40 +26,42 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const [githubRepo, setGithubRepo] = useState('');
     const [addProjectError, setAddProjectError] = useState('');
     const [addingProject, setAddingProject] = useState(false);
+    const [isAddingProject, setIsAddingProject] = useState(false);
+
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-
-                const response = await api.get("/list_projects", { params: { user_email: email } });
-                if (response.status === 200) {
-                    // Check if the response data for projects is null
-                    if (response.data.projects === null) {
-                        setProjects([]);
-                        setSelectedProject(null);
-                    } else {
-                        setProjects(response.data.projects);
-                        // Find a favorite project or default to the first project
-                        const favoriteProject = response.data.projects.find(p => p.favorite);
-                        setSelectedProject(favoriteProject ? favoriteProject.name : response.data.projects[0]?.name);
-                    }
-                }
-            } catch (error) {
-                console.error("An error occurred while fetching projects.", error);
-                setProjects([]);
-                setSelectedProject(null);
-            } finally {
-                setIsFetchingProjects(false);
-            }
-        };
-
         // Call fetchProjects if projects array is empty and it's not currently fetching
         if (!projects.length) {
             fetchProjects();
         }
     }, [open, email, setProjects, setSelectedProject]);
+
+    const fetchProjects = async () => {
+        try {
+
+            const response = await api.get("/list_projects", { params: { user_email: email } });
+            if (response.status === 200) {
+                // Check if the response data for projects is null
+                if (response.data.projects === null) {
+                    setProjects([]);
+                    setSelectedProject(null);
+                } else {
+                    setProjects(response.data.projects);
+                    // Find a favorite project or default to the first project
+                    const favoriteProject = response.data.projects.find(p => p.favorite);
+                    setSelectedProject(favoriteProject ? favoriteProject.name : response.data.projects[0]?.name);
+                }
+            }
+        } catch (error) {
+            console.error("An error occurred while fetching projects.", error);
+            setProjects([]);
+            setSelectedProject(null);
+        } finally {
+            setIsFetchingProjects(false);
+        }
+    };
 
     const handleSelectProject = (projectName) => {
         setSelectedProject(projectName);
@@ -97,6 +100,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const handleAddProject = async (e) => {
         e.preventDefault();
         setAddProjectError('');
+        setIsAddingProject(true);
 
         try {
             // Validate GitHub project
@@ -115,8 +119,10 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 });
 
                 if (insertResponse.status === 200) {
-                    // Fetch updated projects list
-                    // ... (fetch projects logic)
+                    await fetchProjects();
+                    setGithubUsername('');
+                    setGithubRepo('');
+                    setAddingProject(false);
                 }
             }
         } catch (error) {
@@ -136,6 +142,8 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 // Fallback error message
                 setAddProjectError('Failed to add project. An unexpected error occurred.');
             }
+        } finally {
+            setIsAddingProject(false);
         }
     };
 
@@ -146,6 +154,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
     return (
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
+            {isAddingProject && <LinearProgress />}
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />

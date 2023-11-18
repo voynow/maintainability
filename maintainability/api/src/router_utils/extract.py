@@ -60,7 +60,7 @@ def validate_github_project(user: str, github_username: str, github_repo: str):
         raise HTTPException(status_code=404, detail="GitHub project not found")
 
     # Check for duplicates in the database
-    if io_operations.check_duplicate_project(user, github_username, github_repo):
+    if io_operations.check_project_exists(user, github_username, github_repo):
         raise HTTPException(
             status_code=400, detail="Project already exists in the database"
         )
@@ -68,21 +68,27 @@ def validate_github_project(user: str, github_username: str, github_repo: str):
 
 
 def insert_project(user, github_username, github_repo):
-    project = models.Project(
-        primary_id=uuid.uuid4(),
-        name=github_repo,
-        user=user,
-        created_at=datetime.now(),
-        github_username=github_username,
-        is_active=True,
+    project_exists = io_operations.check_project_exists(
+        user, github_username, github_repo
     )
-    io_operations.insert_project(project)
-    return True
+    if project_exists:
+        return io_operations.mark_project_active(user, github_username, github_repo)
+    else:
+        return io_operations.insert_project(
+            models.Project(
+                primary_id=uuid.uuid4(),
+                name=github_repo,
+                user=user,
+                created_at=datetime.now(),
+                github_username=github_username,
+                is_active=True,
+            )
+        )
 
 
 def delete_project(user, github_username, github_repo):
     """Mark project as inactive in the database"""
-    if not io_operations.check_duplicate_project(user, github_username, github_repo):
+    if not io_operations.check_project_exists(user, github_username, github_repo):
         raise HTTPException(status_code=404, detail="Project not found in the database")
     return io_operations.mark_project_inactive(user, github_username, github_repo)
 

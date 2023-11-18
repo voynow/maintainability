@@ -38,38 +38,43 @@ def insert_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
-def check_duplicate_project(user: str, github_username: str, github_repo: str) -> bool:
+def check_project_exists(user: str, github_username: str, github_repo: str) -> bool:
+    """
+    Check for duplicates in the database, return True if project exists and is
+    active, False otherwise
+    """
     table = connect_to_supabase_table("projects")
     response = (
-        table.select("*")
+        table.select("is_active")
         .eq("user", user)
         .eq("github_username", github_username)
         .eq("name", github_repo)
-        .eq("is_active", True)
         .execute()
     )
-    return True if response.data else False
+
+    if response.data:
+        project_is_active = response.data[0]["is_active"]
+        return project_is_active
+    else:
+        return False
 
 
 def insert_project(project: models.Project) -> Tuple:
     table = connect_to_supabase_table("projects")
-    project_exists = check_duplicate_project(
-        project.user, project.github_username, project.name
-    )
     project.primary_id = str(project.primary_id)
     project.created_at = project.created_at.isoformat()
+    return table.insert(project.model_dump()).execute()
 
-    # If project exists and is inactive, update it to be active
-    if project_exists:
-        return (
-            table.update({"is_active": True})
-            .eq("user", project.user)
-            .eq("github_username", project.github_username)
-            .eq("name", project.name)
-            .execute()
-        )
-    else:
-        return table.insert(project.model_dump()).execute()
+
+def mark_project_active(user: str, github_username: str, github_repo: str) -> bool:
+    table = connect_to_supabase_table("projects")
+    return (
+        table.update({"is_active": True})
+        .eq("user", user)
+        .eq("github_username", github_username)
+        .eq("name", github_repo)
+        .execute()
+    )
 
 
 def mark_project_inactive(user: str, github_username: str, github_repo: str) -> bool:

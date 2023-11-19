@@ -248,7 +248,7 @@ def test_insert_delete_project(test_client):
     assert intermediate_status == models.ProjectStatus.ACTIVE
 
     # Delete project
-    response = test_client.put("/delete_project", params=params)
+    response = test_client.post("/delete_project", params=params)
     assert response.status_code == 200, response.text
 
     # Check that project exists but is inactive

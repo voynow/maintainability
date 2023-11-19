@@ -99,11 +99,13 @@ const ProjectsDashboard = ({ open, onClose }) => {
         // Optional: show confirmation dialog before proceeding
 
         try {
-            // Call your API to delete the project
-            const response = await api.put("/delete_project", {
-                user: email,
-                github_username: githubUsername,
-                github_repo: githubRepo
+            console.log('Deleting project:', email, githubRepo, githubUsername);
+            const response = await api.post("/delete_project", null, {
+                params: {
+                    user: email,
+                    github_username: githubUsername,
+                    github_repo: githubRepo
+                }
             });
 
             // Handle the response, refresh project list if necessary

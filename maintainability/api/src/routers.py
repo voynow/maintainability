@@ -21,7 +21,7 @@ async def insert_project(user: str, github_username: str, github_repo: str):
     return extract.insert_project(user, github_username, github_repo)
 
 
-@router.put("/delete_project")
+@router.post("/delete_project")
 async def delete_project(user: str, github_username: str, github_repo: str):
     """Mark project as inactive"""
     return extract.delete_project(user, github_username, github_repo)

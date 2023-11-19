@@ -103,27 +103,20 @@ const ProjectsDashboard = ({ open, onClose }) => {
         setIsAddingProject(true);
 
         try {
-            // Validate GitHub project
-            const validationResponse = await api.get("/validate_github_project", {
-                params: { user: email, github_username: githubUsername, github_repo: githubRepo }
+            // Insert project into the database
+            const insertResponse = await api.post("/insert_project", null, {
+                params: {
+                    user: email,
+                    github_username: githubUsername,
+                    github_repo: githubRepo
+                }
             });
 
-            if (validationResponse.data) {
-                // Insert project into the database
-                const insertResponse = await api.post("/insert_project", null, {
-                    params: {
-                        user: email,
-                        github_username: githubUsername,
-                        github_repo: githubRepo
-                    }
-                });
-
-                if (insertResponse.status === 200) {
-                    await fetchProjects();
-                    setGithubUsername('');
-                    setGithubRepo('');
-                    setAddingProject(false);
-                }
+            if (insertResponse.status === 200) {
+                await fetchProjects();
+                setGithubUsername('');
+                setGithubRepo('');
+                setAddingProject(false);
             }
         } catch (error) {
             console.error('Error adding project:', error);

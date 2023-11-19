@@ -1,25 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Accordion, AccordionSummary, AccordionDetails, Typography, useMediaQuery } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, useMediaQuery, Button, LinearProgress, Tooltip, Zoom, IconButton, TextField, InputAdornment } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import Button from '@mui/material/Button';
-import api from '../axiosConfig';
-import { useAppContext } from '../AppContext';
-import Tooltip from '@mui/material/Tooltip';
-import Zoom from '@mui/material/Zoom';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import StorageIcon from '@mui/icons-material/Storage';
-import { LinearProgress } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-
+import api from '../axiosConfig';
+import { useAppContext } from '../AppContext';
+import ProjectAccordion from './ProjectAccordion';
 
 const ProjectsDashboard = ({ open, onClose }) => {
     const { email, projects, setProjects, selectedProject, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
@@ -33,7 +22,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     useEffect(() => {
-        // Call fetchProjects if projects array is empty and it's not currently fetching
         if (!projects.length) {
             fetchProjects();
         }
@@ -64,7 +52,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
         }
     };
 
-    const handleSelectProject = (projectName) => {
+    const handleSelectProject = projectName => {
         setSelectedProject(projectName);
         onClose();
     };
@@ -121,7 +109,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
     };
 
     const handleToggleAddProject = () => {
-        setAddingProject((prev) => !prev);
+        setAddingProject(prev => !prev);
     };
 
     const handleAddProject = async (e) => {
@@ -183,42 +171,15 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogTitle>
 
             <DialogContent dividers>
-                {projects.map((project) => (
-                    <Accordion key={project.primary_id} elevation={1} square>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`panel-content-${project.primary_id}`} id={`panel-header-${project.primary_id}`}>
-                            <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
-                                {project.name}
-                            </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <Typography variant="body2">
-                                    Created at: {new Date(project.created_at).toLocaleDateString()}
-                                    <br />
-                                    GitHub Username: {project.github_username || 'Not provided'}
-                                </Typography>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Tooltip title="Select Project">
-                                    <IconButton onClick={() => handleSelectProject(project.name)} size="small">
-                                        <CheckCircleOutlineIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={project.favorite ? "Unset as Favorite" : "Set as Favorite"}>
-                                    <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
-                                        {project.favorite ? <FavoriteIcon style={{ color: '#CD5C5C' }} /> : <FavoriteBorderIcon />}
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Delete Project">
-                                    <IconButton onClick={(e) => handleDeleteProject(project.github_repo, project.github_username, e)} size="small">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
+                {projects.map(project => (
+                    <ProjectAccordion
+                        key={project.primary_id}
+                        project={project}
+                        onSelectProject={handleSelectProject}
+                        onSetFavorite={handleSetFavorite}
+                        onDeleteProject={handleDeleteProject}
+                    />
                 ))}
-
                 {addingProject ? (
                     <Zoom in={addingProject}>
                         <form onSubmit={handleAddProject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '20px' }}>

@@ -21,7 +21,7 @@ async def insert_project(user: str, github_username: str, github_repo: str):
     return extract.insert_project(user, github_username, github_repo)
 
 
-@router.put("/delete_project")
+@router.post("/delete_project")
 async def delete_project(user: str, github_username: str, github_repo: str):
     """Mark project as inactive"""
     return extract.delete_project(user, github_username, github_repo)
@@ -62,7 +62,7 @@ async def get_user_email(api_key: str):
 
 @router.get("/list_projects", response_model=models.ProjectList)
 async def list_projects(user_email: str):
-    """Database proxy for getting user projects given email"""
+    """Database proxy for listing all active projects for a user"""
     return io_operations.list_projects(user_email)
 
 

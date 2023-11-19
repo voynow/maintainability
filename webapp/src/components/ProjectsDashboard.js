@@ -18,6 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import StorageIcon from '@mui/icons-material/Storage';
 import { LinearProgress } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 const ProjectsDashboard = ({ open, onClose }) => {
@@ -26,7 +27,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const [githubRepo, setGithubRepo] = useState('');
     const [addProjectError, setAddProjectError] = useState('');
     const [addingProject, setAddingProject] = useState(false);
-    const [isAddingProject, setIsAddingProject] = useState(false);
+    const [operationInProgress, setOperationInProgress] = useState(false);
 
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
@@ -93,6 +94,32 @@ const ProjectsDashboard = ({ open, onClose }) => {
         }
     };
 
+    const handleDeleteProject = async (githubRepo, githubUsername, e) => {
+        e.stopPropagation();
+        setOperationInProgress(true);
+        // Optional: show confirmation dialog before proceeding
+
+        try {
+            console.log('Deleting project:', email, githubRepo, githubUsername);
+            const response = await api.post("/delete_project", null, {
+                params: {
+                    user: email,
+                    github_username: githubUsername,
+                    github_repo: githubRepo
+                }
+            });
+
+            // Handle the response, refresh project list if necessary
+            if (response.status === 200) {
+                fetchProjects(); // Refresh the projects list
+            }
+        } catch (error) {
+            console.error('Error deleting project:', error);
+        } finally {
+            setOperationInProgress(false);
+        }
+    };
+
     const handleToggleAddProject = () => {
         setAddingProject((prev) => !prev);
     };
@@ -100,30 +127,23 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const handleAddProject = async (e) => {
         e.preventDefault();
         setAddProjectError('');
-        setIsAddingProject(true);
+        setOperationInProgress(true);
 
         try {
-            // Validate GitHub project
-            const validationResponse = await api.get("/validate_github_project", {
-                params: { user: email, github_username: githubUsername, github_repo: githubRepo }
+            // Insert project into the database
+            const insertResponse = await api.post("/insert_project", null, {
+                params: {
+                    user: email,
+                    github_username: githubUsername,
+                    github_repo: githubRepo
+                }
             });
 
-            if (validationResponse.data) {
-                // Insert project into the database
-                const insertResponse = await api.post("/insert_project", null, {
-                    params: {
-                        user: email,
-                        github_username: githubUsername,
-                        github_repo: githubRepo
-                    }
-                });
-
-                if (insertResponse.status === 200) {
-                    await fetchProjects();
-                    setGithubUsername('');
-                    setGithubRepo('');
-                    setAddingProject(false);
-                }
+            if (insertResponse.status === 200) {
+                await fetchProjects();
+                setGithubUsername('');
+                setGithubRepo('');
+                setAddingProject(false);
             }
         } catch (error) {
             console.error('Error adding project:', error);
@@ -143,7 +163,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 setAddProjectError('Failed to add project. An unexpected error occurred.');
             }
         } finally {
-            setIsAddingProject(false);
+            setOperationInProgress(false);
         }
     };
 
@@ -154,7 +174,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
     return (
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
-            {isAddingProject && <LinearProgress />}
+            {operationInProgress && <LinearProgress />}
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
@@ -165,35 +185,36 @@ const ProjectsDashboard = ({ open, onClose }) => {
             <DialogContent dividers>
                 {projects.map((project) => (
                     <Accordion key={project.primary_id} elevation={1} square>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id={`panel1a-header-${project.primary_id}`}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                                <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
-                                    {project.name}
-                                </Typography>
-                                <div>
-                                    <Tooltip title="Set as Favorite">
-                                        <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
-                                            {project.favorite ? (
-                                                <FavoriteIcon style={{ color: '#CD5C5C' }} />
-                                            ) : (
-                                                <FavoriteBorderIcon />
-                                            )}
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Select Project">
-                                        <IconButton onClick={() => handleSelectProject(project.name)} size="small">
-                                            <CheckCircleOutlineIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </div>
-                            </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <Typography variant="body2">
-                                Created at: {new Date(project.created_at).toLocaleDateString()}
-                                <br />
-                                GitHub Username: {project.github_username || 'Not provided'}
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`panel-content-${project.primary_id}`} id={`panel-header-${project.primary_id}`}>
+                            <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
+                                {project.name}
                             </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <Typography variant="body2">
+                                    Created at: {new Date(project.created_at).toLocaleDateString()}
+                                    <br />
+                                    GitHub Username: {project.github_username || 'Not provided'}
+                                </Typography>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Tooltip title="Select Project">
+                                    <IconButton onClick={() => handleSelectProject(project.name)} size="small">
+                                        <CheckCircleOutlineIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={project.favorite ? "Unset as Favorite" : "Set as Favorite"}>
+                                    <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
+                                        {project.favorite ? <FavoriteIcon style={{ color: '#CD5C5C' }} /> : <FavoriteBorderIcon />}
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete Project">
+                                    <IconButton onClick={(e) => handleDeleteProject(project.github_repo, project.github_username, e)} size="small">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
                         </AccordionDetails>
                     </Accordion>
                 ))}

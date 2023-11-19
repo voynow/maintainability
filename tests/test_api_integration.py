@@ -147,6 +147,8 @@ def test_list_projects(test_client):
     for project in response.json()["projects"]:
         assert "name" in project, response.text
         assert "user" in project, response.text
+        assert "is_active" in project, response.text
+        assert project["is_active"] == True, response.text
 
 
 def test_set_favorite_project(test_client):
@@ -248,7 +250,7 @@ def test_insert_delete_project(test_client):
     assert intermediate_status == models.ProjectStatus.ACTIVE
 
     # Delete project
-    response = test_client.put("/delete_project", params=params)
+    response = test_client.post("/delete_project", params=params)
     assert response.status_code == 200, response.text
 
     # Check that project exists but is inactive

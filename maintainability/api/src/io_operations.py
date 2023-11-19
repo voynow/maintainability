@@ -38,16 +38,31 @@ def insert_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
-def check_duplicate_project(user: str, github_username: str, github_repo: str) -> bool:
+def get_project_status(
+    user: str, github_username: str, github_repo: str
+) -> models.ProjectStatus:
+    """
+    Check for duplicates in the database, return True if project exists and is
+    active, False otherwise
+    """
     table = connect_to_supabase_table("projects")
     response = (
-        table.select("*")
+        table.select("is_active")
         .eq("user", user)
         .eq("github_username", github_username)
         .eq("name", github_repo)
         .execute()
     )
-    return True if response.data else False
+
+    if response.data:
+        active_status_map = {
+            True: models.ProjectStatus.ACTIVE,
+            False: models.ProjectStatus.INACTIVE,
+        }
+        is_active = response.data[0]["is_active"]
+        return active_status_map[is_active]
+    else:
+        return models.ProjectStatus.NOT_FOUND
 
 
 def insert_project(project: models.Project) -> Tuple:
@@ -55,6 +70,37 @@ def insert_project(project: models.Project) -> Tuple:
     project.primary_id = str(project.primary_id)
     project.created_at = project.created_at.isoformat()
     return table.insert(project.model_dump()).execute()
+
+
+def mark_project_active(user: str, github_username: str, github_repo: str):
+    table = connect_to_supabase_table("projects")
+    return (
+        table.update({"is_active": True})
+        .eq("user", user)
+        .eq("github_username", github_username)
+        .eq("name", github_repo)
+        .execute()
+    )
+
+
+def mark_project_inactive(user: str, github_username: str, github_repo: str):
+    table = connect_to_supabase_table("projects")
+    return (
+        table.update({"is_active": False})
+        .eq("user", user)
+        .eq("github_username", github_username)
+        .eq("name", github_repo)
+        .execute()
+    )
+
+
+def delete_project_for_testing(user: str, github_username: str, github_repo: str):
+    table = connect_to_supabase_table("projects")
+    return (
+        table.delete()
+        .match({"user": user, "github_username": github_username, "name": github_repo})
+        .execute()
+    )
 
 
 def list_projects(user_email: str) -> models.ProjectList:

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 os.environ["SKIP_AUTH_MIDDLEWARE"] = "True"
-from maintainability.api.src import main, io_operations
+from maintainability.api.src import main, io_operations, models
 
 load_dotenv()
 MAINTAINABILITY_API_KEY = os.getenv("MAINTAINABILITY_API_KEY")
@@ -225,13 +225,37 @@ def test_insert_delete_project(test_client):
     Test insert and delete functionality by inserting an existing but inactive
     project and then deleting it
     """
-    # Start up
-    #   Check that project exists but is inactive
+    params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "turbo-docs",
+    }
+
+    # Check that project exists but is inactive
+    start_status = io_operations.get_project_status(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+    assert start_status == models.ProjectStatus.INACTIVE
+
     # Insert project
-    #   Check that project exists and is active
+    response = test_client.post("/insert_project", params=params)
+    assert response.status_code == 200, response.text
+
+    # Check that project exists and is active
+    intermediate_status = io_operations.get_project_status(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+    assert intermediate_status == models.ProjectStatus.ACTIVE
+
     # Delete project
-    #   Check that project exists but is inactive
-    assert True
+    response = test_client.put("/delete_project", params=params)
+    assert response.status_code == 200, response.text
+
+    # Check that project exists but is inactive
+    end_status = io_operations.get_project_status(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+    assert end_status == models.ProjectStatus.INACTIVE
 
 
 def test_insert_new_project(test_client):
@@ -239,10 +263,35 @@ def test_insert_new_project(test_client):
     Test insert and delete functionality by inserting a NEW project and then
     deleting it
     """
-    # Start up
-    #   Check that project does not exist
+    params = {
+        "user": "voynow99@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "leet-learn-ai",
+    }
+
+    # Check that project does not exist
+    start_status = io_operations.get_project_status(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+    assert start_status == models.ProjectStatus.NOT_FOUND
+
     # Insert project
-    #   Check that project exists and is active
+    response = test_client.post("/insert_project", params=params)
+    assert response.status_code == 200, response.text
+
+    # Check that project exists and is active
+    intermediate_status = io_operations.get_project_status(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+    assert intermediate_status == models.ProjectStatus.ACTIVE
+
     # Delete project
-    #   Check that project exists but is inactive
-    assert True
+    io_operations.delete_project_for_testing(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+
+    # Check that project exists but is inactive
+    end_status = io_operations.get_project_status(
+        params["user"], params["github_username"], params["github_repo"]
+    )
+    assert end_status == models.ProjectStatus.NOT_FOUND

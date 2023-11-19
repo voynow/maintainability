@@ -28,8 +28,8 @@ async def delete_project(user: str, github_username: str, github_repo: str):
 
 
 @router.get("/fetch_repo_structure")
-async def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
-    return extract.fetch_repo_structure(user, repo, branch)
+async def fetch_repo_structure(user: str, repo: str):
+    return extract.fetch_repo_structure(user, repo)
 
 
 @router.get("/fetch_file_content")

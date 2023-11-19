@@ -108,9 +108,21 @@ def delete_project(user, github_username, github_repo):
     return io_operations.mark_project_inactive(user, github_username, github_repo)
 
 
-def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
+def fetch_default_branch(user: str, repo: str) -> str:
     headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
-    url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
+    repo_info_url = f"https://api.github.com/repos/{user}/{repo}"
+
+    resp = requests.get(repo_info_url, headers=headers)
+    resp.raise_for_status()
+
+    return resp.json().get("default_branch", "main")
+
+
+def fetch_repo_structure(user: str, repo: str) -> list:
+    default_branch = fetch_default_branch(user, repo)
+
+    headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
+    url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{default_branch}?recursive=1"
 
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()

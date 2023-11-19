@@ -27,7 +27,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const [githubRepo, setGithubRepo] = useState('');
     const [addProjectError, setAddProjectError] = useState('');
     const [addingProject, setAddingProject] = useState(false);
-    const [isAddingProject, setIsAddingProject] = useState(false);
+    const [operationInProgress, setOperationInProgress] = useState(false);
 
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.down('xs'));
@@ -96,6 +96,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
     const handleDeleteProject = async (githubRepo, githubUsername, e) => {
         e.stopPropagation();
+        setOperationInProgress(true);
         // Optional: show confirmation dialog before proceeding
 
         try {
@@ -114,6 +115,8 @@ const ProjectsDashboard = ({ open, onClose }) => {
             }
         } catch (error) {
             console.error('Error deleting project:', error);
+        } finally {
+            setOperationInProgress(false);
         }
     };
 
@@ -124,7 +127,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
     const handleAddProject = async (e) => {
         e.preventDefault();
         setAddProjectError('');
-        setIsAddingProject(true);
+        setOperationInProgress(true);
 
         try {
             // Insert project into the database
@@ -160,7 +163,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 setAddProjectError('Failed to add project. An unexpected error occurred.');
             }
         } finally {
-            setIsAddingProject(false);
+            setOperationInProgress(false);
         }
     };
 
@@ -171,7 +174,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
     return (
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
-            {isAddingProject && <LinearProgress />}
+            {operationInProgress && <LinearProgress />}
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />

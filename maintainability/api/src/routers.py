@@ -62,7 +62,7 @@ async def get_user_email(api_key: str):
 
 @router.get("/list_projects", response_model=models.ProjectList)
 async def list_projects(user_email: str):
-    """Database proxy for getting user projects given email"""
+    """Database proxy for listing all active projects for a user"""
     return io_operations.list_projects(user_email)
 
 

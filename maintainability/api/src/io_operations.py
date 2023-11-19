@@ -104,8 +104,9 @@ def delete_project_for_testing(user: str, github_username: str, github_repo: str
 
 
 def list_projects(user_email: str) -> models.ProjectList:
+    """Select all projects for some user where is_active is True"""
     table = connect_to_supabase_table("projects")
-    response = table.select("*").eq("user", user_email).execute()
+    response = table.select("*").eq("user", user_email).eq("is_active", True).execute()
     if not response.data:
         return {"projects": None}
     return models.ProjectList(projects=[models.Project(**row) for row in response.data])

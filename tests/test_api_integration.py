@@ -147,6 +147,8 @@ def test_list_projects(test_client):
     for project in response.json()["projects"]:
         assert "name" in project, response.text
         assert "user" in project, response.text
+        assert "is_active" in project, response.text
+        assert project["is_active"] == True, response.text
 
 
 def test_set_favorite_project(test_client):

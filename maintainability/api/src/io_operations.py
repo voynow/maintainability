@@ -38,7 +38,9 @@ def insert_file(file: models.File) -> Tuple:
     return table.insert(file.model_dump()).execute()
 
 
-def get_project_status(user: str, github_username: str, github_repo: str) -> bool:
+def get_project_status(
+    user: str, github_username: str, github_repo: str
+) -> models.ProjectStatus:
     """
     Check for duplicates in the database, return True if project exists and is
     active, False otherwise
@@ -53,10 +55,14 @@ def get_project_status(user: str, github_username: str, github_repo: str) -> boo
     )
 
     if response.data:
-        project_is_active = response.data[0]["is_active"]
-        return project_is_active
+        active_status_map = {
+            True: models.ProjectStatus.ACTIVE,
+            False: models.ProjectStatus.INACTIVE,
+        }
+        is_active = response.data[0]["is_active"]
+        return active_status_map[is_active]
     else:
-        return False
+        return models.ProjectStatus.NOT_FOUND
 
 
 def insert_project(project: models.Project) -> Tuple:

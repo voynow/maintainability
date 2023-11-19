@@ -185,40 +185,36 @@ const ProjectsDashboard = ({ open, onClose }) => {
             <DialogContent dividers>
                 {projects.map((project) => (
                     <Accordion key={project.primary_id} elevation={1} square>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id={`panel1a-header-${project.primary_id}`}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                                <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
-                                    {project.name}
-                                </Typography>
-                                <div>
-                                    <Tooltip title="Set as Favorite">
-                                        <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
-                                            {project.favorite ? (
-                                                <FavoriteIcon style={{ color: '#CD5C5C' }} />
-                                            ) : (
-                                                <FavoriteBorderIcon />
-                                            )}
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Select Project">
-                                        <IconButton onClick={() => handleSelectProject(project.name)} size="small">
-                                            <CheckCircleOutlineIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete Project">
-                                        <IconButton onClick={(e) => handleDeleteProject(project.name, project.github_username, e)} size="small">
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </div>
-                            </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <Typography variant="body2">
-                                Created at: {new Date(project.created_at).toLocaleDateString()}
-                                <br />
-                                GitHub Username: {project.github_username || 'Not provided'}
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`panel-content-${project.primary_id}`} id={`panel-header-${project.primary_id}`}>
+                            <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
+                                {project.name}
                             </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <Typography variant="body2">
+                                    Created at: {new Date(project.created_at).toLocaleDateString()}
+                                    <br />
+                                    GitHub Username: {project.github_username || 'Not provided'}
+                                </Typography>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Tooltip title="Select Project">
+                                    <IconButton onClick={() => handleSelectProject(project.name)} size="small">
+                                        <CheckCircleOutlineIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={project.favorite ? "Unset as Favorite" : "Set as Favorite"}>
+                                    <IconButton onClick={(e) => handleSetFavorite(project.name, e)} size="small">
+                                        {project.favorite ? <FavoriteIcon style={{ color: '#CD5C5C' }} /> : <FavoriteBorderIcon />}
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete Project">
+                                    <IconButton onClick={(e) => handleDeleteProject(project.github_repo, project.github_username, e)} size="small">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
                         </AccordionDetails>
                     </Accordion>
                 ))}

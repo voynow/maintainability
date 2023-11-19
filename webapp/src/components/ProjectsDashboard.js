@@ -18,6 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import StorageIcon from '@mui/icons-material/Storage';
 import { LinearProgress } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 const ProjectsDashboard = ({ open, onClose }) => {
@@ -90,6 +91,27 @@ const ProjectsDashboard = ({ open, onClose }) => {
             );
         } catch (error) {
             console.error('Error setting favorite project', error);
+        }
+    };
+
+    const handleDeleteProject = async (githubRepo, githubUsername, e) => {
+        e.stopPropagation();
+        // Optional: show confirmation dialog before proceeding
+
+        try {
+            // Call your API to delete the project
+            const response = await api.put("/delete_project", {
+                user: email,
+                github_username: githubUsername,
+                github_repo: githubRepo
+            });
+
+            // Handle the response, refresh project list if necessary
+            if (response.status === 200) {
+                fetchProjects(); // Refresh the projects list
+            }
+        } catch (error) {
+            console.error('Error deleting project:', error);
         }
     };
 
@@ -176,6 +198,11 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                     <Tooltip title="Select Project">
                                         <IconButton onClick={() => handleSelectProject(project.name)} size="small">
                                             <CheckCircleOutlineIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete Project">
+                                        <IconButton onClick={(e) => handleDeleteProject(project.name, project.github_username, e)} size="small">
+                                            <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
                                 </div>

@@ -7,18 +7,22 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 
-class ExtractMetrics(BaseModel):
+class ExtractMetricsTransaction(BaseModel):
     file_id: str
-    filepath: str
-    file_content: str
-    metric: str
+    session_id: UUID = Field(default_factory=UUID)
+    file_path: str
+    content: str
+    metric_name: str
 
 
-class MetricTransaction(BaseModel):
+class Metric(BaseModel):
+    primary_id: UUID = Field(default_factory=UUID)
+    file_id: UUID = Field(default_factory=UUID)
+    session_id: UUID = Field(default_factory=UUID)
+    timestamp: datetime
     metric: str
     score: int
     reasoning: str
-    file_id: str
 
 
 class File(BaseModel):
@@ -42,14 +46,6 @@ class File(BaseModel):
         This replaces the deprecated '.dict()' method if it's no longer available.
         """
         return json.loads(self.model_dump_json(by_alias=True))
-
-
-class Metric(BaseModel):
-    primary_id: UUID = Field(default_factory=UUID)
-    metric: str
-    score: int
-    reasoning: str
-    file_id: UUID
 
 
 class Project(BaseModel):
@@ -96,18 +92,6 @@ class User(BaseModel):
     email: str
     password: str  # hashed password
     role: str
-
-
-class TokenRequest(BaseModel):
-    email: str
-    password: str
-
-
-class Token(BaseModel):
-    """JWT token information"""
-
-    access_token: str
-    token_type: str  # generally 'bearer'
 
 
 class APIKey(BaseModel):

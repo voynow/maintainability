@@ -50,14 +50,9 @@ async def get_metrics_config():
 
 
 @router.post("/extract_metrics")
-async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
+async def extract_metrics(transaction: models.ExtractMetricsTransaction):
     """Extract some metrics from a single file of code"""
-    return extract.extract_metrics(
-        file_id=extract_metrics_obj.file_id,
-        filepath=extract_metrics_obj.filepath,
-        code=extract_metrics_obj.file_content,
-        metric=extract_metrics_obj.metric,
-    )
+    return extract.extract_metrics(transaction)
 
 
 @router.get("/get_user_email")

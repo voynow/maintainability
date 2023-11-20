@@ -32,23 +32,28 @@ def parse_response(text: str) -> float:
     return response
 
 
-def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
+def extract_metrics(
+    transaction: models.ExtractMetricsTransaction,
+) -> models.Metric:
     gpt_interface = get_llm()
-    description = config.METRICS[metric]
     response = gpt_interface(
-        filepath=filepath,
-        code=code,
-        metric=metric.replace("_", " "),
-        description=description,
+        filepath=transaction.file_path,
+        code=transaction.content,
+        metric=transaction.metric.replace("_", " "),
+        description=config.METRICS[transaction.metric_name],
     )
     metric_quantity = int(parse_response(response))
-    io_operations.write_metrics(
-        file_id=file_id,
-        metric=metric,
-        metric_quantity=metric_quantity,
+    metric = models.Metric(
+        primary_id=uuid.uuid4(),
+        file_id=transaction.file_id,
+        session_id=transaction.session_id,
+        timestamp=datetime.now(),
+        metric=transaction.metric_name,
+        score=metric_quantity,
         reasoning=response,
     )
-    return metric_quantity
+    io_operations.write_metrics(metric)
+    return metric
 
 
 def validate_github_project(

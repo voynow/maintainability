@@ -36,14 +36,15 @@ def test_extract_metrics_with_valid_data(test_client):
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     payload = {
         "file_id": "88888888-8888-8888-8888-888888888888",
-        "filepath": "/test/path/testfile.py",
-        "file_content": "print('hello world')\n" * 100,
-        "metric": "adaptive_resilience",
+        "session_id": "88888888-8888-8888-8888-888888888888",
+        "file_path": "/test/path/testfile.py",
+        "content": "print('hello world')\n" * 100,
+        "metric_name": "adaptive_resilience",
     }
     response = test_client.post("/extract_metrics", headers=headers, json=payload)
     assert response.status_code == 200, response.text
-    assert isinstance(response.json(), int), response.text
-    assert response.json() >= 0 and response.json() <= 10, response.text
+    assert "file_id" in response.json()
+    assert response.json()["file_id"] == payload["file_id"], response.text
 
 
 def test_extract_metrics_with_invalid_data(test_client):

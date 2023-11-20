@@ -1,14 +1,14 @@
 import json
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 
 class ExtractMetricsTransaction(BaseModel):
-    file_id: str
+    file_id: UUID = Field(default_factory=UUID)
     session_id: UUID = Field(default_factory=UUID)
     file_path: str
     content: str
@@ -23,6 +23,16 @@ class Metric(BaseModel):
     metric: str
     score: int
     reasoning: str
+
+    class Config:
+        json_encoders = {UUID: lambda v: str(v), datetime: lambda v: v.isoformat()}
+
+    def model_dump(self, mode: str = "json", **kwargs) -> Any:
+        """
+        Custom serialization to handle the conversion of non-serializable types and
+        additional formatting based on the 'mode'.
+        """
+        return json.loads(self.model_dump_json(**kwargs))
 
 
 class File(BaseModel):

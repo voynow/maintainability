@@ -39,7 +39,7 @@ def extract_metrics(
     response = gpt_interface(
         filepath=transaction.file_path,
         code=transaction.content,
-        metric=transaction.metric.replace("_", " "),
+        metric=transaction.metric_name.replace("_", " "),
         description=config.METRICS[transaction.metric_name],
     )
     metric_quantity = int(parse_response(response))
@@ -52,7 +52,7 @@ def extract_metrics(
         score=metric_quantity,
         reasoning=response,
     )
-    io_operations.write_metrics(metric)
+    io_operations.write_metric(metric)
     return metric
 
 

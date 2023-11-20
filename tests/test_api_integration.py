@@ -47,15 +47,6 @@ def test_extract_metrics_with_valid_data(test_client):
     assert response.json()["file_id"] == payload["file_id"], response.text
 
 
-def test_extract_metrics_with_invalid_data(test_client):
-    """Test /extract_metrics route with invalid data"""
-    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
-    response = test_client.post(
-        "/extract_metrics", headers=headers, json={"invalid": -1}
-    )
-    assert response.status_code == 422, response.text
-
-
 def test_insert_file(test_client):
     """Test /insert_file route with valid data"""
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}

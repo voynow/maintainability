@@ -59,8 +59,10 @@ def extract_metrics(
 def validate_github_project(
     user: str, github_username: str, github_repo: str
 ) -> models.ProjectStatus:
+    headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
     url = f"https://api.github.com/repos/{github_username}/{github_repo}"
-    response = requests.get(url)
+
+    response = requests.get(url, headers=headers)
 
     # Check that project exists on GitHub
     if response.status_code != 200:

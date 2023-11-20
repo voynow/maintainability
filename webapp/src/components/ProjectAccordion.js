@@ -7,14 +7,34 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import api from '../axiosConfig';
+import { v4 as uuidv4 } from 'uuid';
 
-const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeleteProject, api_key }) => {
+const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeleteProject }) => {
     const [isTriggering, setIsTriggering] = useState(false);
+    const [metricsConfig, setMetricsConfig] = useState({});
+
+    useEffect(() => {
+        // Fetch metrics config when component mounts
+        const fetchMetricsConfig = async () => {
+            try {
+                const response = await api.get("/get_metrics_config");
+                setMetricsConfig(response.data);
+            } catch (error) {
+                console.error('Error fetching metrics config:', error);
+            }
+        };
+
+        fetchMetricsConfig();
+    }, []);
 
     const handleTriggerRun = async () => {
         setIsTriggering(true);
 
         try {
+            // Generating a random UUID
+            const session_id = uuidv4();
+
+            // retieving project structure from github/com/project.github_username/project.name
             const repoStructureResponse = await api.get("/fetch_repo_structure", {
                 params: {
                     user: project.github_username,
@@ -22,6 +42,7 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                 }
             });
 
+            // Iterating over each file in the project structure
             for (let path of repoStructureResponse.data) {
                 const fileContentResponse = await api.get("/fetch_file_content", {
                     params: {
@@ -31,15 +52,17 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                     }
                 });
 
+                // Extracting file content & metadata
                 const fileContent = fileContentResponse.data;
-                const file_id = generateUUID();
+                const file_id = uuidv4();
                 const timestamp = new Date().toISOString();
 
+                // Insert file snapshot into database
                 await api.post("/insert_file", {
                     file_id,
                     user_email: project.user,
                     project_name: project.name,
-                    session_id: generateUUID(),
+                    session_id: session_id,
                     file_path: path,
                     file_size: fileContent.length,
                     loc: fileContent.split('\n').length,
@@ -48,7 +71,8 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                     timestamp
                 });
 
-                for (let metric of config.METRICS) {
+                // Extracting metrics for each file using the keys of the metrics config
+                for (let metric of Object.keys(metricsConfig)) {
                     await api.post("/extract_metrics", {
                         file_id: file_id,
                         filepath: path,

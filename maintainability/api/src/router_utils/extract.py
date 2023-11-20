@@ -34,7 +34,7 @@ def parse_response(text: str) -> float:
 
 def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
     gpt_interface = get_llm()
-    description = config.METRIC_DESCRIPTIONS[metric]
+    description = config.METRICS[metric]
     response = gpt_interface(
         filepath=filepath,
         code=code,
@@ -141,6 +141,10 @@ def fetch_file_content(user: str, repo: str, path: str) -> str:
     file_resp = requests.get(file_url, headers=headers)
     file_resp.raise_for_status()
     return base64.b64decode(file_resp.json()["content"]).decode("utf-8")
+
+
+def get_metrics_config():
+    return config.METRICS
 
 
 #

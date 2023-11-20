@@ -43,6 +43,12 @@ async def insert_file(file: models.File):
     return io_operations.insert_file(file)
 
 
+@router.get("/get_metrics_config")
+async def get_metrics_config():
+    """Interface to retirve metrics configuration"""
+    return extract.get_metrics_config()
+
+
 @router.post("/extract_metrics")
 async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
     """Extract some metrics from a single file of code"""

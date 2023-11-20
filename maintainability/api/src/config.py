@@ -35,7 +35,7 @@ EXTENSIONS = [
     ".css",
 ]
 
-METRIC_DESCRIPTIONS = {
+METRICS = {
     "intuitive_design": """Variable and Function Naming: Clear names indicating purpose and type.
 Good: total_amount, calculate_tax(income)
 Bad: ta, calc()

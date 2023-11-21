@@ -152,11 +152,13 @@ def fetch_file_content(user: str, repo: str, path: str) -> str:
 
 
 def check_file_criteria(
-    file_path: Path, extension: str, line_count: int
+    file_path: str, extension: str, line_count: int
 ) -> dict[str, str]:
-    
+    """Check if a file meets the criteria for analysis"""
+    file_path = Path(file_path)
+
     # Check if the file extension is allowed
-    if not extension or f".{extension}" not in config.ALLOWED_EXTENSIONS:
+    if not extension or f".{extension}" not in config.EXTENSIONS:
         return {"result": False, "message": "File extension not allowed"}
 
     # Check minimum line count if content is provided
@@ -165,11 +167,11 @@ def check_file_criteria(
 
     # Check if it's a test file
     if file_path.name.startswith("test") or file_path.stem.endswith("test"):
-        return f"identified as test file."
+        return {"result": False, "message": "identified as test file."}
 
     # Check if it's a config file
     if file_path.name.startswith("config."):
-        return f"identified as config file."
+        return {"result": False, "message": "identified as config file."}
 
     # If all checks pass
     return {"result": True, "message": "File meets criteria"}

@@ -196,7 +196,7 @@ def test_fetch_file_content(test_client):
 
 def test_check_file_criteria_valid(test_client):
     params = {"file_path": "utils/process.py", "extension": "py", "line_count": 150}
-    response = test_client.post("/check_file_criteria", json=params)
+    response = test_client.post("/check_file_criteria", params=params)
     assert response.status_code == 200, response.text
     assert response.json() == {
         "result": True,
@@ -210,7 +210,7 @@ def test_check_file_criteria_disallowed_extension(test_client):
         "extension": "unknown",
         "line_count": 150,
     }
-    response = test_client.post("/check_file_criteria", json=params)
+    response = test_client.post("/check_file_criteria", params=params)
     assert response.status_code == 200, response.text
     assert response.json() == {
         "result": False,
@@ -224,7 +224,7 @@ def test_check_file_criteria_insufficient_lines(test_client):
         "extension": "py",
         "line_count": 5,
     }
-    response = test_client.post("/check_file_criteria", json=params)
+    response = test_client.post("/check_file_criteria", params=params)
     assert response.status_code == 200, response.text
     assert response.json() == {
         "result": False,
@@ -238,7 +238,7 @@ def test_check_file_criteria_test_file(test_client):
         "extension": "py",
         "line_count": 150,
     }
-    response = test_client.post("/check_file_criteria", json=params)
+    response = test_client.post("/check_file_criteria", params=params)
     assert response.status_code == 200, response.text
     assert response.json() == {
         "result": False,
@@ -248,7 +248,7 @@ def test_check_file_criteria_test_file(test_client):
 
 def test_check_file_criteria_config_file(test_client):
     params = {"file_path": "utils/config.py", "extension": "py", "line_count": 150}
-    response = test_client.post("/check_file_criteria", json=params)
+    response = test_client.post("/check_file_criteria", params=params)
     assert response.status_code == 200, response.text
     assert response.json() == {
         "result": False,

@@ -194,6 +194,68 @@ def test_fetch_file_content(test_client):
     assert isinstance(response.json(), str), response.text
 
 
+def test_check_file_criteria_valid(test_client):
+    params = {"file_path": "utils/process.py", "extension": "py", "line_count": 150}
+    response = test_client.post("/check_file_criteria", json=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": True,
+        "message": "File meets criteria",
+    }, response.text
+
+
+def test_check_file_criteria_disallowed_extension(test_client):
+    params = {
+        "file_path": "main.unknown",
+        "extension": "unknown",
+        "line_count": 150,
+    }
+    response = test_client.post("/check_file_criteria", json=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "File extension not allowed",
+    }, response.text
+
+
+def test_check_file_criteria_insufficient_lines(test_client):
+    params = {
+        "file_path": "utils/process.py",
+        "extension": "py",
+        "line_count": 5,
+    }
+    response = test_client.post("/check_file_criteria", json=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "Insufficient number of lines",
+    }, response.text
+
+
+def test_check_file_criteria_test_file(test_client):
+    params = {
+        "file_path": "utils/process_test.py",
+        "extension": "py",
+        "line_count": 150,
+    }
+    response = test_client.post("/check_file_criteria", json=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "identified as test file.",
+    }, response.text
+
+
+def test_check_file_criteria_config_file(test_client):
+    params = {"file_path": "utils/config.py", "extension": "py", "line_count": 150}
+    response = test_client.post("/check_file_criteria", json=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "identified as config file.",
+    }, response.text
+
+
 def test_validate_github_project_not_found(test_client):
     params = {
         "user": "voynow99@gmail.com",

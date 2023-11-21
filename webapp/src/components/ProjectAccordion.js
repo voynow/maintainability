@@ -27,6 +27,14 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
         fetchMetricsConfig();
     }, []);
 
+    const extractExtension = (path) => {
+        if (!path) return '';
+
+        const lastDotIndex = path.lastIndexOf('.');
+        if (lastDotIndex === -1 || lastDotIndex === 0) return '';
+        return path.substring(lastDotIndex + 1);
+    };
+
     const handleTriggerRun = async () => {
         setIsTriggering(true);
         console.log('isTriggering:', isTriggering, 'for project:', project.name);
@@ -57,23 +65,23 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                 });
 
                 // Extracting file content & metadata
-                const fileContent = fileContentResponse.data;
+                const content = fileContentResponse.data;
                 const file_id = uuidv4();
                 const timestamp = new Date().toISOString();
 
                 // Insert file snapshot into database
                 console.log('Inserting file snapshot into database:', path);
                 await api.post("/insert_file", {
-                    file_id,
+                    file_id: file_id,
                     user_email: project.user,
                     project_name: project.name,
                     session_id: session_id,
                     file_path: path,
-                    file_size: fileContent.length,
-                    loc: fileContent.split('\n').length,
+                    file_size: content.length,
+                    loc: content.split('\n').length,
                     extension: extractExtension(path),
-                    content: fileContent,
-                    timestamp
+                    content: content,
+                    timestamp: timestamp
                 });
 
                 // Extracting metrics for each file using the keys of the metrics config
@@ -82,7 +90,7 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                     await api.post("/extract_metrics", {
                         file_id: file_id,
                         filepath: path,
-                        file_content: fileContent,
+                        file_content: content,
                         metric: metric
                     });
                 }

@@ -2,6 +2,7 @@ import base64
 from datetime import datetime
 import os
 import re
+from pathlib import Path
 import uuid
 
 import requests
@@ -148,6 +149,30 @@ def fetch_file_content(user: str, repo: str, path: str) -> str:
     file_resp = requests.get(file_url, headers=headers)
     file_resp.raise_for_status()
     return base64.b64decode(file_resp.json()["content"]).decode("utf-8")
+
+
+def check_file_criteria(
+    file_path: Path, extension: str, line_count: int
+) -> dict[str, str]:
+    
+    # Check if the file extension is allowed
+    if not extension or f".{extension}" not in config.ALLOWED_EXTENSIONS:
+        return {"result": False, "message": "File extension not allowed"}
+
+    # Check minimum line count if content is provided
+    if line_count < config.MIN_NUM_LINES:
+        return {"result": False, "message": "Insufficient number of lines"}
+
+    # Check if it's a test file
+    if file_path.name.startswith("test") or file_path.stem.endswith("test"):
+        return f"identified as test file."
+
+    # Check if it's a config file
+    if file_path.name.startswith("config."):
+        return f"identified as config file."
+
+    # If all checks pass
+    return {"result": True, "message": "File meets criteria"}
 
 
 def get_metrics_config():

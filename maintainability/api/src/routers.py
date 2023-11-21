@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Dict
 
 from fastapi import APIRouter
@@ -35,6 +36,12 @@ async def fetch_repo_structure(user: str, repo: str):
 @router.get("/fetch_file_content")
 async def fetch_file_content(user: str, repo: str, path: str):
     return extract.fetch_file_content(user, repo, path)
+
+
+@router.post("/check_file_criteria")
+async def check_file_criteria(file_path: Path, extension: str, line_count: int):
+    """Check if a file meets the criteria for analysis"""
+    return extract.check_file_criteria(file_path, extension, line_count)
 
 
 @router.post("/insert_file")

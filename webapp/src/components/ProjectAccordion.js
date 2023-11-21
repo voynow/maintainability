@@ -14,6 +14,7 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
     const [isTriggering, setIsTriggering] = useState(false);
     const [metricsConfig, setMetricsConfig] = useState({});
     const [error, setError] = useState('');
+    const [latestLog, setLatestLog] = useState(''); // State to hold the latest log message
 
     useEffect(() => {
         // Fetch metrics config when component mounts
@@ -61,8 +62,8 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
 
     const extractFileMetrics = async (fileId, sessionId, path, content, metricsConfig) => {
         for (let metric of Object.keys(metricsConfig)) {
-            console.log('Extracting metric:', metric, 'for file:', path);
-            console.log('fileId:', fileId, 'sessionId:', sessionId, 'path:', path, 'metric:', metric);
+            console.log(path, 'Extracting metric:', metric);
+            setLatestLog(`${path} Extracting metric: ${metric}`);
             // await api.post("/extract_metrics", {
             //     file_id: fileId,
             //     session_id: sessionId,
@@ -208,22 +209,37 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                     </Typography>
                 ) : (
                     progress.isTriggering && (
-                        <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                            <LinearProgress
-                                variant="determinate"
-                                value={progress.percentage}
-                                style={{
-                                    height: '15px',
-                                    borderRadius: '5px',
-                                    backgroundColor: 'rgba(0,0,0,0.1)',
-                                    flexGrow: 1,
-                                }}
-                            />
-                            <Typography variant="body2" style={{ marginLeft: '15px', marginRight: '15px' }}>
-                                {`${progress.percentage.toFixed(0)}%`}
-                            </Typography>
+                        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <div style={{ width: '100%', position: 'relative' }}>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={progress.percentage}
+                                    style={{
+                                        height: '15px',
+                                        borderRadius: '5px',
+                                        backgroundColor: 'rgba(0,0,0,0.1)',
+                                    }}
+                                />
+                                <Typography variant="body2" style={{
+                                    position: 'absolute',
+                                    right: 0,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    padding: '0 10px',
+                                    backgroundColor: '#fff' // Ensure the text is readable over the progress bar
+                                }}>
+                                    {`${progress.percentage.toFixed(0)}%`}
+                                </Typography>
+                            </div>
+                            {latestLog && (
+                                <Typography variant="caption" style={{ color: '#666', marginTop: '4px' }}>
+                                    {latestLog}
+                                </Typography>
+                            )}
                         </div>
                     )
+
+
                 )}
             </div>
 

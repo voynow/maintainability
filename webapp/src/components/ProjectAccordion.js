@@ -46,31 +46,31 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
 
     const insertFileSnapshot = async (project, path, sessionId, fileId, content, lineCount, extension, timestamp) => {
         console.log('Inserting file snapshot into database:', path);
-        // await api.post("/insert_file", {
-        //     file_id: fileId,
-        //     user_email: project.user,
-        //     project_name: project.name,
-        //     session_id: sessionId,
-        //     file_path: path,
-        //     file_size: content.length,
-        //     loc: lineCount,
-        //     extension: extension,
-        //     content: content,
-        //     timestamp: timestamp
-        // });
+        await api.post("/insert_file", {
+            file_id: fileId,
+            user_email: project.user,
+            project_name: project.name,
+            session_id: sessionId,
+            file_path: path,
+            file_size: content.length,
+            loc: lineCount,
+            extension: extension,
+            content: content,
+            timestamp: timestamp
+        });
     };
 
     const extractFileMetrics = async (fileId, sessionId, path, content, metricsConfig) => {
         for (let metric of Object.keys(metricsConfig)) {
             console.log(path, 'Extracting metric:', metric);
             setLatestLog(`${path} Extracting metric: ${metric}`);
-            // await api.post("/extract_metrics", {
-            //     file_id: fileId,
-            //     session_id: sessionId,
-            //     file_path: path,
-            //     content: content,
-            //     metric_name: metric
-            // });
+            await api.post("/extract_metrics", {
+                file_id: fileId,
+                session_id: sessionId,
+                file_path: path,
+                content: content,
+                metric_name: metric
+            });
         }
     };
 

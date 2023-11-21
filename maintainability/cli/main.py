@@ -93,23 +93,29 @@ def call_api_wrapper(
 
 
 def extract_metrics_wrapper(
-    base_url: str, file_id: str, filepath: str, content: str, api_key: str
+    base_url: str,
+    file_id: str,
+    session_id: str,
+    file_path: str,
+    content: str,
+    api_key: str,
 ) -> Dict:
     maintainability_metrics = {}
-    for metric in config.METRICS:
-        logger.info(f"Extracting {filepath}:{metric}")
+    for metric_name in config.METRICS:
+        logger.info(f"Extracting {file_path}:{metric_name}")
         response = call_api_wrapper(
             base_url=base_url,
             endpoint="extract_metrics",
             payload={
                 "file_id": file_id,
-                "filepath": filepath,
-                "file_content": content,
-                "metric": metric,
+                "session_id": session_id,
+                "file_path": file_path,
+                "content": content,
+                "metric_name": metric_name,
             },
             api_key=api_key,
         )
-        maintainability_metrics[metric] = response
+        maintainability_metrics[metric_name] = response
     return maintainability_metrics
 
 

@@ -102,13 +102,26 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
         }
     };
 
+    const retry = async (fn, retries = 3, delay = 1000) => {
+        try {
+            return await fn();
+        } catch (error) {
+            if (retries > 0) {
+                setTimeout(() => { }, delay);
+                return retry(fn, retries - 1, delay);
+            } else {
+                throw error;
+            }
+        }
+    };
+
     const handleTriggerRun = async () => {
         setIsTriggering(true);
         try {
             const sessionId = uuidv4();
-            const repoStructureResponse = await fetchProjectStructure(project);
+            const repoStructureResponse = await retry(() => fetchProjectStructure(project));
             for (let path of repoStructureResponse.data) {
-                await processFile(path, project, sessionId, metricsConfig);
+                await retry(() => processFile(path, project, sessionId, metricsConfig));
             }
         } catch (error) {
             console.error('Error triggering project run:', error);

@@ -59,7 +59,6 @@ async def get_metrics_config():
 @router.post("/extract_metrics")
 async def extract_metrics(transaction: models.ExtractMetricsTransaction):
     """Extract some metrics from a single file of code"""
-    print("******************************routes.py: extract_metrics")
     return extract.extract_metrics(transaction)
 
 

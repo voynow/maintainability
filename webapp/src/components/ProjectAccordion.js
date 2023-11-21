@@ -35,79 +35,80 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
         return path.substring(lastDotIndex + 1);
     };
 
+    const insertFileSnapshot = async (project, path, sessionId, fileId, content, lineCount, extension, timestamp) => {
+        console.log('Inserting file snapshot into database:', path);
+        await api.post("/insert_file", {
+            file_id: fileId,
+            user_email: project.user,
+            project_name: project.name,
+            session_id: sessionId,
+            file_path: path,
+            file_size: content.length,
+            loc: lineCount,
+            extension: extension,
+            content: content,
+            timestamp: timestamp
+        });
+    };
+
+    const extractFileMetrics = async (fileId, path, content, metricsConfig) => {
+        for (let metric of Object.keys(metricsConfig)) {
+            console.log('Extracting metric:', metric, 'for file:', path);
+            await api.post("/extract_metrics", {
+                file_id: fileId,
+                filepath: path,
+                file_content: content,
+                metric: metric
+            });
+        }
+    };
+
+    const fetchProjectStructure = async (project) => {
+        console.log('Fetching project structure:', project.name);
+        return await api.get("/fetch_repo_structure", {
+            params: {
+                user: project.github_username,
+                repo: project.name
+            }
+        });
+    };
+
+    const processFile = async (path, project, sessionId, metricsConfig) => {
+        console.log('Processing file:', path);
+        const fileContentResponse = await api.get("/fetch_file_content", {
+            params: {
+                user: project.github_username,
+                repo: project.name,
+                path: path
+            }
+        });
+        const content = fileContentResponse.data;
+        const file_id = uuidv4();
+        const timestamp = new Date().toISOString();
+        const extension = extractExtension(path);
+        const line_count = content.split('\n').length;
+
+        const checkFileCriteriaResponse = await api.post("/check_file_criteria", {
+            file_path: path,
+            extension: extension,
+            line_count: line_count
+        });
+
+        if (!checkFileCriteriaResponse.data.result) {
+            await insertFileSnapshot(project, path, sessionId, file_id, content, line_count, extension, timestamp);
+            await extractFileMetrics(file_id, path, content, metricsConfig);
+        } else {
+            console.log('Skipping file:', path);
+        }
+    };
+
     const handleTriggerRun = async () => {
         setIsTriggering(true);
-        console.log('isTriggering:', isTriggering, 'for project:', project.name);
-
         try {
-            // Generating a random UUID
-            const session_id = uuidv4();
-
-            // retieving project structure from github/com/project.github_username/project.name
-            console.log('Fetching project structure:', project.name);
-            const repoStructureResponse = await api.get("/fetch_repo_structure", {
-                params: {
-                    user: project.github_username,
-                    repo: project.name
-                }
-            });
-            console.log('Project structure:', repoStructureResponse.data);
-
-            // Iterating over each file in the project structure
+            const sessionId = uuidv4();
+            const repoStructureResponse = await fetchProjectStructure(project);
             for (let path of repoStructureResponse.data) {
-                console.log('Fetching file content:', path);
-                const fileContentResponse = await api.get("/fetch_file_content", {
-                    params: {
-                        user: project.github_username,
-                        repo: project.name,
-                        path: path
-                    }
-                });
-
-                // Extracting file content & metadata
-                const content = fileContentResponse.data;
-                const file_id = uuidv4();
-                const timestamp = new Date().toISOString();
-                const extension = extractExtension(path);
-                const line_count = content.split('\n').length;
-
-                // check if file meets criteria for ingestion
-                const check_file_criteria = await api.post("/check_file_criteria", {
-                    file_path: path,
-                    extension: extension,
-                    line_count: line_count
-                });
-
-                if (!check_file_criteria.data.result) {
-                    console.log('Inserting file snapshot into database:', path);
-
-                    // Insert file snapshot into database
-                    await api.post("/insert_file", {
-                        file_id: file_id,
-                        user_email: project.user,
-                        project_name: project.name,
-                        session_id: session_id,
-                        file_path: path,
-                        file_size: content.length,
-                        loc: line_count,
-                        extension: extension,
-                        content: content,
-                        timestamp: timestamp
-                    });
-
-                    // Extracting metrics for each file using the keys of the metrics config
-                    for (let metric of Object.keys(metricsConfig)) {
-                        console.log('Extracting metric:', metric, 'for file:', path);
-                        await api.post("/extract_metrics", {
-                            file_id: file_id,
-                            filepath: path,
-                            file_content: content,
-                            metric: metric
-                        });
-                    }
-                } else {
-                    console.log('Skipping file:', path);
-                }
+                await processFile(path, project, sessionId, metricsConfig);
             }
         } catch (error) {
             console.error('Error triggering project run:', error);

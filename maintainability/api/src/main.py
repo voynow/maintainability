@@ -1,4 +1,6 @@
 import os
+import traceback
+import json
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,7 +26,13 @@ app.include_router(routers.router)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logger.logger(f"Unexpected Exception {type(exc)}: {str(exc)}")
+    log_data = {
+        "path": request.url.path,
+        "method": request.method,
+        "error": f"{type(exc)}: {str(exc)}",
+        "traceback": traceback.format_exc(),
+    }
+    logger.logger(json.dumps(log_data))
     return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 

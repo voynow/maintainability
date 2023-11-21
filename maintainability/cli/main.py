@@ -93,23 +93,29 @@ def call_api_wrapper(
 
 
 def extract_metrics_wrapper(
-    base_url: str, file_id: str, filepath: str, content: str, api_key: str
+    base_url: str,
+    file_id: str,
+    session_id: str,
+    file_path: str,
+    content: str,
+    api_key: str,
 ) -> Dict:
     maintainability_metrics = {}
-    for metric in config.METRICS:
-        logger.info(f"Extracting {filepath}:{metric}")
+    for metric_name in config.METRICS:
+        logger.info(f"Extracting {file_path}:{metric_name}")
         response = call_api_wrapper(
             base_url=base_url,
             endpoint="extract_metrics",
             payload={
                 "file_id": file_id,
-                "filepath": filepath,
-                "file_content": content,
-                "metric": metric,
+                "session_id": session_id,
+                "file_path": file_path,
+                "content": content,
+                "metric_name": metric_name,
             },
             api_key=api_key,
         )
-        maintainability_metrics[metric] = response
+        maintainability_metrics[metric_name] = response
     return maintainability_metrics
 
 
@@ -134,7 +140,7 @@ def cli_runner(paths, base_url, api_key):
     )
 
     logger.info(f"Starting extraction for {user_email}:{project_name}")
-    for filepath, content in filtered_repo.items():
+    for file_path, content in filtered_repo.items():
         file_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
@@ -147,10 +153,10 @@ def cli_runner(paths, base_url, api_key):
                 "user_email": user_email,
                 "project_name": project_name,
                 "session_id": session_id,
-                "file_path": filepath,
+                "file_path": file_path,
                 "file_size": len(content.encode("utf-8")),
                 "loc": len(content.splitlines()),
-                "extension": filepath.split(".")[-1] if "." in filepath else "",
+                "extension": file_path.split(".")[-1] if "." in file_path else "",
                 "content": content,
                 "timestamp": timestamp,
             },
@@ -161,12 +167,13 @@ def cli_runner(paths, base_url, api_key):
         maintainability_metrics = extract_metrics_wrapper(
             base_url=base_url,
             file_id=file_id,
-            filepath=filepath,
+            session_id=session_id,
+            file_path=file_path,
             content=content,
             api_key=api_key,
         )
 
-        logger.info(f"Inserted {filepath}, metrics={maintainability_metrics}")
+        logger.info(f"Inserted {file_path}")
 
 
 if __name__ == "__main__":

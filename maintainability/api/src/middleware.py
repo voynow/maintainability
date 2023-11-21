@@ -5,6 +5,7 @@ import json
 import jwt
 from fastapi import HTTPException, Request
 from jose import jwt, JWTError
+from fastapi.responses import JSONResponse
 
 from . import io_operations, logger
 
@@ -53,25 +54,25 @@ def api_key_or_jwt_middleware(request: Request):
 def auth_strategy_dispatcher(request: Request):
     """dispatches to the correct auth strategy based on the request path"""
     path = request.url.path
-    auth_map = {
-        "/insert_file": api_key_middleware,
-        "/extract_metrics": api_key_middleware,
-        "/get_user_email": api_key_or_jwt_middleware,
-    }
-    middleware = auth_map.get(path, jwt_middleware)
+    optional_auth = ["/insert_file", "/extract_metrics", "/get_user_email"]
+    middleware = api_key_or_jwt_middleware if path in optional_auth else jwt_middleware
     middleware(request)
 
 
 async def mixed_auth_middleware(request: Request, call_next):
-    """middleware for handling auth"""
     log_data = {
         "path": request.url.path,
         "method": request.method,
-        "client_ip": str(request.headers),
+        "headers": str(request.headers),
+        "client_ip": request.client.host,
     }
-    logger.logger(f"{json.dumps(log_data)}")
-
-    if request.method != "OPTIONS":
-        auth_strategy_dispatcher(request)
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
+        log_data["status_code"] = response.status_code
+    except Exception as exc:
+        log_data["error"] = str(exc)
+        log_data["traceback"] = traceback.format_exc()
+        response = JSONResponse(status_code=500, content={"detail": str(exc)})
+    finally:
+        logger.logger(json.dumps(log_data))
     return response

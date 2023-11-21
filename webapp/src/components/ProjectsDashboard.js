@@ -164,7 +164,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
             {operationInProgress && <LinearProgress />}
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" component="div" sx={{ textAlign: 'center', width: '100%' }}>
+                <Typography variant="h5" component="div" sx={{ textAlign: 'center', width: '100%' }}>
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
                     {email}'s Projects
                 </Typography>

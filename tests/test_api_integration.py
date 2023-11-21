@@ -36,23 +36,15 @@ def test_extract_metrics_with_valid_data(test_client):
     headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     payload = {
         "file_id": "88888888-8888-8888-8888-888888888888",
-        "filepath": "/test/path/testfile.py",
-        "file_content": "print('hello world')\n" * 100,
-        "metric": "adaptive_resilience",
+        "session_id": "88888888-8888-8888-8888-888888888888",
+        "file_path": "/test/path/testfile.py",
+        "content": "print('hello world')\n" * 100,
+        "metric_name": "adaptive_resilience",
     }
     response = test_client.post("/extract_metrics", headers=headers, json=payload)
     assert response.status_code == 200, response.text
-    assert isinstance(response.json(), int), response.text
-    assert response.json() >= 0 and response.json() <= 10, response.text
-
-
-def test_extract_metrics_with_invalid_data(test_client):
-    """Test /extract_metrics route with invalid data"""
-    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
-    response = test_client.post(
-        "/extract_metrics", headers=headers, json={"invalid": -1}
-    )
-    assert response.status_code == 422, response.text
+    assert "file_id" in response.json()
+    assert response.json()["file_id"] == payload["file_id"], response.text
 
 
 def test_insert_file(test_client):
@@ -200,6 +192,68 @@ def test_fetch_file_content(test_client):
     response = test_client.get("/fetch_file_content", params=params)
     assert response.status_code == 200, response.text
     assert isinstance(response.json(), str), response.text
+
+
+def test_check_file_criteria_valid(test_client):
+    params = {"file_path": "utils/process.py", "extension": "py", "line_count": 150}
+    response = test_client.post("/check_file_criteria", params=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": True,
+        "message": "File meets criteria",
+    }, response.text
+
+
+def test_check_file_criteria_disallowed_extension(test_client):
+    params = {
+        "file_path": "main.unknown",
+        "extension": "unknown",
+        "line_count": 150,
+    }
+    response = test_client.post("/check_file_criteria", params=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "File extension not allowed",
+    }, response.text
+
+
+def test_check_file_criteria_insufficient_lines(test_client):
+    params = {
+        "file_path": "utils/process.py",
+        "extension": "py",
+        "line_count": 5,
+    }
+    response = test_client.post("/check_file_criteria", params=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "Insufficient number of lines",
+    }, response.text
+
+
+def test_check_file_criteria_test_file(test_client):
+    params = {
+        "file_path": "utils/process_test.py",
+        "extension": "py",
+        "line_count": 150,
+    }
+    response = test_client.post("/check_file_criteria", params=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "identified as test file.",
+    }, response.text
+
+
+def test_check_file_criteria_config_file(test_client):
+    params = {"file_path": "utils/config.py", "extension": "py", "line_count": 150}
+    response = test_client.post("/check_file_criteria", params=params)
+    assert response.status_code == 200, response.text
+    assert response.json() == {
+        "result": False,
+        "message": "identified as config file.",
+    }, response.text
 
 
 def test_validate_github_project_not_found(test_client):

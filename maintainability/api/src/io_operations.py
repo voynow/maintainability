@@ -16,21 +16,9 @@ def connect_to_supabase_table(table_name: str) -> Client:
     ).table(table_name)
 
 
-def write_metrics(
-    file_id: str,
-    metric: str,
-    metric_quantity: int,
-    reasoning: str,
-) -> Tuple:
+def write_metric(metric: models.Metric) -> Tuple:
     table = connect_to_supabase_table("metrics")
-    return table.insert(
-        {
-            "file_id": file_id,
-            "metric": metric,
-            "reasoning": reasoning,
-            "score": metric_quantity,
-        }
-    ).execute()
+    return table.insert(metric.model_dump()).execute()
 
 
 def insert_file(file: models.File) -> Tuple:

@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Dict
 
 from fastapi import APIRouter
@@ -28,13 +29,19 @@ async def delete_project(user: str, github_username: str, github_repo: str):
 
 
 @router.get("/fetch_repo_structure")
-async def fetch_repo_structure(user: str, repo: str, branch: str = "main"):
-    return extract.fetch_repo_structure(user, repo, branch)
+async def fetch_repo_structure(user: str, repo: str):
+    return extract.fetch_repo_structure(user, repo)
 
 
 @router.get("/fetch_file_content")
 async def fetch_file_content(user: str, repo: str, path: str):
     return extract.fetch_file_content(user, repo, path)
+
+
+@router.post("/check_file_criteria")
+async def check_file_criteria(file_path: str, extension: str, line_count: int):
+    """Check if a file meets the criteria for analysis"""
+    return extract.check_file_criteria(file_path, extension, line_count)
 
 
 @router.post("/insert_file")
@@ -43,15 +50,16 @@ async def insert_file(file: models.File):
     return io_operations.insert_file(file)
 
 
+@router.get("/get_metrics_config")
+async def get_metrics_config():
+    """Interface to retirve metrics configuration"""
+    return extract.get_metrics_config()
+
+
 @router.post("/extract_metrics")
-async def extract_metrics(extract_metrics_obj: models.ExtractMetrics):
+async def extract_metrics(transaction: models.ExtractMetricsTransaction):
     """Extract some metrics from a single file of code"""
-    return extract.extract_metrics(
-        file_id=extract_metrics_obj.file_id,
-        filepath=extract_metrics_obj.filepath,
-        code=extract_metrics_obj.file_content,
-        metric=extract_metrics_obj.metric,
-    )
+    return extract.extract_metrics(transaction)
 
 
 @router.get("/get_user_email")

@@ -2,6 +2,7 @@ import base64
 from datetime import datetime
 import os
 import re
+from pathlib import Path
 import uuid
 
 import requests
@@ -32,30 +33,37 @@ def parse_response(text: str) -> float:
     return response
 
 
-def extract_metrics(file_id: str, filepath: str, code: str, metric: str) -> int:
+def extract_metrics(
+    transaction: models.ExtractMetricsTransaction,
+) -> models.Metric:
     gpt_interface = get_llm()
-    description = config.METRIC_DESCRIPTIONS[metric]
     response = gpt_interface(
-        filepath=filepath,
-        code=code,
-        metric=metric.replace("_", " "),
-        description=description,
+        filepath=transaction.file_path,
+        code=transaction.content,
+        metric=transaction.metric_name.replace("_", " "),
+        description=config.METRICS[transaction.metric_name],
     )
     metric_quantity = int(parse_response(response))
-    io_operations.write_metrics(
-        file_id=file_id,
-        metric=metric,
-        metric_quantity=metric_quantity,
+    metric = models.Metric(
+        primary_id=uuid.uuid4(),
+        file_id=transaction.file_id,
+        session_id=transaction.session_id,
+        timestamp=datetime.now(),
+        metric=transaction.metric_name,
+        score=metric_quantity,
         reasoning=response,
     )
-    return metric_quantity
+    io_operations.write_metric(metric)
+    return metric
 
 
 def validate_github_project(
     user: str, github_username: str, github_repo: str
 ) -> models.ProjectStatus:
+    headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
     url = f"https://api.github.com/repos/{github_username}/{github_repo}"
-    response = requests.get(url)
+
+    response = requests.get(url, headers=headers)
 
     # Check that project exists on GitHub
     if response.status_code != 200:
@@ -108,9 +116,21 @@ def delete_project(user, github_username, github_repo):
     return io_operations.mark_project_inactive(user, github_username, github_repo)
 
 
-def fetch_repo_structure(user: str, repo: str, branch: str = "main") -> list:
+def fetch_default_branch(user: str, repo: str) -> str:
     headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
-    url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{branch}?recursive=1"
+    repo_info_url = f"https://api.github.com/repos/{user}/{repo}"
+
+    resp = requests.get(repo_info_url, headers=headers)
+    resp.raise_for_status()
+
+    return resp.json().get("default_branch", "main")
+
+
+def fetch_repo_structure(user: str, repo: str) -> list:
+    default_branch = fetch_default_branch(user, repo)
+
+    headers = {"Authorization": f"token {GH_AUTH_TOKEN}"}
+    url = f"https://api.github.com/repos/{user}/{repo}/git/trees/{default_branch}?recursive=1"
 
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
@@ -129,6 +149,36 @@ def fetch_file_content(user: str, repo: str, path: str) -> str:
     file_resp = requests.get(file_url, headers=headers)
     file_resp.raise_for_status()
     return base64.b64decode(file_resp.json()["content"]).decode("utf-8")
+
+
+def check_file_criteria(
+    file_path: str, extension: str, line_count: int
+) -> dict[str, str]:
+    """Check if a file meets the criteria for analysis"""
+    file_path = Path(file_path)
+
+    # Check if the file extension is allowed
+    if not extension or f".{extension}" not in config.EXTENSIONS:
+        return {"result": False, "message": "File extension not allowed"}
+
+    # Check minimum line count if content is provided
+    if line_count < config.MIN_NUM_LINES:
+        return {"result": False, "message": "Insufficient number of lines"}
+
+    # Check if it's a test file
+    if file_path.name.startswith("test") or file_path.stem.endswith("test"):
+        return {"result": False, "message": "identified as test file."}
+
+    # Check if it's a config file
+    if file_path.name.startswith("config."):
+        return {"result": False, "message": "identified as config file."}
+
+    # If all checks pass
+    return {"result": True, "message": "File meets criteria"}
+
+
+def get_metrics_config():
+    return config.METRICS
 
 
 #

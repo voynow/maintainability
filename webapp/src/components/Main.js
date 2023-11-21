@@ -6,14 +6,11 @@ import Header from './Header';
 import MainContent from './MainContent';
 
 const Main = () => {
-
-
-
   return (
-    <div className='flex flex-col h-full'>
+    <div className='flex flex-col min-h-screen'>
       <Header />
-      <div className='flex flex-row flex-grow'>
-        <MainContent>
+      <div className='flex flex-row flex-grow overflow-x-hidden'>
+        <MainContent className="max-w-full">
           <Routes>
             <Route index element={<Analytics />} />
           </Routes>

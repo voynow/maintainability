@@ -1,24 +1,38 @@
 import json
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 
-class ExtractMetrics(BaseModel):
-    file_id: str
-    filepath: str
-    file_content: str
-    metric: str
+class ExtractMetricsTransaction(BaseModel):
+    file_id: UUID = Field(default_factory=UUID)
+    session_id: UUID = Field(default_factory=UUID)
+    file_path: str
+    content: str
+    metric_name: str
 
 
-class MetricTransaction(BaseModel):
+class Metric(BaseModel):
+    primary_id: UUID = Field(default_factory=UUID)
+    file_id: UUID = Field(default_factory=UUID)
+    session_id: UUID = Field(default_factory=UUID)
+    timestamp: datetime
     metric: str
     score: int
     reasoning: str
-    file_id: str
+
+    class Config:
+        json_encoders = {UUID: lambda v: str(v), datetime: lambda v: v.isoformat()}
+
+    def model_dump(self, mode: str = "json", **kwargs) -> Any:
+        """
+        Custom serialization to handle the conversion of non-serializable types and
+        additional formatting based on the 'mode'.
+        """
+        return json.loads(self.model_dump_json(**kwargs))
 
 
 class File(BaseModel):
@@ -42,14 +56,6 @@ class File(BaseModel):
         This replaces the deprecated '.dict()' method if it's no longer available.
         """
         return json.loads(self.model_dump_json(by_alias=True))
-
-
-class Metric(BaseModel):
-    primary_id: UUID = Field(default_factory=UUID)
-    metric: str
-    score: int
-    reasoning: str
-    file_id: UUID
 
 
 class Project(BaseModel):
@@ -96,18 +102,6 @@ class User(BaseModel):
     email: str
     password: str  # hashed password
     role: str
-
-
-class TokenRequest(BaseModel):
-    email: str
-    password: str
-
-
-class Token(BaseModel):
-    """JWT token information"""
-
-    access_token: str
-    token_type: str  # generally 'bearer'
 
 
 class APIKey(BaseModel):

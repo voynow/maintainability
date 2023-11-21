@@ -1,17 +1,9 @@
-PROMPT = """You are a highly respected tech lead at a leading technology company, participating in a code review of {filepath}:
-{code}
-
-Evaluate the code on {metric}:
-{description}
-
-Approach this review with big tech, production-ready expectations. Be uncompromising and severe in your critique. Use a zero-tolerance policy for lapses in quality, and make sure to distribute your scores rigorously and evenly across the 0-10 range. Reserve scores of 8, 9 or 10 for exceptional code that could be considered a best-in-class example. Reserve scores of 0, 1 or 2 for code that is entry-level, amateurish, or otherwise unacceptable.
-
-Write two-three bullet points on your initial thoughts while being as brief as possible. When you are done, conclude with a numerical response (X/10, where 10 is exceptional and 0 is unacceptable) and nothing else.
-"""
-
+# configs for LLM
 MODEL_NAME = "gpt-3.5-turbo"
 TEMPERATURE = 0.0
 
+# configs for file analysis
+MIN_NUM_LINES = 50
 EXTENSIONS = [
     ".py",
     ".js",
@@ -35,7 +27,20 @@ EXTENSIONS = [
     ".css",
 ]
 
-METRIC_DESCRIPTIONS = {
+# prompt template
+PROMPT = """You are a highly respected tech lead at a leading technology company, participating in a code review of {filepath}:
+{code}
+
+Evaluate the code on {metric}:
+{description}
+
+Approach this review with big tech, production-ready expectations. Be uncompromising and severe in your critique. Use a zero-tolerance policy for lapses in quality, and make sure to distribute your scores rigorously and evenly across the 0-10 range. Reserve scores of 8, 9 or 10 for exceptional code that could be considered a best-in-class example. Reserve scores of 0, 1 or 2 for code that is entry-level, amateurish, or otherwise unacceptable.
+
+Write two-three bullet points on your initial thoughts while being as brief as possible. When you are done, conclude with a numerical response (X/10, where 10 is exceptional and 0 is unacceptable) and nothing else.
+"""
+
+# prompts for metric descriptions
+METRICS = {
     "intuitive_design": """Variable and Function Naming: Clear names indicating purpose and type.
 Good: total_amount, calculate_tax(income)
 Bad: ta, calc()

@@ -77,7 +77,7 @@ const Analytics = () => {
                 NoProjectsUI()
             ) : plotData ? (
                 plotData.map((plot, index) => (
-                    <div key={index} style={{ width: '100%', marginBottom: '128px', position: 'relative' }}>
+                    <div key={index} style={{ width: '100%', maxWidth: '100%', marginBottom: '128px', position: 'relative' }}>
                         <CustomTooltip
                             title={
                                 <Typography style={{ whiteSpace: 'pre-line' }}>
@@ -103,6 +103,7 @@ const Analytics = () => {
                         <Plot
                             data={plot.data}
                             layout={{ ...plot.layout, autosize: true }}
+                            useResizeHandler={true}
                             style={{ width: '100%', height: '100%' }}
                         />
                     </div>

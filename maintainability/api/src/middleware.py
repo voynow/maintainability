@@ -53,12 +53,8 @@ def api_key_or_jwt_middleware(request: Request):
 def auth_strategy_dispatcher(request: Request):
     """dispatches to the correct auth strategy based on the request path"""
     path = request.url.path
-    auth_map = {
-        "/insert_file": api_key_middleware,
-        "/extract_metrics": api_key_middleware,
-        "/get_user_email": api_key_or_jwt_middleware,
-    }
-    middleware = auth_map.get(path, jwt_middleware)
+    optional_auth = ["/insert_file", "/extract_metrics", "/get_user_email"]
+    middleware = api_key_or_jwt_middleware if path in optional_auth else jwt_middleware
     middleware(request)
 
 

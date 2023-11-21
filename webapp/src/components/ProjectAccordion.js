@@ -51,14 +51,18 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
         });
     };
 
-    const extractFileMetrics = async (fileId, path, content, metricsConfig) => {
+    const extractFileMetrics = async (fileId, sessionId, path, content, metricsConfig) => {
         for (let metric of Object.keys(metricsConfig)) {
             console.log('Extracting metric:', metric, 'for file:', path);
-            await api.post("/extract_metrics", {
-                file_id: fileId,
-                filepath: path,
-                file_content: content,
-                metric: metric
+            console.log('fileId:', fileId, 'sessionId:', sessionId, 'path:', path, 'metric:', metric);
+            await api.post("/extract_metrics", null, {
+                params: {
+                    file_id: fileId,
+                    session_id: sessionId,
+                    filepath: path,
+                    file_content: content,
+                    metric: metric
+                }
             });
         }
     };
@@ -88,15 +92,17 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
         const extension = extractExtension(path);
         const line_count = content.split('\n').length;
 
-        const checkFileCriteriaResponse = await api.post("/check_file_criteria", {
-            file_path: path,
-            extension: extension,
-            line_count: line_count
+        const checkFileCriteriaResponse = await api.post("/check_file_criteria", null, {
+            params: {
+                file_path: path,
+                extension: extension,
+                line_count: line_count
+            }
         });
 
-        if (!checkFileCriteriaResponse.data.result) {
+        if (checkFileCriteriaResponse.data.result) {
             await insertFileSnapshot(project, path, sessionId, file_id, content, line_count, extension, timestamp);
-            await extractFileMetrics(file_id, path, content, metricsConfig);
+            await extractFileMetrics(file_id, sessionId, path, content, metricsConfig);
         } else {
             console.log('Skipping file:', path);
         }

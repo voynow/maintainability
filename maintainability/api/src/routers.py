@@ -39,7 +39,7 @@ async def fetch_file_content(user: str, repo: str, path: str):
 
 
 @router.post("/check_file_criteria")
-async def check_file_criteria(file_path: Path, extension: str, line_count: int):
+async def check_file_criteria(file_path: str, extension: str, line_count: int):
     """Check if a file meets the criteria for analysis"""
     return extract.check_file_criteria(file_path, extension, line_count)
 
@@ -59,6 +59,7 @@ async def get_metrics_config():
 @router.post("/extract_metrics")
 async def extract_metrics(transaction: models.ExtractMetricsTransaction):
     """Extract some metrics from a single file of code"""
+    print("******************************routes.py: extract_metrics")
     return extract.extract_metrics(transaction)
 
 

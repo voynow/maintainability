@@ -68,31 +68,45 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                 const content = fileContentResponse.data;
                 const file_id = uuidv4();
                 const timestamp = new Date().toISOString();
+                const extension = extractExtension(path);
+                const line_count = content.split('\n').length;
 
-                // Insert file snapshot into database
-                console.log('Inserting file snapshot into database:', path);
-                await api.post("/insert_file", {
-                    file_id: file_id,
-                    user_email: project.user,
-                    project_name: project.name,
-                    session_id: session_id,
+                // check if file meets criteria for ingestion
+                const check_file_criteria = await api.post("/check_file_criteria", {
                     file_path: path,
-                    file_size: content.length,
-                    loc: content.split('\n').length,
-                    extension: extractExtension(path),
-                    content: content,
-                    timestamp: timestamp
+                    extension: extension,
+                    line_count: line_count
                 });
 
-                // Extracting metrics for each file using the keys of the metrics config
-                for (let metric of Object.keys(metricsConfig)) {
-                    console.log('Extracting metric:', metric, 'for file:', path);
-                    await api.post("/extract_metrics", {
+                if (!check_file_criteria.data.result) {
+                    console.log('Inserting file snapshot into database:', path);
+
+                    // Insert file snapshot into database
+                    await api.post("/insert_file", {
                         file_id: file_id,
-                        filepath: path,
-                        file_content: content,
-                        metric: metric
+                        user_email: project.user,
+                        project_name: project.name,
+                        session_id: session_id,
+                        file_path: path,
+                        file_size: content.length,
+                        loc: line_count,
+                        extension: extension,
+                        content: content,
+                        timestamp: timestamp
                     });
+
+                    // Extracting metrics for each file using the keys of the metrics config
+                    for (let metric of Object.keys(metricsConfig)) {
+                        console.log('Extracting metric:', metric, 'for file:', path);
+                        await api.post("/extract_metrics", {
+                            file_id: file_id,
+                            filepath: path,
+                            file_content: content,
+                            metric: metric
+                        });
+                    }
+                } else {
+                    console.log('Skipping file:', path);
                 }
             }
         } catch (error) {

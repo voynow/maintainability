@@ -8,10 +8,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import api from '../axiosConfig';
 import { v4 as uuidv4 } from 'uuid';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeleteProject }) => {
     const [isTriggering, setIsTriggering] = useState(false);
     const [metricsConfig, setMetricsConfig] = useState({});
+    const [error, setError] = useState('');
 
     useEffect(() => {
         // Fetch metrics config when component mounts
@@ -26,6 +28,12 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
 
         fetchMetricsConfig();
     }, []);
+
+    const [progress, setProgress] = useState({
+        isTriggering: false,
+        percentage: 0,
+        estimatedTime: null
+    });
 
     const extractExtension = (path) => {
         if (!path) return '';
@@ -120,19 +128,33 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
     };
 
     const handleTriggerRun = async () => {
-        setIsTriggering(true);
+        setProgress({ isTriggering: true, percentage: 0 });
+        setError('');
         try {
             const sessionId = uuidv4();
             const repoStructureResponse = await retry(() => fetchProjectStructure(project));
-            for (let path of repoStructureResponse.data) {
-                await retry(() => processFile(path, project, sessionId, metricsConfig));
+            const totalFiles = repoStructureResponse.data.length;
+
+            for (let i = 0; i < totalFiles; i++) {
+                await retry(() => processFile(repoStructureResponse.data[i], project, sessionId, metricsConfig));
+
+                // Asynchronous state update
+                setProgress(prevProgress => ({
+                    ...prevProgress,
+                    percentage: ((i + 1) / totalFiles) * 100
+                }));
+
+                // Optional: artificial delay for visibility
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
+            setProgress(prevProgress => ({ ...prevProgress, isTriggering: false }));
         } catch (error) {
             console.error('Error triggering project run:', error);
-        } finally {
-            setIsTriggering(false);
+            setProgress({ isTriggering: false, percentage: 0 });
+            setError('An error occurred while processing. Please contact the developement team.');
         }
     };
+
 
     return (
         <Accordion key={project.primary_id} elevation={1} square>
@@ -167,17 +189,45 @@ const ProjectAccordion = ({ project, onSelectProject, onSetFavorite, onDeletePro
                     </Tooltip>
                 </div>
             </AccordionDetails>
-            <Button
-                startIcon={<PlayCircleOutlineIcon />}
-                onClick={handleTriggerRun}
-                disabled={isTriggering}
-                size="small"
-                variant="outlined"
-                sx={{ margin: 2 }}
-            >
-                Trigger Run
-            </Button>
-        </Accordion>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ flexShrink: 0 }}>
+                    <Button
+                        startIcon={<PlayCircleOutlineIcon />}
+                        onClick={handleTriggerRun}
+                        disabled={isTriggering}
+                        size="small"
+                        variant="outlined"
+                        sx={{ margin: 2, width: 'fit-content' }}
+                    >
+                        Trigger Run
+                    </Button>
+                </div>
+                {error ? (
+                    <Typography variant="body2" style={{ color: 'red' }}>
+                        {error}
+                    </Typography>
+                ) : (
+                    progress.isTriggering && (
+                        <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                            <LinearProgress
+                                variant="determinate"
+                                value={progress.percentage}
+                                style={{
+                                    height: '15px',
+                                    borderRadius: '5px',
+                                    backgroundColor: 'rgba(0,0,0,0.1)',
+                                    flexGrow: 1,
+                                }}
+                            />
+                            <Typography variant="body2" style={{ marginLeft: '15px', marginRight: '15px' }}>
+                                {`${progress.percentage.toFixed(0)}%`}
+                            </Typography>
+                        </div>
+                    )
+                )}
+            </div>
+
+        </Accordion >
     );
 };
 

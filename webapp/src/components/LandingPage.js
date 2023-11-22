@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SpeedIcon from '@mui/icons-material/Speed';
-import CodeIcon from '@mui/icons-material/Code';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import InsightsIcon from '@mui/icons-material/Insights';
-import LayersIcon from '@mui/icons-material/Layers';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import SettingsIcon from '@mui/icons-material/Settings';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -12,28 +13,28 @@ const LandingPage = () => {
     const metrics = [
         {
             title: 'Intuitive Design',
-            summary: 'Streamlined user interfaces that enhance user experience and engagement.',
-            icon: <InsightsIcon />,
+            icon: <AssessmentIcon />,
+            summary: 'Emphasizes clear variable/function naming, comment quality, logical code organization, API usability, and code simplicity.'
         },
         {
             title: 'Functional Cohesion',
-            summary: 'Highly cohesive code modules that improve maintainability and scalability.',
-            icon: <LayersIcon />,
+            icon: <SettingsIcon />,
+            summary: 'Focuses on single responsibility, separation of concerns, concise functions, and module cohesion.'
         },
         {
-            title: 'Performance Efficiency',
-            summary: 'Optimized code for the fastest execution and responsiveness.',
+            title: 'Adaptive Resilience',
+            icon: <AutorenewIcon />,
+            summary: 'Involves comprehensive error-handling, graceful degradation, diligent resource management, and code adaptability.'
+        },
+        {
+            title: 'Code Efficiency',
             icon: <SpeedIcon />,
+            summary: 'Covers algorithmic complexity, resource utilization, runtime profiling, concurrency, and optimized data fetching/caching.'
         },
         {
-            title: 'Code Quality',
-            summary: 'Adherence to best coding practices and standards.',
-            icon: <CodeIcon />,
-        },
-        {
-            title: 'Growth Potential',
-            summary: 'Scalability and adaptability of the codebase for future growth.',
-            icon: <TrendingUpIcon />,
+            title: 'Data Integrity',
+            icon: <VerifiedUserIcon />,
+            summary: 'Includes data validation & sanitation, security of sensitive info, integrity checks, least privilege access, and thorough logging and monitoring.'
         }
     ];
 
@@ -69,22 +70,25 @@ const LandingPage = () => {
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>
             </section>
-            <section className="flex justify-center p-4">
-                <div className="flex flex-row flex-wrap justify-center gap-4">
+            <section className="flex justify-center p-4 mb-16">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
                     {metrics.map((metric, index) => (
-                        <div key={index} className="flex-none bg-white border-l-4 border-blue-500 shadow-md p-4">
-                            <div className="flex items-center mb-2">
-                                {metric.icon}
-                                <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
+                        <div key={index} className="bg-white border-l-4 border-blue-500 shadow-md p-4 rounded-lg flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center mb-2">
+                                    {metric.icon}
+                                    <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
+                                </div>
+                                <p className="text-sm text-gray-600">{metric.summary}</p>
                             </div>
-                            <p className="text-sm text-gray-600">{metric.summary}</p>
                         </div>
                     ))}
                 </div>
             </section>
+
             <footer className="text-center p-4 text-gray-800">
                 <p className="text-sm">
-                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved. Contact: voynow99@gmail.com, @jamievoynow on X.com
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>Contact me at voynow99@gmail.com or connect with me on X @jamievoynow
                 </p>
             </footer>
         </main>

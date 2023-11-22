@@ -71,16 +71,14 @@ const LandingPage = () => {
                 </div>
             </section>
             <section className="flex justify-center p-4 mb-16">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-items-center gap-4 max-w-7xl mx-auto">
                     {metrics.map((metric, index) => (
-                        <div key={index} className="bg-white border-l-4 border-blue-500 shadow-md p-4 rounded-lg flex flex-col justify-between">
-                            <div>
-                                <div className="flex items-center mb-2">
-                                    {metric.icon}
-                                    <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
-                                </div>
-                                <p className="text-sm text-gray-600">{metric.summary}</p>
+                        <div key={index} className="bg-white border-l-4 border-blue-500 shadow-md p-4 rounded-lg flex flex-col items-center">
+                            <div className="flex items-center mb-2">
+                                {metric.icon}
+                                <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
                             </div>
+                            <p className="text-sm text-gray-600">{metric.summary}</p>
                         </div>
                     ))}
                 </div>

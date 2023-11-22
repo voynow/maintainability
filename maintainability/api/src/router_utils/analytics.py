@@ -89,7 +89,7 @@ def group_calc_helper(aggregated_file_metrics: List[AggFileMetric]) -> GroupMetr
             )
         )
 
-    key_files = sorted(key_files, key=lambda x: x.contrib_percent, reverse=True)[:5]
+    key_files = sorted(key_files, key=lambda x: x.contrib_percent, reverse=True)[:8]
     return {"score": weighted_score, "key_files": key_files}
 
 
@@ -167,36 +167,42 @@ def generate_plotly_layout(fig: go.Figure, title: str) -> go.Figure:
 
 
 def create_hover_templates(scores: Dict[datetime, GroupMetrics]) -> List[str]:
-    return [
-        f"<b>({date}) Score: {scores[date]['score']:.2f}</b><br>"
-        + "<br>".join(
-            [
-                f"{file.file_path}: {file.score} ({file.contrib_percent:.2f}%)"
-                for file in scores[date]["key_files"]
-            ]
-        )
-        for date in sorted(scores.keys())
-    ]
+    hover_templates = []
+    for date in sorted(scores.keys()):
+        hover_text = f"<b>Date:</b> {date.strftime('%Y-%m-%d')}<br><b>Score:</b> {scores[date]['score']:.2f}<br>"
+
+        max_len = max([len(file.file_path) for file in scores[date]["key_files"]])
+
+        for file in scores[date]["key_files"]:
+            padding = max_len - len(file.file_path)
+            file_path = f"<span style='font-family: monospace;'>{file.file_path} {' ' * padding}</span>"
+            score = f"<span style='font-weight: bold;'>{file.score:.1f}</span>"
+            contrib_percent = f"({int(file.contrib_percent)}%)"
+            hover_text += f"{file_path} {score} {contrib_percent}<br>"
+
+        hover_text += "<extra></extra>"
+        hover_templates.append(hover_text)
+    return hover_templates
 
 
 def generate_plotly_figs(weighted_metrics: WeightedMetrics) -> List[Dict]:
-    """
-    Generate a list of individual Plotly figures based on the given metrics data.
-    """
     color_palette = ["#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD"]
     figs_json = []
 
     for idx, (metric, scores) in enumerate(weighted_metrics.items()):
+        hover_templates = create_hover_templates(scores)
+        dates_sorted = sorted(scores.keys())
+
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
-                x=sorted(scores.keys()),
-                y=[scores[date]["score"] for date in sorted(scores.keys())],
+                x=dates_sorted,
+                y=[scores[date]["score"] for date in dates_sorted],
                 mode="lines+markers",
                 name=metric,
                 marker=dict(size=10, color=color_palette[idx % len(color_palette)]),
                 line=dict(width=3, color=color_palette[idx % len(color_palette)]),
-                hovertemplate=create_hover_templates(scores),
+                hovertemplate=hover_templates,
             )
         )
         fig = generate_plotly_layout(fig, metric)

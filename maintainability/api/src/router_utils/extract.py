@@ -69,6 +69,13 @@ def validate_github_project(
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="GitHub project not found")
 
+    # only allow users on whitelist to add projects
+    if user not in config.WHITELIST:
+        raise HTTPException(
+            status_code=403,
+            detail="You do not have permisions enabled to add this project.",
+        )
+
     # Check for active project in the database
     project_status: models.ProjectStatus = io_operations.get_project_status(
         user, github_username, github_repo

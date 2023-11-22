@@ -133,3 +133,7 @@ Logging and Monitoring: Keep detailed logs for security-relevant events and set 
 Good: Logging failed login attempts and setting up alerts for multiple failures from the same IP.
 Bad: No logging or monitoring in place for security-relevant activities.""",
 }
+
+WHITELIST = [
+    "voynow99@gmail.com",
+]

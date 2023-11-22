@@ -24,10 +24,16 @@ class FileMetric(BaseModel):
     reasoning: str
 
 
+class AggFileMetric(BaseModel):
+    file_path: str
+    loc: int
+    scores: List[float]
+
+
 class KeyFile(BaseModel):
     file_path: str
     contrib_percent: float
-    score: int
+    score: float
 
 
 class GroupMetrics(BaseModel):
@@ -67,23 +73,36 @@ def group_metrics(file_metrics: List[FileMetric]) -> GroupedMetrics:
     return grouped_metrics
 
 
-def group_calc_helper(file_metrics: List[FileMetric]) -> GroupMetrics:
-    total_loc = sum(file_metric.loc for file_metric in file_metrics)
+def group_calc_helper(aggregated_file_metrics: List[AggFileMetric]) -> GroupMetrics:
+    total_loc = sum(file_metric.loc for file_metric in aggregated_file_metrics)
     weighted_score = 0
     key_files = []
-    for file_metric in file_metrics:
-        contrib_percent = file_metric.loc / total_loc
-        weighted_score += file_metric.score * contrib_percent
+    for aggregated_file_metric in aggregated_file_metrics:
+        contrib_percent = aggregated_file_metric.loc / total_loc
+        score = sum(aggregated_file_metric.scores) / len(aggregated_file_metric.scores)
+        weighted_score += score * contrib_percent
         key_files.append(
             KeyFile(
-                file_path=file_metric.file_path,
-                contrib_percent=contrib_percent,
-                score=file_metric.score,
+                file_path=aggregated_file_metric.file_path,
+                contrib_percent=contrib_percent * 100,
+                score=score,
             )
         )
 
     key_files = sorted(key_files, key=lambda x: x.contrib_percent, reverse=True)[:5]
     return {"score": weighted_score, "key_files": key_files}
+
+
+def aggregate_file_metrics(file_metrics: List[FileMetric]) -> List[AggFileMetric]:
+    """Aggregate file metrics by file path, and calculate a weighted score"""
+    agg_file_metrics = {}
+    for file_metric in file_metrics:
+        if file_metric.file_path not in agg_file_metrics:
+            agg_file_metrics[file_metric.file_path] = AggFileMetric(
+                file_path=file_metric.file_path, loc=file_metric.loc, scores=[]
+            )
+        agg_file_metrics[file_metric.file_path].scores.append(file_metric.score)
+    return list(agg_file_metrics.values())
 
 
 def calculate_weighted_metrics(grouped_metrics: GroupedMetrics) -> WeightedMetrics:
@@ -93,7 +112,10 @@ def calculate_weighted_metrics(grouped_metrics: GroupedMetrics) -> WeightedMetri
         metric_name = metric.replace("_", " ").capitalize()
         weighted_metrics[metric_name] = {}
         for date, file_metrics in dates.items():
-            weighted_metrics[metric_name][date] = group_calc_helper(file_metrics)
+            aggregated_file_metrics = aggregate_file_metrics(file_metrics)
+            weighted_metrics[metric_name][date] = group_calc_helper(
+                aggregated_file_metrics
+            )
 
     return weighted_metrics
 

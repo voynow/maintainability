@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import traceback
 
 import json
 import jwt

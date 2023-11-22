@@ -1,12 +1,46 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SpeedIcon from '@mui/icons-material/Speed';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import SettingsIcon from '@mui/icons-material/Settings';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+
 
 const LandingPage = () => {
     const navigate = useNavigate();
 
+    const metrics = [
+        {
+            title: 'Intuitive Design',
+            icon: <AssessmentIcon />,
+            summary: 'Emphasizes clear variable/function naming, comment quality, logical code organization, API usability, and code simplicity.'
+        },
+        {
+            title: 'Functional Cohesion',
+            icon: <SettingsIcon />,
+            summary: 'Focuses on single responsibility, separation of concerns, concise functions, and module cohesion.'
+        },
+        {
+            title: 'Adaptive Resilience',
+            icon: <AutorenewIcon />,
+            summary: 'Involves comprehensive error-handling, graceful degradation, diligent resource management, and code adaptability.'
+        },
+        {
+            title: 'Code Efficiency',
+            icon: <SpeedIcon />,
+            summary: 'Covers algorithmic complexity, resource utilization, runtime profiling, concurrency, and optimized data fetching/caching.'
+        },
+        {
+            title: 'Data Integrity',
+            icon: <VerifiedUserIcon />,
+            summary: 'Includes data validation & sanitation, security of sensitive info, integrity checks, least privilege access, and thorough logging and monitoring.'
+        }
+    ];
+
     return (
         <main className="text-gray-700">
-            <section className="flex flex-col items-center justify-center min-h-screen p-4">
+            <section className="flex flex-col items-center justify-center min-h-screen p-4 -mt-16">
                 <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-8xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
@@ -31,25 +65,30 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 pt-8 -mt-40 relative pb-32">
+            <section className="w-full flex justify-center px-4 pt-8 -mt-32 relative pb-32">
                 <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
-                    <div className="absolute bottom-0 translate-y-1/2 transform -translate-x-1/2 left-1/2 bg-gray-100 text-gray-700 px-8 py-4 rounded-lg shadow-lg w-full max-w-lg text-left">
-                        <h3 className="text-xl font-bold">Example Insights</h3>
-                        <p className="text-md mt-1">
-                            Out of the box your projects will be evaluated against:
-                        </p>
-                        <ul className="list-disc pl-6 mt-1 text-md">
-                            <li>Intuitive design</li>
-                            <li>Functional cohesion</li>
-                            <li>And more</li>
-                        </ul>
-                    </div>
                 </div>
             </section>
+            <section className="flex justify-center p-4 mb-16">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
+                    {metrics.map((metric, index) => (
+                        <div key={index} className="bg-white border-l-4 border-blue-500 shadow-md p-4 rounded-lg flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center mb-2">
+                                    {metric.icon}
+                                    <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
+                                </div>
+                                <p className="text-sm text-gray-600">{metric.summary}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
             <footer className="text-center p-4 text-gray-800">
                 <p className="text-sm">
-                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved. Contact: voynow99@gmail.com, @jamievoynow on X.com
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>Contact me at voynow99@gmail.com or connect with me on X @jamievoynow
                 </p>
             </footer>
         </main>

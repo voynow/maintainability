@@ -334,7 +334,7 @@ def test_insert_new_project(test_client):
     params = {
         "user": "voynow99@gmail.com",
         "github_username": "voynow",
-        "github_repo": "leet-learn-ai",
+        "github_repo": "ConvNet-Architectures",
     }
 
     # Check that project does not exist

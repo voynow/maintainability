@@ -276,6 +276,18 @@ def test_validate_github_project_duplicate(test_client):
     assert response.status_code == 400, response.text
 
 
+def test_validate_github_project_whitelist(test_client):
+    params = {
+        "user": "unknownuser@gmail.com",
+        "github_username": "voynow",
+        "github_repo": "maintainability",
+    }
+    response = test_client.post("/insert_project", params=params)
+    assert response.json() == {
+        "detail": "You do not have permisions enabled to add this project."
+    }
+
+
 def test_insert_delete_project(test_client):
     """
     Test insert and delete functionality by inserting an existing but inactive
@@ -322,7 +334,7 @@ def test_insert_new_project(test_client):
     params = {
         "user": "voynow99@gmail.com",
         "github_username": "voynow",
-        "github_repo": "leet-learn-ai",
+        "github_repo": "ConvNet-Architectures",
     }
 
     # Check that project does not exist

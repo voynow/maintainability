@@ -189,7 +189,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                 value={githubUsername}
                                 onChange={(e) => setGithubUsername(e.target.value)}
                                 helperText="Enter your GitHub username."
-                                error={Boolean(addProjectError)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -204,7 +203,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                 value={githubRepo}
                                 onChange={(e) => setGithubRepo(e.target.value)}
                                 helperText="Enter your GitHub repository name."
-                                error={Boolean(addProjectError)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -224,6 +222,11 @@ const ProjectsDashboard = ({ open, onClose }) => {
                             <AddIcon fontSize="large" />
                         </IconButton>
                     </Tooltip>
+                )}
+                {addProjectError && (
+                    <Typography color="error" align="left">
+                        {addProjectError}
+                    </Typography>
                 )}
             </DialogContent>
             <DialogActions>

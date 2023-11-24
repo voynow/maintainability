@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 const Header = () => {
     const [popupOpen, setPopupOpen] = useState(false);
     const { selectedProject, setSelectedProject } = useAppContext();
-    const [dashboardOpen, setDashboardOpen] = useState(false);
+    const { isDashboardOpen, toggleDashboardOpen } = useAppContext();
 
 
     const togglePopup = () => {
@@ -75,7 +75,7 @@ const Header = () => {
                             {selectedProject || 'No projects found'}
                         </Typography>
 
-                        <Button sx={buttonStyle} onClick={() => setDashboardOpen(true)}>
+                        <Button sx={buttonStyle} onClick={toggleDashboardOpen}>
                             <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
                             My Projects
                         </Button>
@@ -89,7 +89,7 @@ const Header = () => {
             </AppBar >
 
             <Profile open={popupOpen} onClose={togglePopup} />
-            <ProjectsDashboard open={dashboardOpen} onClose={() => setDashboardOpen(false)} />
+            <ProjectsDashboard open={isDashboardOpen} onClose={toggleDashboardOpen} />
         </>
     );
 };

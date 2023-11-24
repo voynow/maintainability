@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import api from '../axiosConfig';
 import { useAppContext } from '../AppContext';
 import Plot from 'react-plotly.js';
-import { CircularProgress, Typography, IconButton, Tooltip, tooltipClasses } from '@mui/material';
+import { Button, CircularProgress, Typography, IconButton, Tooltip, tooltipClasses } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/material/styles';
 import DownhillSkiingIcon from '@mui/icons-material/DownhillSkiing';
@@ -20,6 +20,7 @@ const Analytics = () => {
     const [plotData, setPlotData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { toggleDashboardOpen } = useAppContext();
 
     const fetchMetrics = useCallback(async () => {
         if (!selectedProject) {
@@ -56,18 +57,32 @@ const Analytics = () => {
 
 
     const NoProjectsUI = () => (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: '64px' }}>
             <DownhillSkiingIcon style={{ fontSize: 120, color: '#CD5C5C' }} />
 
-            <Typography variant="h3" style={{ marginTop: '20px', color: '#999999' }}>
+            <Typography variant="h3" style={{ marginTop: '20px', fontWeight: 300, color: '#333' }}>
                 Ready to dive in?
             </Typography>
-            <Typography variant="body1" style={{ marginTop: '15px', color: '#555555' }}>
-                You haven't created any projects yet. Start your journey by adding a new project.
+            <Typography variant="body1" style={{ marginTop: '15px', color: '#555' }}>
+                You haven't created any projects yet. Let's start your journey by adding a new project.
             </Typography>
-            {/* add a button here that links to project creation if such a workflow exists */}
+            <Button
+                variant="contained"
+                color="primary"
+                style={{
+                    marginTop: '30px',
+                    borderRadius: '20px',
+                    padding: '10px 25px',
+                    fontWeight: '600'
+                }}
+                onClick={toggleDashboardOpen}
+            >
+                Create Project
+            </Button>
         </div>
     );
+
+
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0 16px' }}>

@@ -160,6 +160,10 @@ const ProjectsDashboard = ({ open, onClose }) => {
         onClose();
     };
 
+
+    const isEmpty = projects.length === 0;
+    const addProjectButtonClass = `transform transition duration-500 ease-in-out ${isEmpty ? 'scale-110 animate-bounce' : ''}`;
+
     return (
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
             {operationInProgress && <LinearProgress />}
@@ -171,57 +175,31 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogTitle>
 
             <DialogContent dividers>
-                {projects.map(project => (
-                    <ProjectAccordion
-                        key={project.primary_id}
-                        project={project}
-                        onSelectProject={handleSelectProject}
-                        onSetFavorite={handleSetFavorite}
-                        onDeleteProject={handleDeleteProject}
-                    />
-                ))}
-                {addingProject ? (
-                    <Zoom in={addingProject}>
-                        <form onSubmit={handleAddProject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '20px' }}>
-                            <TextField
-                                label="GitHub Username"
-                                variant="standard"
-                                value={githubUsername}
-                                onChange={(e) => setGithubUsername(e.target.value)}
-                                helperText="Enter your GitHub username."
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <AccountCircle />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                            <TextField
-                                label="GitHub Repository"
-                                variant="standard"
-                                value={githubRepo}
-                                onChange={(e) => setGithubRepo(e.target.value)}
-                                helperText="Enter your GitHub repository name."
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <StorageIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                            <IconButton type="submit" color="primary" aria-label="add project">
-                                <CheckIcon />
-                            </IconButton>
-                        </form>
-                    </Zoom>
+                {isEmpty ? (
+                    <div className="flex flex-col items-center justify-center p-10">
+                        <Typography variant="h6" color="textSecondary">
+                            No projects yet! Click below to add your first project.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={handleToggleAddProject}
+                            sx={{ mt: 2, mb: 1 }}
+                        >
+                            Add Project
+                        </Button>
+                    </div>
                 ) : (
-                    <Tooltip title="Add New Project">
-                        <IconButton onClick={handleToggleAddProject} color="primary" aria-label="add project" size="large">
-                            <AddIcon fontSize="large" />
-                        </IconButton>
-                    </Tooltip>
+                    projects.map(project => (
+                        <ProjectAccordion
+                            key={project.primary_id}
+                            project={project}
+                            onSelectProject={handleSelectProject}
+                            onSetFavorite={handleSetFavorite}
+                            onDeleteProject={handleDeleteProject}
+                        />
+                    ))
                 )}
                 {addProjectError && (
                     <Typography color="error" align="left">
@@ -234,6 +212,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogActions>
         </Dialog>
     );
-};
+}
 
 export default ProjectsDashboard;

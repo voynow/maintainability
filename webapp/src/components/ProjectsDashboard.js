@@ -157,12 +157,13 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
     const handleClose = () => {
         setAddingProject(false);
+        setAddProjectError('');
         onClose();
     };
 
 
     const isEmpty = projects.length === 0;
-    const addProjectButtonClass = `transform transition duration-500 ease-in-out ${isEmpty ? 'scale-110 animate-bounce' : ''}`;
+ 
 
     return (
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
@@ -175,7 +176,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogTitle>
 
             <DialogContent dividers>
-                {isEmpty ? (
+                {isEmpty && !addingProject ? (
                     <div className="flex flex-col items-center justify-center p-10">
                         <Typography variant="h6" color="textSecondary">
                             No projects yet! Click below to add your first project.
@@ -201,8 +202,49 @@ const ProjectsDashboard = ({ open, onClose }) => {
                         />
                     ))
                 )}
+
+                {addingProject && (
+                    <Zoom in={addingProject}>
+                        <form onSubmit={handleAddProject} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <TextField
+                                label="GitHub Username"
+                                variant="standard"
+                                value={githubUsername}
+                                onChange={(e) => setGithubUsername(e.target.value)}
+                                helperText="Enter your GitHub username."
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <AccountCircle />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{ mt: 2 }}
+                            />
+                            <TextField
+                                label="GitHub Repository"
+                                variant="standard"
+                                value={githubRepo}
+                                onChange={(e) => setGithubRepo(e.target.value)}
+                                helperText="Enter your GitHub repository name."
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <StorageIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{ mt: 2 }}
+                            />
+                            <Button type="submit" color="primary" variant="contained" startIcon={<CheckIcon />} sx={{ mt: 2 }}>
+                                Confirm Add
+                            </Button>
+                        </form>
+                    </Zoom>
+                )}
+
                 {addProjectError && (
-                    <Typography color="error" align="left">
+                    <Typography color="error" align="left" sx={{ mt: 2 }}>
                         {addProjectError}
                     </Typography>
                 )}
@@ -212,6 +254,6 @@ const ProjectsDashboard = ({ open, onClose }) => {
             </DialogActions>
         </Dialog>
     );
-}
+};
 
 export default ProjectsDashboard;

@@ -45,6 +45,7 @@ export const AppProvider = ({ children }) => {
             setEmail(null);
             setProjects([]);
             setSelectedProject(null);
+            setIsFetchingProjects(true);
         }
     };
 

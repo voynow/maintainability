@@ -11,7 +11,7 @@ import { useAppContext } from '../AppContext';
 import ProjectAccordion from './ProjectAccordion';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setProjects, selectedProject, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
+    const { email, projects, setProjects, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
     const [githubUsername, setGithubUsername] = useState('');
     const [githubRepo, setGithubRepo] = useState('');
     const [addProjectError, setAddProjectError] = useState('');
@@ -163,7 +163,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
 
 
     const isEmpty = projects.length === 0;
- 
+
 
     return (
         <Dialog onClose={handleClose} open={open} fullScreen={isXsScreen} fullWidth={!isXsScreen} maxWidth="md">
@@ -173,39 +173,37 @@ const ProjectsDashboard = ({ open, onClose }) => {
                     <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C', fontSize: '32px' }} />
                     {email}'s Projects
                 </Typography>
+                {!addingProject && (
+                    <Tooltip title="Add New Project">
+                        <IconButton onClick={handleToggleAddProject} color="primary" aria-label="add project" size="large">
+                            <AddIcon fontSize="large" />
+                        </IconButton>
+                    </Tooltip>
+                )}
             </DialogTitle>
 
             <DialogContent dividers>
-                {isEmpty && !addingProject ? (
+                {isEmpty && !addingProject && (
                     <div className="flex flex-col items-center justify-center p-10">
                         <Typography variant="h6" color="textSecondary">
-                            No projects yet! Click below to add your first project.
+                            No projects yet! Click the plus button above to add your first project.
                         </Typography>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            onClick={handleToggleAddProject}
-                            sx={{ mt: 2, mb: 1 }}
-                        >
-                            Add Project
-                        </Button>
                     </div>
-                ) : (
-                    projects.map(project => (
-                        <ProjectAccordion
-                            key={project.primary_id}
-                            project={project}
-                            onSelectProject={handleSelectProject}
-                            onSetFavorite={handleSetFavorite}
-                            onDeleteProject={handleDeleteProject}
-                        />
-                    ))
                 )}
+
+                {!isEmpty && projects.map(project => (
+                    <ProjectAccordion
+                        key={project.primary_id}
+                        project={project}
+                        onSelectProject={handleSelectProject}
+                        onSetFavorite={handleSetFavorite}
+                        onDeleteProject={handleDeleteProject}
+                    />
+                ))}
 
                 {addingProject && (
                     <Zoom in={addingProject}>
-                        <form onSubmit={handleAddProject} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <form onSubmit={handleAddProject} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
                             <TextField
                                 label="GitHub Username"
                                 variant="standard"
@@ -219,7 +217,7 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                         </InputAdornment>
                                     ),
                                 }}
-                                sx={{ mt: 2 }}
+                                sx={{ mt: 2, minWidth: '180px', flexGrow: 1 }}
                             />
                             <TextField
                                 label="GitHub Repository"
@@ -234,9 +232,9 @@ const ProjectsDashboard = ({ open, onClose }) => {
                                         </InputAdornment>
                                     ),
                                 }}
-                                sx={{ mt: 2 }}
+                                sx={{ mt: 2, minWidth: '180px', flexGrow: 1 }}
                             />
-                            <Button type="submit" color="primary" variant="contained" startIcon={<CheckIcon />} sx={{ mt: 2 }}>
+                            <Button type="submit" color="primary" variant="contained" startIcon={<CheckIcon />} sx={{ mt: 3 }}>
                                 Confirm Add
                             </Button>
                         </form>

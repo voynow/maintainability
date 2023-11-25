@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 os.environ["SKIP_AUTH_MIDDLEWARE"] = "True"
-from maintainability.api.src import main, io_operations, models
+from api.src import main, io_operations, models
 
 load_dotenv()
 MAINTAINABILITY_API_KEY = os.getenv("MAINTAINABILITY_API_KEY")

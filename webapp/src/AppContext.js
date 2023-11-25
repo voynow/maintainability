@@ -13,7 +13,7 @@ export const AppProvider = ({ children }) => {
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
     const [isFetchingProjects, setIsFetchingProjects] = useState(true);
-
+    const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
     useEffect(() => {
         const session = supabase.auth.session();
@@ -45,8 +45,11 @@ export const AppProvider = ({ children }) => {
             setEmail(null);
             setProjects([]);
             setSelectedProject(null);
+            setIsFetchingProjects(true);
         }
     };
+
+    const toggleDashboardOpen = () => setIsDashboardOpen(!isDashboardOpen);
 
     const value = {
         isLoggedIn,
@@ -60,6 +63,8 @@ export const AppProvider = ({ children }) => {
         setIsFetchingProjects,
         projects,
         setProjects,
+        isDashboardOpen,
+        toggleDashboardOpen
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

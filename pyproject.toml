@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "maintainability"
-version = "0.4.3"
+version = "0.5.0"
 description = "Codebase Maintainability Analyzer"
 authors = ["voynow <voynow99@gmail.com>"]
 license = "MIT"
@@ -13,22 +13,6 @@ include = ["maintainability/cli/**/*"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-click = "*"
-pathspec = "*"
-supabase = "*"
-llm_blocks = "0.3.7"
-fastapi = "*"
-uvicorn = "*"
-requests = "*"
-pytest = "*"
-pytz = "*"
-python-jose = "*"
-bcrypt = "*"
-python-multipart = "*"
-passlib = "*"
-pyJWT = "*"
-plotly = "*"
-retrying = "*"
 
 [tool.poetry.scripts]
 maintainability = "maintainability.cli.main:cli_runner"

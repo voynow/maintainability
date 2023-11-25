@@ -11,7 +11,7 @@ import { useAppContext } from '../AppContext';
 import ProjectAccordion from './ProjectAccordion';
 
 const ProjectsDashboard = ({ open, onClose }) => {
-    const { email, projects, setProjects, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
+    const { email, logout, projects, setProjects, setSelectedProject, isFetchingProjects, setIsFetchingProjects } = useAppContext();
     const [githubUsername, setGithubUsername] = useState('');
     const [githubRepo, setGithubRepo] = useState('');
     const [addProjectError, setAddProjectError] = useState('');
@@ -248,6 +248,9 @@ const ProjectsDashboard = ({ open, onClose }) => {
                 )}
             </DialogContent>
             <DialogActions>
+                <Button onClick={logout}>
+                    Logout
+                </Button>
                 <Button onClick={handleClose}>Close</Button>
             </DialogActions>
         </Dialog>

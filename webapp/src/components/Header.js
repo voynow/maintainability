@@ -3,7 +3,6 @@ import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppContext } from '../AppContext';
-import Profile from './Profile';
 import ProjectsDashboard from './ProjectsDashboard';
 import { Box } from '@mui/system';
 import Button from '@mui/material/Button';
@@ -79,16 +78,10 @@ const Header = () => {
                             <AssessmentIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
                             My Projects
                         </Button>
-
-                        <Button sx={buttonStyle} onClick={togglePopup}>
-                            <AccountCircleIcon sx={{ marginRight: '5px', color: '#CD5C5C' }} />
-                            My Profile
-                        </Button>
                     </Box>
                 </Toolbar>
             </AppBar >
 
-            <Profile open={popupOpen} onClose={togglePopup} />
             <ProjectsDashboard open={isDashboardOpen} onClose={toggleDashboardOpen} />
         </>
     );

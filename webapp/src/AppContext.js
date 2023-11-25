@@ -46,6 +46,7 @@ export const AppProvider = ({ children }) => {
             setProjects([]);
             setSelectedProject(null);
             setIsFetchingProjects(true);
+            setIsDashboardOpen(false);
         }
     };
 

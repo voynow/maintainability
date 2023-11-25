@@ -24,11 +24,8 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Poetry
-      run: pip install poetry
-
     - name: Install dependencies
-      run: poetry install
+      run: pip install -r requirements.txt
 
     - name: Make script executable
       run: chmod +x ./integration_tests.sh

@@ -21,7 +21,7 @@ fi
 export API_URL=http://localhost:8000
 export PYTHONPATH="$PWD"
 echo "Starting API..."
-poetry run uvicorn maintainability.api.src.main:app --port 8000 &
+python -m api.src.main --port 8000 &
 API_PID=$!
 echo "API started with PID: $API_PID"
 
@@ -30,7 +30,7 @@ sleep 4
 
 # Run tests
 echo "Running tests..."
-poetry run pytest -s || exit 1
+pytest -s || exit 1
 
 echo "Tests completed"
 

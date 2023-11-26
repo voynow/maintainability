@@ -33,7 +33,6 @@ def test_health_route(test_client):
 
 def test_extract_metrics_with_valid_data(test_client):
     """Test /extract_metrics route with valid data"""
-    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     payload = {
         "file_id": "88888888-8888-8888-8888-888888888888",
         "session_id": "88888888-8888-8888-8888-888888888888",
@@ -41,7 +40,7 @@ def test_extract_metrics_with_valid_data(test_client):
         "content": "print('hello world')\n" * 100,
         "metric_name": "adaptive_resilience",
     }
-    response = test_client.post("/extract_metrics", headers=headers, json=payload)
+    response = test_client.post("/extract_metrics", json=payload)
     assert response.status_code == 200, response.text
     assert "file_id" in response.json()
     assert response.json()["file_id"] == payload["file_id"], response.text
@@ -49,7 +48,6 @@ def test_extract_metrics_with_valid_data(test_client):
 
 def test_insert_file(test_client):
     """Test /insert_file route with valid data"""
-    headers = {"X-API-KEY": MAINTAINABILITY_API_KEY}
     file_id = str(uuid4())
     session_id = str(uuid4())
     timestamp = datetime.now().isoformat()
@@ -65,40 +63,10 @@ def test_insert_file(test_client):
         "extension": "",
         "timestamp": timestamp,
     }
-    response = test_client.post("/insert_file", headers=headers, json=payload)
+    response = test_client.post("/insert_file", json=payload)
     assert response.status_code == 200, response.text
     assert isinstance(response.json(), dict), response.text
     assert response.json()["data"][0]["file_id"] == payload["file_id"], response.text
-
-
-def test_generate_api_key(test_client):
-    new_key = {"email": "genapikey@test.com", "name": "testkey"}
-    response = test_client.post("/generate_key", json=new_key)
-    assert response.status_code == 200, response.text
-    assert "api_key" in response.json(), response.text
-
-
-def test_list_api_keys(test_client):
-    response = test_client.get("/api_keys?email=listapikey@test.com")
-    assert response.status_code == 200, response.text
-    assert isinstance(response.json()["api_keys"], list), response.text
-
-
-@pytest.fixture(scope="module")
-def generated_api_key(test_client):
-    new_key = {"email": "fixture@test.com", "name": "fixturekey"}
-    response = test_client.post("/generate_key", json=new_key)
-    if response.status_code == 200 and "api_key" in response.json():
-        return response.json()["api_key"]
-    else:
-        pytest.fail("Failed to generate API key for tests.")
-
-
-def test_invalidate_api_key(test_client, generated_api_key):
-    response = test_client.delete(f"/api_keys/{generated_api_key}")
-    assert response.status_code == 200, response.text
-    assert "message" in response.json(), response.text
-    assert response.json()["message"] == "API key deleted successfully", response.text
 
 
 def test_get_metrics_with_valid_project(test_client):
@@ -158,26 +126,6 @@ def test_set_favorite_project(test_client):
     assert response.json() == {
         "message": f"{project_name} set as favorite project"
     }, response.text
-
-
-def test_get_user_email(test_client):
-    """Test /get_user_email route with valid data"""
-    user_email = "voynow99@gmail.com"
-    params = {"email": user_email}
-    response = test_client.get("/api_keys", params=params)
-    key = response.json()["api_keys"][0]["api_key"]
-
-    params = {"api_key": key}
-    response = test_client.get(f"/get_user_email", params=params)
-    assert response.status_code == 200, response.text
-    assert response.json() == user_email, response.text
-
-
-def test_get_user_email_with_invalid_api_key(test_client):
-    """Test /get_user_email route with invalid data"""
-    params = {"api_key": "invalid"}
-    response = test_client.get(f"/get_user_email", params=params)
-    assert response.status_code == 401, response.text
 
 
 def test_fetch_repo_structure(test_client):

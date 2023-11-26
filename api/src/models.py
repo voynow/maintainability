@@ -103,11 +103,3 @@ class User(BaseModel):
     password: str  # hashed password
     role: str
 
-
-class APIKey(BaseModel):
-    """API key information"""
-
-    api_key: str
-    user: str
-    creation_date: str
-    status: str = Field("active", description="active or inactive")

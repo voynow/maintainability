@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 from fastapi import APIRouter
-from .router_utils import analytics, extract, user
+from .router_utils import analytics, extract
 
 from . import io_operations, models, logger
 
@@ -62,12 +62,6 @@ async def extract_metrics(transaction: models.ExtractMetricsTransaction):
     return extract.extract_metrics(transaction)
 
 
-@router.get("/get_user_email")
-async def get_user_email(api_key: str):
-    """Database proxy for getting user email given api key"""
-    return io_operations.get_user_email(api_key)
-
-
 @router.get("/list_projects", response_model=models.ProjectList)
 async def list_projects(user_email: str):
     """Database proxy for listing all active projects for a user"""
@@ -77,35 +71,6 @@ async def list_projects(user_email: str):
 @router.post("/set_favorite_project")
 async def set_favorite_project(request: models.FavoriteProjectRequest):
     return io_operations.set_favorite_project(request.user_email, request.project_name)
-
-
-@router.post("/generate_key")
-async def generate_key(new_key: Dict[str, str]):
-    """Allows users to generate new API keys"""
-    api_key = user.generate_api_key_helper()
-
-    io_operations.write_api_key(
-        api_key=api_key,
-        user=new_key["email"],
-        name=new_key["name"],
-        creation_date=datetime.utcnow().isoformat(),
-        status="active",
-    )
-    return {"api_key": api_key}
-
-
-@router.get("/api_keys")
-async def list_api_keys(email: str):
-    """Used for displaying all API keys associated with a user"""
-    api_keys = io_operations.list_api_keys(email)
-    return {"api_keys": api_keys}
-
-
-@router.delete("/api_keys/{api_key}")
-async def remove_api_key(api_key: str):
-    """Allows users to delete API keys"""
-    io_operations.delete_api_key(api_key)
-    return {"message": "API key deleted successfully"}
 
 
 @router.get("/get_metrics")

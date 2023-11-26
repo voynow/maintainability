@@ -38,7 +38,10 @@ async def mixed_auth_middleware(request: Request, call_next):
         "client_ip": request.client.host,
     }
     try:
-        jwt_middleware(request)
+        # OPTIONS requests are not authenticated
+        if request.method != "OPTIONS":
+            jwt_middleware(request)
+        
         response = await call_next(request)
         log_data["status_code"] = response.status_code
     except Exception as exc:

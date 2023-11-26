@@ -8,17 +8,10 @@ from fastapi import HTTPException, Request
 from jose import jwt, JWTError
 from fastapi.responses import JSONResponse
 
-from . import io_operations, logger
+from . import logger
 
 load_dotenv()
 SUPABASE_JWT_SECRET = os.environ["SUPABASE_JWT_SECRET"]
-
-
-def api_key_middleware(request: Request):
-    """some functions are exposed via API key for data ingestion"""
-    api_key = request.headers.get("X-API-KEY", None)
-    if api_key is None or not io_operations.select_api_key(api_key):
-        raise HTTPException(status_code=401, detail="Invalid API Key")
 
 
 def jwt_middleware(request: Request):
@@ -37,29 +30,6 @@ def jwt_middleware(request: Request):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-def api_key_or_jwt_middleware(request: Request):
-    """some functions are used in API key workflows and in the webapp"""
-    auth_methods = [api_key_middleware, jwt_middleware]
-
-    errors = []
-    for method in auth_methods:
-        try:
-            method(request)
-            return  # Exit if any method succeeds
-        except HTTPException as e:
-            errors.append(str(e.detail))
-
-    raise HTTPException(status_code=401, detail=f"Failures: {', '.join(errors)}")
-
-
-def auth_strategy_dispatcher(request: Request):
-    """dispatches to the correct auth strategy based on the request path"""
-    path = request.url.path
-    optional_auth = ["/insert_file", "/extract_metrics", "/get_user_email"]
-    middleware = api_key_or_jwt_middleware if path in optional_auth else jwt_middleware
-    middleware(request)
-
-
 async def mixed_auth_middleware(request: Request, call_next):
     log_data = {
         "path": request.url.path,
@@ -68,6 +38,7 @@ async def mixed_auth_middleware(request: Request, call_next):
         "client_ip": request.client.host,
     }
     try:
+        jwt_middleware(request)
         response = await call_next(request)
         log_data["status_code"] = response.status_code
     except Exception as exc:

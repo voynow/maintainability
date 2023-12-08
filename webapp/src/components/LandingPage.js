@@ -65,10 +65,8 @@ const LandingPage = () => {
                         </button>
                     </div>
                 </div>
-            </section>
-            <section className="w-full flex justify-center p-8">
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2">
-                    <ChevronDownIcon className="h-6 w-6 animate-bounce" />
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 md:block hidden">
+                    <ChevronDownIcon className="h-10 w-10 animate-bounce" />
                 </div>
             </section>
             <section className="w-full flex justify-center p-16">

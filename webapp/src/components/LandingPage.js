@@ -40,7 +40,7 @@ const LandingPage = () => {
 
     return (
         <main className="text-gray-700">
-            <section className="w-full flex justify-center px-4 pt-8 relative pb-32 mt-32">
+            <section className="w-full flex justify-center p-32 pt-64">
                 <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-8xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
@@ -65,12 +65,12 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center px-4 pt-8 relative">
+            <section className="w-full flex justify-center p-32">
                 <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>
             </section>
-            <section className="flex justify-center p-4 mb-24 mt-32">
+            <section className="flex justify-center p-32">
                 <div className="flex flex-col items-center">
                     <div className="flex justify-center gap-4 mb-4">
                         {metrics.slice(0, 3).map((metric, index) => (
@@ -96,7 +96,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <footer className="text-center p-4 text-gray-800">
+            <footer className="text-center pt-32 text-gray-800">
                 <p className="text-sm">
                     &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>Contact me at voynow99@gmail.com or connect with me on X @jamievoynow
                 </p>

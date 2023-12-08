@@ -65,7 +65,7 @@ const LandingPage = () => {
                         </button>
                     </div>
                 </div>
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 md:block hidden">
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 sm:block hidden">
                     <ChevronDownIcon className="h-10 w-10 animate-bounce" />
                 </div>
             </section>

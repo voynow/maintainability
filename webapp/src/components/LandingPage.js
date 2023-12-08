@@ -5,6 +5,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 
 const LandingPage = () => {
@@ -45,7 +46,7 @@ const LandingPage = () => {
                     <h1 className="text-8xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
                     </h1>
-                    <h1 className="text-6xl font-bold text-blue-400">The Future of Code Analysis</h1>
+                    <h1 className="text-5xl font-bold text-blue-400">The Future of Code Analysis</h1>
                     <p className='mt-4 mb-4 text-xl'>
                         Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional static code analysis systems.
                     </p>
@@ -63,6 +64,11 @@ const LandingPage = () => {
                             Log In
                         </button>
                     </div>
+                </div>
+            </section>
+            <section className="w-full flex justify-center p-8">
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2">
+                    <ChevronDownIcon className="h-6 w-6 animate-bounce" />
                 </div>
             </section>
             <section className="w-full flex justify-center p-16">

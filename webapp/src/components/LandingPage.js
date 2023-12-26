@@ -42,7 +42,7 @@ const LandingPage = () => {
 
     return (
         <main className="text-gray-700">
-            <section className="w-full flex justify-center pt-64">
+            <section className="w-full flex justify-center pt-48">
                 <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-9xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability

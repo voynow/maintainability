@@ -99,14 +99,14 @@ const LandingPage = () => {
                 </div>
             </section>
             <section className="pt-16 pb-16"></section>
-            <section className="bg-gray-800 text-gray-200 p-4">
+            <section className="bg-gray-900 text-gray-200 p-4">
                 <div className="container mx-auto text-center">
                     <div className="m-10">
                         <h2 className="text-5xl font-bold mb-4">Interested in our mission?</h2>
                         <p className="text-2xl mb-3">
                             Motivated individuals passionate about the future of AI-assisted software development:
                         </p>
-                        <p className="text-red-500 font-bold text-3xl mb-8">    
+                        <p className="text-red-400 font-bold text-3xl mb-8">    
                             Lets connect!
                         </p>
                         <div className="flex justify-center gap-10 mt-20 text-blue-400">
@@ -123,7 +123,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <footer className="text-center pt-24 pb-2 text-gray-800">
+            <footer className="text-center pt-16 pb-2 text-gray-800">
                 <p className="text-sm">
                     &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>
                 </p>

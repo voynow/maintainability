@@ -41,16 +41,15 @@ const LandingPage = () => {
 
     return (
         <main className="text-gray-700">
-            <section className="w-full flex justify-center items-center min-h-screen">
-                <div className="text-center">
-                    <h1 className="text-9xl font-bold mb-2">
+            <section className="w-full flex justify-center pt-64">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h1 className="text-9xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
                     </h1>
-                    <h1 className="text-6xl font-bold text-blue-400 mb-4">The Future of Code Analysis</h1>
-                    <div className="flex justify-center gap-4 px-40">                         <p className='text-2xl mb-4'>
-                            Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional static code analysis systems.
-                        </p>
-                    </div>
+                    <h1 className="text-6xl font-bold text-blue-400">The Future of Code Analysis</h1>
+                    <p className='mt-4 mb-4 text-2xl'>
+                        Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional static code analysis systems.
+                    </p>
                     <div className="flex justify-center gap-4">
                         <button
                             onClick={() => navigate('/signup')}
@@ -67,40 +66,45 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center pb-8">
+            <section className="w-full flex justify-center pt-48">
                 <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>
             </section>
-            <section className="w-full flex justify-center items-center min-h-screen">
+            <section className="flex justify-center pt-32">
                 <div className="flex flex-col items-center">
                     <div className="flex justify-center gap-4 mb-4">
                         {metrics.slice(0, 3).map((metric, index) => (
-                            <div key={index} className="bg-white border-l-4 border-blue-400 shadow-md p-4 rounded-lg flex flex-col items-center" style={{ width: '450px', height: '200px' }}>
+                            <div key={index} className="bg-white border-l-4 border-blue-400 shadow-md p-4 rounded-lg flex flex-col items-center" style={{ width: '300px', height: '200px' }}>
                                 <div className="flex items-center mb-2">
                                     {metric.icon}
-                                    <h3 className="ml-2 text-3xl font-semibold">{metric.title}</h3>
+                                    <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
                                 </div>
-                                <p className="text-lg text-gray-600">{metric.summary}</p>
+                                <p className="text-sm text-gray-600">{metric.summary}</p>
                             </div>
                         ))}
                     </div>
                     <div className="flex justify-center gap-4">
                         {metrics.slice(3, 5).map((metric, index) => (
-                            <div key={index} className="bg-white border-l-4 border-blue-400 shadow-md p-4 rounded-lg flex flex-col items-center" style={{ width: '450px', height: '200px' }}>
+                            <div key={index} className="bg-white border-l-4 border-blue-400 shadow-md p-4 rounded-lg flex flex-col items-center" style={{ width: '300px', height: '200px' }}>
                                 <div className="flex items-center mb-2">
                                     {metric.icon}
-                                    <h3 className="ml-2 text-3xl font-semibold">{metric.title}</h3>
+                                    <h3 className="ml-2 text-lg font-semibold">{metric.title}</h3>
                                 </div>
-                                <p className="text-lg text-gray-600">{metric.summary}</p>
+                                <p className="text-sm text-gray-600">{metric.summary}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
-            <footer className="text-center pt-16 text-gray-800">
+            <section className="w-full flex justify-center pt-32">
+                <div className="relative shadow-2xl rounded-lg">
+                    <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
+                </div>
+            </section>
+            <footer className="text-center pt-32 text-gray-800">
                 <p className="text-sm">
-                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>Contact me at voynow99@gmail.com or connect with me on X @jamievoynow
                 </p>
             </footer>
         </main>

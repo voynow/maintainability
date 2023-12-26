@@ -72,7 +72,7 @@ const LandingPage = () => {
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>
             </section>
-            <section className="flex justify-center pt-32">
+            <section className="flex justify-center pt-48">
                 <div className="flex flex-col items-center">
                     <div className="flex justify-center gap-4 mb-4">
                         {metrics.slice(0, 3).map((metric, index) => (
@@ -98,8 +98,8 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="pt-16 pb-16"></section>
-            <section className="bg-gray-900 text-gray-200 p-4">
+            <section className="pt-24 pb-24"></section>
+            <section className="bg-gray-800 text-gray-200 p-4">
                 <div className="container mx-auto text-center">
                     <div className="m-10">
                         <h2 className="text-5xl font-bold mb-4">Interested in our mission?</h2>

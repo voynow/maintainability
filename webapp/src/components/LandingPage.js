@@ -5,8 +5,9 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
-
+import TwitterIcon from '@mui/icons-material/Twitter';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -41,13 +42,13 @@ const LandingPage = () => {
 
     return (
         <main className="text-gray-700">
-            <section className="w-full flex justify-center p-64">
+            <section className="w-full flex justify-center pt-48">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h1 className="text-8xl mb-2 font-bold">
+                    <h1 className="text-9xl mb-2 font-bold">
                         Maint<span className="text-red-500">AI</span>nability
                     </h1>
-                    <h1 className="text-5xl font-bold text-blue-400">The Future of Code Analysis</h1>
-                    <p className='mt-4 mb-4 text-xl'>
+                    <h1 className="text-6xl font-bold text-blue-400">The Future of Code Analysis</h1>
+                    <p className='mt-4 mb-4 text-2xl'>
                         Leveraging advanced Language Models, our platform offers a nuanced understanding of code that goes beyond traditional static code analysis systems.
                     </p>
                     <div className="flex justify-center gap-4">
@@ -65,16 +66,13 @@ const LandingPage = () => {
                         </button>
                     </div>
                 </div>
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 lg:block hidden">
-                    <ChevronDownIcon className="h-10 w-10 animate-bounce" />
-                </div>
             </section>
-            <section className="w-full flex justify-center p-16">
+            <section className="w-full flex justify-center pt-48">
                 <div className="relative shadow-2xl rounded-lg">
                     <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
                 </div>
             </section>
-            <section className="flex justify-center p-16">
+            <section className="flex justify-center pt-48">
                 <div className="flex flex-col items-center">
                     <div className="flex justify-center gap-4 mb-4">
                         {metrics.slice(0, 3).map((metric, index) => (
@@ -100,9 +98,34 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <footer className="text-center pt-16 text-gray-800">
+            <section className="pt-24 pb-24"></section>
+            <section className="bg-gray-800 text-gray-200 p-4">
+                <div className="container mx-auto text-center">
+                    <div className="m-10">
+                        <h2 className="text-5xl font-bold mb-4">Interested in our mission?</h2>
+                        <p className="text-2xl mb-3">
+                            Motivated individuals passionate about the future of AI-assisted software development:
+                        </p>
+                        <p className="text-red-400 font-bold text-3xl mb-8">    
+                            Lets connect!
+                        </p>
+                        <div className="flex justify-center gap-10 mt-20 text-blue-400">
+                            <a href="https://twitter.com/jamievoynow" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <TwitterIcon fontSize="large" />
+                            </a>
+                            <a href="https://github.com/voynow" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                                <GitHubIcon fontSize="large" />
+                            </a>
+                            <a href="https://linkedin.com/in/voynow" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                                <LinkedInIcon fontSize="large" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <footer className="text-center pt-16 pb-2 text-gray-800">
                 <p className="text-sm">
-                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>Contact me at voynow99@gmail.com or connect with me on X @jamievoynow
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>
                 </p>
             </footer>
         </main>

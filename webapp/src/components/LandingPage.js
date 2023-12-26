@@ -5,8 +5,9 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
-
+import TwitterIcon from '@mui/icons-material/Twitter';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -97,14 +98,34 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-full flex justify-center pt-32">
-                <div className="relative shadow-2xl rounded-lg">
-                    <img src="/landing_page.png" alt="Workflow" className="max-w-5xl w-full h-auto" />
+            <section className="pt-16 pb-16"></section>
+            <section className="bg-gray-800 text-gray-200 p-4">
+                <div className="container mx-auto text-center">
+                    <div className="m-10">
+                        <h2 className="text-5xl font-bold mb-4">Interested in our mission?</h2>
+                        <p className="text-2xl mb-3">
+                            Motivated individuals passionate about the future of AI-assisted software development:
+                        </p>
+                        <p className="text-red-500 font-bold text-3xl mb-8">    
+                            Lets connect!
+                        </p>
+                        <div className="flex justify-center gap-10 mt-20 text-blue-400">
+                            <a href="https://twitter.com/jamievoynow" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <TwitterIcon fontSize="large" />
+                            </a>
+                            <a href="https://github.com/voynow" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                                <GitHubIcon fontSize="large" />
+                            </a>
+                            <a href="https://linkedin.com/in/voynow" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                                <LinkedInIcon fontSize="large" />
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </section>
-            <footer className="text-center pt-32 text-gray-800">
+            <footer className="text-center pt-24 pb-2 text-gray-800">
                 <p className="text-sm">
-                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>Contact me at voynow99@gmail.com or connect with me on X @jamievoynow
+                    &copy; {new Date().getFullYear()} Maintainability. All rights reserved.<br></br>
                 </p>
             </footer>
         </main>

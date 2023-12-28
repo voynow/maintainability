@@ -1,4 +1,4 @@
-# Maintainability - Data Dashboard for Code Quality Insights 📈
+# Maintainability - AI Driven Code Analysis 📈
 
 Maintainability is a comprehensive platform that leverages advanced language models to go beyond traditional static code analysis systems. Our platform offers nuanced understanding and insightful metrics to help you write more maintainable, secure, and efficient code.
 
